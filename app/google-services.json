@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "767188578624",
+    "firebase_url": "https://tracker-unimet-2.firebaseio.com",
+    "project_id": "tracker-unimet-2",
+    "storage_bucket": "tracker-unimet-2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:767188578624:android:84a38ced5c50dc17",
+        "android_client_info": {
+          "package_name": "com.tracker.tracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "767188578624-e4bnm86j46ibf03tj43sojk2cla5fqu2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2vZV3qEd-VzZsG3kjFvwhQ1F0m4-YZDc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "767188578624-e4bnm86j46ibf03tj43sojk2cla5fqu2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
