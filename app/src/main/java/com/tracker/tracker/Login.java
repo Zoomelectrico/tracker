@@ -21,6 +21,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.tracker.tracker.tareas.UserData;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,6 +34,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         this.btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -45,17 +47,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         this.auth = FirebaseAuth.getInstance();
     }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        FirebaseUser user = this.auth.getCurrentUser();
-        if (user != null) {
-            Log.d("USER", "GOOD");
-        } else {
-            Log.d("USER", "NULL");
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -78,14 +69,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        this.auth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        this.auth.signInWithCredential(credential).addOnCompleteListener(this,
+                new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = auth.getCurrentUser();
-                            Log.d("USER", user.getDisplayName());
+                            new UserData().execute(user);
+                            Intent intent = new Intent(Login.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }

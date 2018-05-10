@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- The android:opacity=”opaque” line — this is critical in preventing a flash of black as your theme transitions. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:opacity="opaque"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <item android:drawable="@color/colorAccent"/>
+
+</layer-list>
