@@ -1,11 +1,9 @@
 package com.tracker.tracker.tareas;
 
+import android.location.Location;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -15,6 +13,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,8 +22,10 @@ public class UserData extends AsyncTask<FirebaseUser, Integer, DocumentSnapshot>
 
     private FirebaseUser user;
     private FirebaseFirestore db;
+    private Location currentLocation;
 
-    public UserData() {
+    public UserData(Location location) {
+        this.currentLocation = location;
         this.db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setTimestampsInSnapshotsEnabled(true)
@@ -53,14 +54,20 @@ public class UserData extends AsyncTask<FirebaseUser, Integer, DocumentSnapshot>
 
     @Override
     protected void onPostExecute(DocumentSnapshot user) {
-        if (user == null) {
-            CollectionReference usersRef = this.db.collection("users");
-            Map<String, Object> u = new HashMap<>();
-            u.put("nombre",this.user.getDisplayName());
-            u.put("email", this.user.getEmail());
-            u.put("photo", this.user.getPhotoUrl().toString());
-            usersRef.document(this.user.getUid()).set(u);
+        CollectionReference usersRef = this.db.collection("users");
+        Map<String, Object> u = new HashMap<>();
+        u.put("nombre",this.user.getDisplayName());
+        u.put("email", this.user.getEmail());
+        u.put("photo", this.user.getPhotoUrl().toString());
+        if(currentLocation == null) {
+            u.put("UbicacionActual", new GeoPoint(1.0,1.0));
+            Log.e("MAMAGUEVOOO", "MAMAGUEVOOOO");
+        } else {
+            u.put("UbicacionActual", new GeoPoint(this.currentLocation.getLatitude(),this.currentLocation.getLongitude()));
+            Log.e("MAMAGUEVOOO", "CHUPALO VV");
         }
+        usersRef.document(this.user.getUid()).set(u);
+
     }
 
     @Override

@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,6 +24,7 @@ public class MainActivity extends AppCompatActivity
 
     private FirebaseUser user;
     private FirebaseAuth auth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
@@ -30,9 +33,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        this.auth = FirebaseAuth.getInstance();
-
-        this.user = this.auth.getCurrentUser();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +51,22 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+
+        View header = ((NavigationView)findViewById(R.id.nav_view)).getHeaderView(0);
+
+        ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
+        ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
+        ((ImageView) header.findViewById(R.id.imgProfilePhoto)).setImageURI(this.user.getPhotoUrl());
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     @Override
@@ -91,21 +107,19 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.logout) {
-            this.auth.signOut();
-            Intent i = new Intent(this, Login.class);
-            startActivityForResult(i, 0);
-            finish();
+        switch (id) {
+            case R.id.add_place :
+                break;
+            case R.id.add_seres:
+                break;
+            case R.id.seres:
+                break;
+            case R.id.logout:
+                this.auth.signOut();
+                Intent i = new Intent(this, Login.class);
+                startActivityForResult(i, 0);
+                finish();
+                break;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
