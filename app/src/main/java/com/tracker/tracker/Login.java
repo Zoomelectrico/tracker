@@ -6,12 +6,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.Manifest;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +29,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.tracker.tracker.tareas.UserData;
+
+import javax.annotation.Nonnull;
 
 public class Login extends Activity implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -50,6 +52,7 @@ public class Login extends Activity implements View.OnClickListener, ActivityCom
         this.btnLogin = (Button) findViewById(R.id.btnLogin);
         this.btnLogin.setOnClickListener(this);
 
+        //Login with google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
@@ -57,12 +60,22 @@ public class Login extends Activity implements View.OnClickListener, ActivityCom
         this.googleSIClient = GoogleSignIn.getClient(this, gso);
         this.auth = FirebaseAuth.getInstance();
 
+        // Location
+        this.getLocation();
+
+    }
+
+    /**
+     *
+     *
+     */
+    public void getLocation() {
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_PERMISSION);
         } else {
-
+            Toast.makeText(this, "Permisos Listos",Toast.LENGTH_SHORT);
         }
 
         this.locationProviderClient.getLastLocation()
@@ -72,23 +85,19 @@ public class Login extends Activity implements View.OnClickListener, ActivityCom
                         if (location != null) {
                             currentLocation = location;
                         } else {
-                            Log.e("COÑO MARICO QUE PEO", "JAJDAJFNDSKFEWJFNSD");
+
                         }
                     }
                 });
 
-
     }
 
-
-
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case MY_LOCATION_PERMISSION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    this.getLocation();
                     Log.d("Permissions", "ALL GOD");
                 } else {
                     Log.d("NO LO SE RICK", "JEJEJEJEJEJ");
@@ -116,7 +125,6 @@ public class Login extends Activity implements View.OnClickListener, ActivityCom
         }
     }
 
-
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -126,7 +134,12 @@ public class Login extends Activity implements View.OnClickListener, ActivityCom
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
-                            new UserData(currentLocation).execute(user);
+                            if(currentLocation == null) {
+                                Log.e("LOCATION|LOGIN", "NULL");
+                                new UserData(null).execute(user);
+                            } else {
+                                new UserData(currentLocation).execute(user);
+                            }
                             Intent intent = new Intent(Login.this, MainActivity.class);
                             startActivity(intent);
                             finish();

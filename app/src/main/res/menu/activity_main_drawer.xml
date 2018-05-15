@@ -16,15 +16,9 @@
             android:id="@+id/seres"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Seres Queridos" />
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/ic_menu_send"
+            android:title="Cerrar Sesión"/>
     </group>
-
-    <item android:title="">
-        <menu>
-            <item
-                android:id="@+id/logout"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Cerrar Sesión"/>
-        </menu>
-    </item>
-
 </menu>
