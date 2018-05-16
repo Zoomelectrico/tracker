@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_PERMISSION);
         } else {
-
+            Toast.makeText(this,"Debes activar el GPS",Toast.LENGTH_LONG);
         }
 
         this.locationProviderClient.getLastLocation()
@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity
                     this.getLocation();
                     Log.d("Permissions", "ALL GOD");
                 } else {
+                    Toast.makeText(this,"Debes activar el GPS",Toast.LENGTH_LONG);
                     Log.e("Permissions", "DENEGADOS");
                 }
                 return;
@@ -163,18 +164,22 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        Intent intent;
         switch (id) {
             case R.id.add_place :
                 break;
             case R.id.add_seres:
+                intent = new Intent(this, AddSerQuerido.class);
+                startActivityForResult(intent, 0);
+                Log.e("JAJAJAJAJA", "JKAJDAKDJKASDM");
+                //onStop();
                 break;
             case R.id.seres:
                 break;
             case R.id.logout:
                 this.auth.signOut();
-                Intent i = new Intent(this, Login.class);
-                startActivityForResult(i, 0);
+                intent = new Intent(this, Login.class);
+                startActivityForResult(intent, 0);
                 finish();
                 break;
         }
