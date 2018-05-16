@@ -40,7 +40,9 @@
             android:name=".MainActivity"
             android:theme="@style/AppTheme" />
         <activity android:name=".Login" />
-        <activity android:name=".AddSerQuerido"></activity>
+        <activity
+            android:name=".AddSerQuerido"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

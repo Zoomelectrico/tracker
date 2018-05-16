@@ -15,21 +15,28 @@ import com.tracker.tracker.tareas.AddSerQueridoAsync;
 
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
+    // UI
     private Button btnAdd;
     private EditText txtNombre;
     private EditText txtPhone;
+    // Firebase
     private FirebaseAuth auth;
     private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // UI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
         this.btnAdd = (Button) findViewById(R.id.btnAdd);
         this.txtNombre = (EditText) findViewById(R.id.txtNombre);
         this.txtPhone = (EditText) findViewById(R.id.txtPhone);
+
+        // Firebase
         this.auth = FirebaseAuth.getInstance();
         this.user = this.auth.getCurrentUser();
+
+        // Add Event Listener
         this.btnAdd.setOnClickListener(this);
     }
 
@@ -37,8 +44,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         String nombre = String.valueOf(txtNombre.getText());
         String telf = String.valueOf(txtPhone.getText());
-        Log.e("ADDSERQUERIDOASYNC", nombre);
-        Log.e("ADDSERQUERIDOASYNC", telf);
+        // Registrar un nuevo ser querido
         new AddSerQueridoAsync(nombre, telf).execute(this.user);
     }
 }
