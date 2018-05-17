@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,7 +45,18 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         String nombre = String.valueOf(txtNombre.getText());
         String telf = String.valueOf(txtPhone.getText());
-        // Registrar un nuevo ser querido
-        new AddSerQueridoAsync(nombre, telf).execute(this.user);
+
+        boolean notEmpty = nombre.length() > 0 && telf.length() > 0;
+        boolean numeric = android.text.TextUtils.isDigitsOnly(telf);
+        if(notEmpty && numeric) {
+            new AddSerQueridoAsync(nombre, telf).execute(this.user);
+            Toast.makeText(this, "Ser Querido registrado",Toast.LENGTH_SHORT).show();
+            finish();
+        } else if (!notEmpty) {
+            Toast.makeText(this, "Los campos no pueden estar vacios", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "El campo de Telf solo puede tener numero", Toast.LENGTH_SHORT ).show();
+        }
     }
+
 }
