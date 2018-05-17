@@ -23,10 +23,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,6 +41,8 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     // Constantes
-    private static final int MY_LOCATION_PERMISSION = 0;
+    private static final int PLACE_PICKER_REQUEST = 2;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
@@ -69,8 +74,8 @@ public class MainActivity extends AppCompatActivity
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
     private Location currentLocation;
-    private Boolean gps;
     private Boolean requestingLocationUpdate;
+
 
 
     @Override
@@ -108,9 +113,6 @@ public class MainActivity extends AppCompatActivity
         this.settingsClient = LocationServices.getSettingsClient(this);
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        this.locationManager = (LocationManager) this.getApplicationContext().getSystemService(this.getApplicationContext().LOCATION_SERVICE);
-        gps = locationManager.isProviderEnabled(this.getApplicationContext().LOCATION_SERVICE);
-
         createLocationCallback();
         createLocationRequest();
         buildLocationSettingsRequest();
@@ -132,6 +134,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUI() {
+        final Activity a = this;
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0);
@@ -140,6 +143,28 @@ public class MainActivity extends AppCompatActivity
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
         // Tarea Especial para la foto
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                // Construct an intent for the place picker
+                try {
+                    PlacePicker.IntentBuilder intentBuilder =
+                            new PlacePicker.IntentBuilder();
+                    Intent intent = intentBuilder.build(a);
+                    // Start the intent by requesting a result,
+                    // identified by a request code.
+                    startActivityForResult(intent, PLACE_PICKER_REQUEST);
+
+                }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    Log.e("ERROR", e.getMessage(), e);
+                }
+            }
+        };
+
+        ((Button) findViewById(R.id.btnFindPlace)).setOnClickListener(listener);
+
     }
 
     private void createLocationCallback() {
@@ -271,6 +296,15 @@ public class MainActivity extends AppCompatActivity
                         break;
                 }
                 break;
+            case PLACE_PICKER_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    Place place = PlacePicker.getPlace(this, data);
+                    Log.e("PLACE", place.getLatLng().toString());
+                    String toastMsg = String.format("Place: %s", place.getName());
+                    Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                }
+
+                break;
         }
     }
 
@@ -399,5 +433,6 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
     }
+
 }
 

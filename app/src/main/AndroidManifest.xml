@@ -42,7 +42,11 @@
         <activity android:name=".Login" />
         <activity
             android:name=".AddSerQuerido"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
     </application>
 
 </manifest>
