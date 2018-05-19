@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
     android:background="@drawable/launch_background"
+    android:padding="20dp"
     tools:context=".Login"
     tools:layout_constraintHeight_min="match_parent"
     tools:layout_constraintWidth_min="match_parent">

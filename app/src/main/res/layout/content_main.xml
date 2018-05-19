@@ -25,7 +25,8 @@
             android:id="@+id/btnFindPlace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Escoger Sitio"
-            android:layout_marginTop="15dp"/>
+            android:layout_marginTop="15dp"
+            android:background="@color/lowContrastLight"
+            android:text="Escoger Sitio" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -7,7 +7,7 @@
         <item
             android:id="@+id/add_seres"
             android:icon="@drawable/ic_add_ser"
-            android:title="Añadir Ser Querido" />
+            android:title="Agregar Ser Querido" />
         <item
             android:id="@+id/add_place"
             android:icon="@drawable/ic_add_place"
