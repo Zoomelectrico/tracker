@@ -27,6 +27,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:background="@color/lowContrastLight"
-            android:text="Escoger Sitio" />
+            android:text="@string/btnEscogerSitio" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
