@@ -3,7 +3,9 @@
     package="com.tracker.tracker">
 
     <uses-permission android:name="android.permission.SEND_SMS" />
+
     <uses-feature android:name="android.hardware.location.gps" />
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNAL" />
@@ -30,12 +32,21 @@
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:theme="@style/AppTheme" />
         <activity android:name=".Login" />
+        <activity
+            android:name=".AddSerQuerido"
+            android:parentActivityName=".MainActivity" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
     </application>
 
 </manifest>

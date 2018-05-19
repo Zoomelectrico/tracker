@@ -37,7 +37,7 @@ public class UserData extends AsyncTask<FirebaseUser, Integer, DocumentSnapshot>
     protected DocumentSnapshot doInBackground(FirebaseUser... users) {
         this.user = users[0];
 
-        DocumentReference dbUser = db.collection("user").document(user.getUid());
+        DocumentReference dbUser = db.collection("users").document(user.getUid());
         final DocumentSnapshot[] document = new DocumentSnapshot[1];
         dbUser.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -59,6 +59,7 @@ public class UserData extends AsyncTask<FirebaseUser, Integer, DocumentSnapshot>
         u.put("nombre",this.user.getDisplayName());
         u.put("email", this.user.getEmail());
         u.put("photo", this.user.getPhotoUrl().toString());
+        u.put("UID", this.user.getUid());
         if(currentLocation == null) {
             Log.e("LOCATION|USERDATA", "LOCATION IS NULL");
         } else {

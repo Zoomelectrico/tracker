@@ -1,10 +1,15 @@
 package com.tracker.tracker;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -18,13 +23,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tracker.tracker.tareas.ProfilePicture;
@@ -33,11 +55,28 @@ import com.tracker.tracker.tareas.UserData;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    // Constantes
+    private static final int PLACE_PICKER_REQUEST = 2;
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+    private static final int REQUEST_CHECK_SETTINGS = 0x1;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
+    private final static String KEY_LOCATION = "location";
+    // Datos de Firebase
     private FirebaseUser user;
     private FirebaseAuth auth;
-    private static final int MY_LOCATION_PERMISSION = 0;
+    // Datos de Ubicación
+    private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
+    private LocationManager locationManager;
+    private LocationCallback locationCallback;
+    private LocationRequest locationRequest;
+    private LocationSettingsRequest locationSettingsRequest;
     private Location currentLocation;
+    private Boolean requestingLocationUpdate;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +84,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Datos de la Aplicación
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
-        this.getLocation();
-
-        // Visual
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,61 +102,210 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        // Datos de la Aplicación
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+
+        updateValuesFromBundle(savedInstanceState);
+
+        // Verificar GPS
+        this.requestingLocationUpdate = true;
+        this.settingsClient = LocationServices.getSettingsClient(this);
+        this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        createLocationCallback();
+        createLocationRequest();
+        buildLocationSettingsRequest();
+        updateUI();
+
+    }
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
+                this.requestingLocationUpdate = savedInstanceState.getBoolean(
+                        KEY_REQUESTING_LOCATION_UPDATES);
+            }
+            if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
+                this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            }
+
+        }
+    }
+
+    private void updateUI() {
+        final Activity a = this;
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         View header = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0);
-
+        // Personalizar la UI
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
+        // Tarea Especial para la foto
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                // Construct an intent for the place picker
+                try {
+                    PlacePicker.IntentBuilder intentBuilder =
+                            new PlacePicker.IntentBuilder();
+                    Intent intent = intentBuilder.build(a);
+                    // Start the intent by requesting a result,
+                    // identified by a request code.
+                    startActivityForResult(intent, PLACE_PICKER_REQUEST);
+
+                }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                    Log.e("ERROR", e.getMessage(), e);
+                }
+            }
+        };
+
+        ((Button) findViewById(R.id.btnFindPlace)).setOnClickListener(listener);
+
     }
 
-    public void getLocation() {
-        this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_PERMISSION);
-        } else {
+    private void createLocationCallback() {
+        this.locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                Location l = locationResult.getLastLocation();
+                currentLocation = locationResult.getLastLocation();
+                updateLocation(user, l);
+            }
+        };
+    }
 
-        }
+    private void createLocationRequest() {
+        this.locationRequest = new LocationRequest();
+        this.locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        this.locationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
 
-        this.locationProviderClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+    private void buildLocationSettingsRequest() {
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(this.locationRequest);
+        this.locationSettingsRequest = builder.build();
+    }
+
+    private void startLocationUpdates() {
+        // Begin by checking if the device has the necessary location settings.
+        this.settingsClient.checkLocationSettings(this.locationSettingsRequest)
+                .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
                     @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            currentLocation = location;
-                            new UserData(location).execute(user);
-                        } else {
-                            Log.e("LOCATION|MAIN", "NULL");
-                            new UserData(null).execute(user);
+                    public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                        Log.i("", "All location settings are satisfied.");
+                        try {
+                            locationProviderClient.requestLocationUpdates(locationRequest,
+                                    locationCallback, Looper.myLooper());
+                        } catch (SecurityException e) {
+
                         }
                     }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        int statusCode = ((ApiException) e).getStatusCode();
+                        switch (statusCode) {
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                Log.i("", "Location settings are not satisfied. Attempting to upgrade " +
+                                        "location settings ");
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(), and check the
+                                    // result in onActivityResult().
+                                    ResolvableApiException rae = (ResolvableApiException) e;
+                                    rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
+                                } catch (IntentSender.SendIntentException sie) {
+                                    Log.i("", "PendingIntent unable to execute request.");
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                String errorMessage = "Location settings are inadequate, and cannot be " +
+                                        "fixed here. Fix in Settings.";
+                                Log.e("", errorMessage);
+                                Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                                requestingLocationUpdate = false;
+                        }
+
+                        updateUI();
+                    }
                 });
-
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_LOCATION_PERMISSION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    this.getLocation();
-                    Log.d("Permissions", "ALL GOD");
-                } else {
-                    Log.e("Permissions", "DENEGADOS");
-                }
-                return;
-            }
+    private void stopLocationUpdates() {
+        if (!requestingLocationUpdate) {
+            Log.d("", "stopLocationUpdates: updates never requested, no-op.");
+            return;
         }
+        this.locationProviderClient.removeLocationUpdates(this.locationCallback)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        requestingLocationUpdate = false;
+                    }
+                });
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
+        // Within {@code onPause()}, we remove location updates. Here, we resume receiving
+        // location updates if the user has requested them.
+        if (requestingLocationUpdate && gotPermissions()) {
+            startLocationUpdates();
+        } else if (!gotPermissions()) {
+            requestPermissions();
+        }
 
+        updateUI();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    /**
+     * Stores activity data in the Bundle.
+     */
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
+        savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            // Check for the integer request code originally supplied to startResolutionForResult().
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.i("", "User agreed to make required location settings changes.");
+                        // Nothing to do. startLocationupdates() gets called in onResume again.
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.i("", "User chose not to make required location settings changes.");
+                        this.requestingLocationUpdate = false;
+                        break;
+                }
+                break;
+            case PLACE_PICKER_REQUEST:
+                if (resultCode == RESULT_OK) {
+                    Place place = PlacePicker.getPlace(this, data);
+                    Log.e("PLACE", place.getLatLng().toString());
+                    String toastMsg = String.format("Place: %s", place.getName());
+                    Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                }
+
+                break;
+        }
     }
 
     @Override
@@ -163,18 +345,21 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        Intent intent;
         switch (id) {
             case R.id.add_place :
                 break;
             case R.id.add_seres:
+                intent = new Intent(this, AddSerQuerido.class);
+                startActivityForResult(intent, 0);
+                onStop();
                 break;
             case R.id.seres:
                 break;
             case R.id.logout:
                 this.auth.signOut();
-                Intent i = new Intent(this, Login.class);
-                startActivityForResult(i, 0);
+                intent = new Intent(this, Login.class);
+                startActivityForResult(intent, 0);
                 finish();
                 break;
         }
@@ -184,5 +369,70 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void updateLocation(FirebaseUser user, Location l) {
+        new UserData(l).execute(user);
+    }
+
+    public boolean gotPermissions() {
+        boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean b =ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return a && b;
+    }
+
+    private void requestPermissions() {
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
+        if (shouldProvideRationale) {
+            Log.i("", "Displaying permission rationale to provide additional context.");
+            showSnackbar(R.string.permission_rationale,
+                    android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Request permission
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    REQUEST_PERMISSIONS_REQUEST_CODE);
+                        }
+                    });
+        } else {
+            Log.i("", "Requesting permission");
+            // Request permission. It's possible this can be auto answered if device policy
+            // sets the permission in a given state or the user denied the permission
+            // previously and checked "Never ask again".
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_PERMISSIONS_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
+            if (grantResults.length <= 0) {
+                Log.i("", "User interaction was cancelled.");
+            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (requestingLocationUpdate) {
+                    Log.i("", "Permission granted, updates requested, starting location updates");
+                    startLocationUpdates();
+                }
+            } else {
+
+            }
+        }
+    }
+
+    private void showSnackbar(final int mainTextStringId, final int actionStringId,View.OnClickListener listener) {
+        Snackbar.make(
+                findViewById(android.R.id.content),
+                getString(mainTextStringId),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(actionStringId), listener).show();
+    }
 
 }
+

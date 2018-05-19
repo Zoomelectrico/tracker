@@ -23,6 +23,7 @@ public class ProfilePicture extends AsyncTask <String, Void, Bitmap>  {
         try {
             InputStream in = new java.net.URL(url).openStream();
             bitmap = BitmapFactory.decodeStream(in);
+
         } catch (Exception e) {
             Log.e("Error", e.getMessage());
             e.printStackTrace();

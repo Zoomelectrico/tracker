@@ -6,19 +6,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/add_seres"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_add_ser"
             android:title="Añadir Ser Querido" />
         <item
             android:id="@+id/add_place"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_add_place"
             android:title="Agregar Lugar" />
         <item
             android:id="@+id/seres"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_seres"
             android:title="Seres Queridos" />
         <item
             android:id="@+id/logout"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/ic_logout"
             android:title="Cerrar Sesión"/>
     </group>
 </menu>
