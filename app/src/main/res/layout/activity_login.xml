@@ -44,9 +44,9 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@color/colorAccent"
+            android:background="@color/lowContrastLight"
             android:padding="20dp"
             android:text="@string/btnIngresar"
-            android:textColor="@color/white" />
+            android:textColor="@color/black" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

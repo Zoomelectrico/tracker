@@ -43,19 +43,39 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        String nombre = String.valueOf(txtNombre.getText());
-        String telf = String.valueOf(txtPhone.getText());
+        String name = String.valueOf(txtNombre.getText());
+        String phone = String.valueOf(txtPhone.getText());
 
-        boolean notEmpty = nombre.length() > 0 && telf.length() > 0;
-        boolean numeric = android.text.TextUtils.isDigitsOnly(telf);
-        if(notEmpty && numeric) {
-            new AddSerQueridoAsync(nombre, telf).execute(this.user);
-            Toast.makeText(this, "Ser Querido registrado",Toast.LENGTH_SHORT).show();
+        // Booleans
+        boolean notEmpty = name.length() > 0 && phone.length() > 0;
+        boolean isAlpha = name.matches("[ a-zA-Z]+");
+        boolean isNumeric = android.text.TextUtils.isDigitsOnly(phone);
+        boolean isLongEnough = phone.length() == 11;
+
+        if(notEmpty && isAlpha && isNumeric && isLongEnough) {
+            new AddSerQueridoAsync(name, phone).execute(this.user);
+            Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
             finish();
-        } else if (!notEmpty) {
-            Toast.makeText(this, "Los campos no pueden estar vacios", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "El campo de Telf solo puede tener numero", Toast.LENGTH_SHORT ).show();
+        }
+
+        if (name.length() <= 0) {
+            txtNombre.setError("El campo de nombre no puede estar vacío");
+        }
+
+        if (phone.length() <= 0) {
+            txtPhone.setError("El campo de teléfono no puede estar vacío");
+        }
+
+        if (!isAlpha){
+            txtNombre.setError("El campo de nombre solo puede contener letras");
+        }
+
+        if (!isNumeric){
+            txtPhone.setError("El campo de teléfono solo puede contener números");
+        }
+
+        if (!isLongEnough) {
+            txtPhone.setError("El teléfono ingresado debe contener 11 dígitos");
         }
     }
 
