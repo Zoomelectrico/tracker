@@ -26,7 +26,7 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nombre" />
+            android:text="@string/labelNombre" />
 
         <EditText
             android:id="@+id/txtNombre"
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="Número de Teléfono" />
+            android:text="@string/labelTelefono" />
 
         <EditText
             android:id="@+id/txtPhone"

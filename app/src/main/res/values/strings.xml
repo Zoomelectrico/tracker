@@ -15,4 +15,6 @@
     <string name="trackerLogo">Tracker Logo</string>
     <string name="btnAgregar">Agregar</string>
     <string name="btnEscogerSitio">Escoger Sitio</string>
+    <string name="labelTelefono">Teléfono</string>
+    <string name="labelNombre">Nombre</string>
 </resources>
