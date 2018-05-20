@@ -61,10 +61,10 @@ public class UserData extends AsyncTask<FirebaseUser, Integer, DocumentSnapshot>
         u.put("photo", this.user.getPhotoUrl().toString());
         u.put("UID", this.user.getUid());
         if(currentLocation == null) {
-            Log.e("LOCATION|USERDATA", "LOCATION IS NULL");
+            Log.e("LOCATION|USERDATA", "Location is null");
         } else {
             u.put("UbicacionActual", new GeoPoint(this.currentLocation.getLatitude(),this.currentLocation.getLongitude()));
-            Log.i("LOCATION|USERDATA", "ALL GOOD");
+            Log.i("LOCATION|USERDATA", "All good");
         }
         usersRef.document(this.user.getUid()).set(u);
     }

@@ -23,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -63,9 +65,11 @@ public class MainActivity extends AppCompatActivity
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     private final static String KEY_LOCATION = "location";
+
     // Datos de Firebase
     private FirebaseUser user;
     private FirebaseAuth auth;
+
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
@@ -75,6 +79,13 @@ public class MainActivity extends AppCompatActivity
     private LocationSettingsRequest locationSettingsRequest;
     private Location currentLocation;
     private Boolean requestingLocationUpdate;
+
+    // Botones
+    FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
+
+    // Animaciones
+    Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
+    boolean isOpen = false;
 
 
 
@@ -87,12 +98,52 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        // Botones
+        fabAdd = (FloatingActionButton) findViewById(R.id.fabAdd);
+        fabAddPerson = (FloatingActionButton) findViewById(R.id.fabAddPerson);
+        fabAddLocation = (FloatingActionButton) findViewById(R.id.fabAddLocation);
+
+        // Animaciones
+        fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        fabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        fabRotateClockwise = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
+        fabRotateCounter = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_counterclockwise);
+
+        fabAddPerson.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), AddSerQuerido.class);
+                startActivityForResult(intent, 0);
+                onStop();
+            }
+        });
+
+        fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                // TODO: Navegar a la actividad para agregar ubicacion
+            }
+        });
+
+
+        fabAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isOpen) {
+                    fabAdd.startAnimation(fabRotateCounter);
+                    fabAddPerson.startAnimation(fabClose);
+                    fabAddLocation.startAnimation(fabClose);
+                    fabAddPerson.setClickable(false);
+                    fabAddLocation.setClickable(false);
+                    isOpen = false;
+                } else {
+                    fabAdd.startAnimation(fabRotateClockwise);
+                    fabAddPerson.startAnimation(fabOpen);
+                    fabAddLocation.startAnimation(fabOpen);
+                    fabAddPerson.setClickable(true);
+                    fabAddLocation.setClickable(true);
+                    isOpen = true;
+                }
             }
         });
 
@@ -134,13 +185,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateUI() {
-        final Activity a = this;
+        final Activity activity = this;
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         View header = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0);
+
         // Personalizar la UI
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
+
         // Tarea Especial para la foto
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
 
@@ -150,9 +204,8 @@ public class MainActivity extends AppCompatActivity
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 // Construct an intent for the place picker
                 try {
-                    PlacePicker.IntentBuilder intentBuilder =
-                            new PlacePicker.IntentBuilder();
-                    Intent intent = intentBuilder.build(a);
+                    PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                    Intent intent = intentBuilder.build(activity);
                     // Start the intent by requesting a result,
                     // identified by a request code.
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
