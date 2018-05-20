@@ -56,14 +56,26 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
             new AddSerQueridoAsync(name, phone).execute(this.user);
             Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
             finish();
-        } else if (!notEmpty) {
-            Toast.makeText(this, "Los campos no pueden estar vacíos", Toast.LENGTH_SHORT).show();
-        } else if (!isAlpha){
-            Toast.makeText(this, "El campo de nombre solo puede contener letras", Toast.LENGTH_SHORT ).show();
-        } else if (!isNumeric){
-            Toast.makeText(this, "El campo de teléfono solo puede contener números", Toast.LENGTH_SHORT ).show();
-        } else { // Means isLongEnough is false
-            Toast.makeText(this, "El teléfono ingresado debe contener 11 dígitos", Toast.LENGTH_SHORT ).show();
+        }
+
+        if (name.length() <= 0) {
+            txtNombre.setError("El campo de nombre no puede estar vacío");
+        }
+
+        if (phone.length() <= 0) {
+            txtPhone.setError("El campo de teléfono no puede estar vacío");
+        }
+
+        if (!isAlpha){
+            txtNombre.setError("El campo de nombre solo puede contener letras");
+        }
+
+        if (!isNumeric){
+            txtPhone.setError("El campo de teléfono solo puede contener números");
+        }
+
+        if (!isLongEnough) {
+            txtPhone.setError("El teléfono ingresado debe contener 11 dígitos");
         }
     }
 
