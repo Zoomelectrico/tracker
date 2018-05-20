@@ -42,36 +42,21 @@ public class SeresQueridosAsync extends AsyncTask<FirebaseUser, Void, DocumentSn
     @Override
     protected DocumentSnapshot doInBackground(FirebaseUser... users) {
         FirebaseUser user = users[0];
-
         if (user != null) {
-            DocumentReference dbUser = db.collection("users").document(user.getUid());
-            final DocumentSnapshot[] document = new DocumentSnapshot[1];
-            dbUser.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            CollectionReference contactos = db.collection("users/" + user.getUid() + "/contactos");
+            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        document[0] = task.getResult();
-                        if (document[0] != null) {
-                            DocumentSnapshot user = document[0];
-                            Log.e(TAG, "el usuario es " + user.get("UID"));
-                            CollectionReference contactos = db.collection("users/" + user.get("UID") + "/contactos");
-                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if (task.isSuccessful()) {
-                                        for (DocumentSnapshot document : task.getResult()) {
-                                            Log.e(TAG, document.getId() + " => " + document.getString("nombre"));
-                                            DummyContent.DummyItem item = new DummyContent.DummyItem(document.getString("nombre"), document.getString("telf"), "1");
-                                            Log.e(TAG, "el id es: " + item.id );
-                                            DummyContent.addItem(item);
-                                            Log.e(TAG, "2. el id es: " + item.id );
-                                        }
-                                    } else {
-                                        Log.d(TAG, "Error getting documents: ", task.getException());
-                                    }
-                                }
-                            });
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Log.e(TAG, document.getId() + " => " + document.getString("nombre"));
+                            DummyContent.DummyItem item = new DummyContent.DummyItem(document.getString("nombre"), document.getString("telf"), "1");
+                            Log.e(TAG, "el id es: " + item.id );
+                            DummyContent.addItem(item);
+                            Log.e(TAG, "2. el id es: " + item.id );
                         }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
                 }
             });
