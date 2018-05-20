@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragmentItem"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:orientation="vertical"
+    tools:divider="@drawable/googleg_disabled_color_18"
+    tools:layout_marginBottom="70dp"
+    tools:layout_marginTop="50dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="?attr/colorBackgroundFloating"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="@dimen/fab_margin"
+        tools:layout_margin="8dp">
+
+        <TextView
+            android:id="@+id/item_number"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:textAlignment="textStart"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="200dp"
+            android:layout_marginTop="50dp"
+            android:padding="8dp"
+            android:textAlignment="viewStart"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textSize="14sp"
+            android:textStyle="italic" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="180dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="25dp"
+            android:text="Editar"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
+            tools:capitalize="words" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="260dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="25dp"
+            android:capitalize="words"
+            android:shadowColor="@android:color/darker_gray"
+            android:shadowDx="32"
+            android:shadowDy="32"
+            android:soundEffectsEnabled="true"
+            android:text="Eliminar"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
+            tools:shadowRadius="32" />
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

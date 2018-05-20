@@ -52,6 +52,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.tracker.tracker.tareas.ProfilePicture;
+import com.tracker.tracker.tareas.SeresQueridosAsync;
 import com.tracker.tracker.tareas.UserData;
 
 public class MainActivity extends AppCompatActivity
@@ -169,6 +170,8 @@ public class MainActivity extends AppCompatActivity
         buildLocationSettingsRequest();
         updateUI();
 
+        //Obtener información de los seres queridos
+        new SeresQueridosAsync().execute(this.user);
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -408,6 +411,9 @@ public class MainActivity extends AppCompatActivity
                 onStop();
                 break;
             case R.id.seres:
+                intent = new Intent(this, seresQueridos.class);
+                startActivityForResult(intent, 0);
+                onStop();
                 break;
             case R.id.logout:
                 this.auth.signOut();

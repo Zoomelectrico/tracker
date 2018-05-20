@@ -2,7 +2,7 @@ package com.tracker.tracker;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,9 +10,8 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.tracker.tracker.tareas.AddSerQueridoAsync;
+import com.tracker.tracker.tareas.SeresQueridosAsync;
 
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
@@ -32,6 +31,9 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         this.btnAdd = (Button) findViewById(R.id.btnAdd);
         this.txtNombre = (EditText) findViewById(R.id.txtNombre);
         this.txtPhone = (EditText) findViewById(R.id.txtPhone);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tbAddSer);
+        toolbar.setTitle("Añadir un Ser querido");
+        setSupportActionBar(toolbar);
 
         // Firebase
         this.auth = FirebaseAuth.getInstance();
@@ -55,6 +57,8 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         if(notEmpty && isAlpha && isNumeric && isLongEnough) {
             new AddSerQueridoAsync(name, phone).execute(this.user);
             Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
+            //Obtener información de los seres queridos
+            new SeresQueridosAsync().execute(this.user);
             finish();
         }
 
