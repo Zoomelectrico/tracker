@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.tracker.tracker.tareas.AddSerQueridoAsync;
+import com.tracker.tracker.tareas.SeresQueridosAsync;
 
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
@@ -55,6 +56,8 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         if(notEmpty && isAlpha && isNumeric && isLongEnough) {
             new AddSerQueridoAsync(name, phone).execute(this.user);
             Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
+            //Obtener información de los seres queridos
+            new SeresQueridosAsync().execute(this.user);
             finish();
         }
 

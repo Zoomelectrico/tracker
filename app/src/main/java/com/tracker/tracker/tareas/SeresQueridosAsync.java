@@ -59,6 +59,7 @@ public class SeresQueridosAsync extends AsyncTask<FirebaseUser, Void, DocumentSn
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if (task.isSuccessful()) {
+                                        DummyContent.ITEMS.clear();
                                         for (DocumentSnapshot document : task.getResult()) {
                                             Log.e(TAG, document.getId() + " => " + document.getString("nombre"));
                                             DummyContent.DummyItem item = new DummyContent.DummyItem(document.getString("nombre"), document.getString("telf"), "1");
