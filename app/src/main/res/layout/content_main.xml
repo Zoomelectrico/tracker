@@ -8,58 +8,35 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <Button
-        android:id="@+id/btnFindPlace"
-        android:layout_width="248dp"
-        android:layout_height="47dp"
-        android:background="@color/lowContrastLight"
-        android:text="@string/btnEscogerSitio"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.644" />
+    <LinearLayout
+        android:layout_margin="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:gravity="center">
 
-    <Spinner
-        android:id="@+id/spSeresQueridos"
-        android:layout_width="329dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="236dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.512"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Spinner
+            android:id="@+id/spSeresQueridos"
+            android:layout_height="30dp"
+            android:layout_width="match_parent"
+            android:padding="16dp"/>
 
-    <TextView
-        android:id="@+id/txtSerQueridoName"
-        android:layout_width="260dp"
-        android:layout_height="47dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="156dp"
-        android:text="Contacto"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/btnSelectSerQuerido"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/btnFindPlace"
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/btnEscogerSitio" />
+        <TextView
+            android:id="@+id/txtContacto"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="gone">
+        </TextView>
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/btnSelectSerQuerido"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginBottom="95dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="156dp"
-        android:onClick="showSeresQueridos"
-        android:text="Button"
-        app:layout_constraintBottom_toTopOf="@+id/btnFindPlace"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/txtSerQueridoName"
-        app:layout_constraintTop_toTopOf="parent" />
+
 
 </android.support.constraint.ConstraintLayout>

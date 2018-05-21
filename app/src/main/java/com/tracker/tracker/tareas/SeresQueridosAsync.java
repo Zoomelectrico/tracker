@@ -3,7 +3,6 @@ package com.tracker.tracker.tareas;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Spinner;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -13,12 +12,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tracker.tracker.MainActivity;
-import com.tracker.tracker.R;
-import com.tracker.tracker.dummy.DummyContent;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.tracker.tracker.Modelos.Contacto;
 
 import static android.content.ContentValues.TAG;
 
@@ -44,12 +38,7 @@ public class SeresQueridosAsync extends AsyncTask<FirebaseUser, Void, DocumentSn
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if(task.isSuccessful()) {
                         for (DocumentSnapshot document : task.getResult()) {
-                            Log.e(TAG, document.getId() + " => " + document.getString("nombre"));
-                            DummyContent.DummyItem item = new DummyContent.DummyItem(document.getString("nombre"), document.getString("telf"), "1");
-                            Log.e(TAG, "el id es: " + item.id );
-                            DummyContent.addItem(item);
-                            MainActivity.opcionesList.add(item);
-                            Log.e(TAG, "2. el id es: " + item.id );
+                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         }
                     } else {
                         Log.d(TAG, "Error getting documents: ", task.getException());

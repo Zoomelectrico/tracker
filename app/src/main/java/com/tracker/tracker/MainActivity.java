@@ -2,6 +2,7 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -29,7 +30,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,16 +55,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.instrumentation.stats.Tag;
-import com.tracker.tracker.dummy.DummyContent;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.tareas.ProfilePicture;
-import com.tracker.tracker.tareas.SeresQueridosAsync;
 import com.tracker.tracker.tareas.UserData;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import static android.content.ContentValues.TAG;
 
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     // Datos de Firebase
     private FirebaseUser user;
     private FirebaseAuth auth;
-
+    private FirebaseFirestore db;
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
@@ -96,21 +97,15 @@ public class MainActivity extends AppCompatActivity
 
     // Botones
     FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
-    Button  btnSelectSerQuerido;
+    //Button  btnSelectSerQuerido;
 
     // Animaciones
     Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
     boolean isOpen = false;
 
     //Opciones en Spinner
-    Spinner opciones;
-    public static List<DummyContent.DummyItem> opcionesList = new ArrayList<DummyContent.DummyItem>();
-
-    //Variable de serQuerido
-    TextView txtSerQueridoName;
-    static String name;
-    static String telephone;
-
+    private Spinner spinner;
+    public ArrayList<Contacto> contactos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,11 +116,95 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Datos de la Aplicación
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+        this.db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        this.db.setFirestoreSettings(settings);
+
+        updateValuesFromBundle(savedInstanceState);
+
+        // Verificar GPS
+        this.requestingLocationUpdate = true;
+        this.settingsClient = LocationServices.getSettingsClient(this);
+        this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        this.contactos = new ArrayList<>();
+
+        this.fabConfig();
+        this.spinnerConfing();
+        this.createLocationCallback();
+        this.createLocationRequest();
+        this.buildLocationSettingsRequest();
+        this.updateUI();
+
+    }
+
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
+                this.requestingLocationUpdate = savedInstanceState.getBoolean(
+                        KEY_REQUESTING_LOCATION_UPDATES);
+            }
+            if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
+                this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            }
+
+        }
+    }
+
+    private void spinnerConfing() {
+        final Context context= this;
+        this.spinner = (Spinner) findViewById(R.id.spSeresQueridos);
+        CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
+        contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult()) {
+                        Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
+                        contactos.add(c);
+                    }
+                    ArrayAdapter<Contacto> adapter = new ArrayAdapter<Contacto>(context, android.R.layout.simple_spinner_item, contactos);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(adapter);
+                } else {
+                    Log.d(TAG, "Error getting documents: ", task.getException());
+                }
+            }
+        });
+        this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                Log.e("SELECTED", String.valueOf(pos));
+                ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.txtContacto)).setText(contactos.get(pos).getNombre());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+
+
+        });
+    }
+
+    private void fabConfig() {
         // Botones
         fabAdd = (FloatingActionButton) findViewById(R.id.fabAdd);
         fabAddPerson = (FloatingActionButton) findViewById(R.id.fabAddPerson);
         fabAddLocation = (FloatingActionButton) findViewById(R.id.fabAddLocation);
-        btnSelectSerQuerido = (Button) findViewById(R.id.btnSelectSerQuerido);
+        //btnSelectSerQuerido = (Button) findViewById(R.id.btnSelectSerQuerido);
 
         // Animaciones
         fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -149,7 +228,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -170,67 +248,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        // Datos de la Aplicación
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
-
-        updateValuesFromBundle(savedInstanceState);
-
-        // Verificar GPS
-        this.requestingLocationUpdate = true;
-        this.settingsClient = LocationServices.getSettingsClient(this);
-        this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        createLocationCallback();
-        createLocationRequest();
-        buildLocationSettingsRequest();
-        updateUI();
-
-        //Obtener información de los seres queridos
-        new SeresQueridosAsync().execute(this.user);
-
-        txtSerQueridoName = (TextView) findViewById(R.id.txtSerQueridoName);
-
-        //Métodos del Spinner
-        opciones = (Spinner) findViewById(R.id.spSeresQueridos);
-        ArrayAdapter<DummyContent.DummyItem> adapter = new ArrayAdapter<DummyContent.DummyItem>(this, android.R.layout.simple_spinner_item, opcionesList);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        opciones.setAdapter(adapter);
-
-        //Obtener selección
-        opciones.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //name = opcionesList.get(position).id;
-                //telephone = opcionesList.get(position).content;
-                Log.e(TAG, "Este es el telefono ");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
-                this.requestingLocationUpdate = savedInstanceState.getBoolean(
-                        KEY_REQUESTING_LOCATION_UPDATES);
-            }
-            if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
-                this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
-            }
-
-        }
     }
 
     private void updateUI() {
