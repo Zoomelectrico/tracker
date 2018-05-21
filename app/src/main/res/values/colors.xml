@@ -6,9 +6,9 @@
     <color name="colorAccent">#1E8248</color>
 
     <!-- Blue -->
-    <color name="secondaryColor">#832196f3</color>
-    <color name="secondaryLightColor">#6ec6ff</color>
-    <color name="secondaryDarkColor">#0069c0</color>
+    <color name="secondaryColor">#2195f2</color>
+    <color name="secondaryLightColor">#6ec5ff</color>
+    <color name="secondaryDarkColor">#0068bf</color>
 
     <!-- Grey -->
     <color name="black">#313536</color>
