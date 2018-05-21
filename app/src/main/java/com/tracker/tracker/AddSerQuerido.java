@@ -35,6 +35,9 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Firebase
         this.auth = FirebaseAuth.getInstance();
         this.user = this.auth.getCurrentUser();
