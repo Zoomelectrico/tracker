@@ -34,6 +34,7 @@ public class ItemFragment extends Fragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public ItemFragment() {
+
     }
 
     // TODO: Customize parameter initialization
@@ -70,6 +71,7 @@ public class ItemFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+
         }
         return view;
     }

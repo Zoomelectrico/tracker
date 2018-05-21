@@ -46,12 +46,12 @@
 
         <Button
             android:id="@+id/button3"
-            android:layout_width="70dp"
+            android:layout_width="103dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="180dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="25dp"
-            android:text="Editar"
+            android:text="Seleccionar"
             android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
             tools:capitalize="words" />
 
@@ -59,7 +59,7 @@
             android:id="@+id/button4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="260dp"
+            android:layout_marginLeft="290dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="25dp"
             android:capitalize="words"
@@ -67,7 +67,7 @@
             android:shadowDx="32"
             android:shadowDy="32"
             android:soundEffectsEnabled="true"
-            android:text="Eliminar"
+            android:text="Editar"
             android:textAppearance="@style/TextAppearance.Compat.Notification.Info"
             tools:shadowRadius="32" />
 

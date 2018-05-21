@@ -25,8 +25,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,9 +55,18 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.instrumentation.stats.Tag;
+import com.tracker.tracker.dummy.DummyContent;
 import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SeresQueridosAsync;
 import com.tracker.tracker.tareas.UserData;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -83,11 +96,20 @@ public class MainActivity extends AppCompatActivity
 
     // Botones
     FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
+    Button  btnSelectSerQuerido;
 
     // Animaciones
     Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
     boolean isOpen = false;
 
+    //Opciones en Spinner
+    Spinner opciones;
+    public static List<DummyContent.DummyItem> opcionesList = new ArrayList<DummyContent.DummyItem>();
+
+    //Variable de serQuerido
+    TextView txtSerQueridoName;
+    static String name;
+    static String telephone;
 
 
     @Override
@@ -103,6 +125,7 @@ public class MainActivity extends AppCompatActivity
         fabAdd = (FloatingActionButton) findViewById(R.id.fabAdd);
         fabAddPerson = (FloatingActionButton) findViewById(R.id.fabAddPerson);
         fabAddLocation = (FloatingActionButton) findViewById(R.id.fabAddLocation);
+        btnSelectSerQuerido = (Button) findViewById(R.id.btnSelectSerQuerido);
 
         // Animaciones
         fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -172,6 +195,29 @@ public class MainActivity extends AppCompatActivity
 
         //Obtener información de los seres queridos
         new SeresQueridosAsync().execute(this.user);
+
+        txtSerQueridoName = (TextView) findViewById(R.id.txtSerQueridoName);
+
+        //Métodos del Spinner
+        opciones = (Spinner) findViewById(R.id.spSeresQueridos);
+        ArrayAdapter<DummyContent.DummyItem> adapter = new ArrayAdapter<DummyContent.DummyItem>(this, android.R.layout.simple_spinner_item, opcionesList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        opciones.setAdapter(adapter);
+
+        //Obtener selección
+        opciones.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //name = opcionesList.get(position).id;
+                //telephone = opcionesList.get(position).content;
+                Log.e(TAG, "Este es el telefono ");
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -492,6 +538,14 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
     }
+
+    //Método de entrada del botón
+    public void showSeresQueridos(View v){
+        Intent intent = new Intent(this, seresQueridos.class);
+        startActivityForResult(intent, 0);
+        onStop();
+    }
+
 
 }
 

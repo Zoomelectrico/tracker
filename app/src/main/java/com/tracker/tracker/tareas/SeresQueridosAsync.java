@@ -3,6 +3,7 @@ package com.tracker.tracker.tareas;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Spinner;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -12,7 +13,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.MainActivity;
+import com.tracker.tracker.R;
 import com.tracker.tracker.dummy.DummyContent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -42,6 +48,7 @@ public class SeresQueridosAsync extends AsyncTask<FirebaseUser, Void, DocumentSn
                             DummyContent.DummyItem item = new DummyContent.DummyItem(document.getString("nombre"), document.getString("telf"), "1");
                             Log.e(TAG, "el id es: " + item.id );
                             DummyContent.addItem(item);
+                            MainActivity.opcionesList.add(item);
                             Log.e(TAG, "2. el id es: " + item.id );
                         }
                     } else {

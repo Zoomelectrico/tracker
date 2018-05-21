@@ -32,4 +32,7 @@ public class seresQueridos extends AppCompatActivity implements ItemFragment.OnL
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
 
     }
+
+    public void selectSeresQueridos(View v){
+    }
 }
