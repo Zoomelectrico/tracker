@@ -32,8 +32,11 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         this.txtNombre = (EditText) findViewById(R.id.txtNombre);
         this.txtPhone = (EditText) findViewById(R.id.txtPhone);
         Toolbar toolbar = (Toolbar) findViewById(R.id.tbAddSer);
-        toolbar.setTitle("Añadir un Ser querido");
+        toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Firebase
         this.auth = FirebaseAuth.getInstance();
