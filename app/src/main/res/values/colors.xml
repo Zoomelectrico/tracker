@@ -22,7 +22,6 @@
 
     <!-- Grey -->
     <color name="black">#313536</color>
-    <color name="white">#F0F0F2</color>
     <color name="lowContrastLight">#DBE3E4</color>
     <color name="lowContrastDark">#525A5C</color>
 </resources>

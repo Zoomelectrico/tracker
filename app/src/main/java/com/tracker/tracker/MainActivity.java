@@ -164,6 +164,7 @@ public class MainActivity extends AppCompatActivity
 
     private void spinnerConfing() {
         final Context context= this;
+        this.contactos.clear();
         this.spinner = (Spinner) findViewById(R.id.spSeresQueridos);
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
         contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -174,9 +175,10 @@ public class MainActivity extends AppCompatActivity
                         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         contactos.add(c);
                     }
-                    ArrayAdapter<Contacto> adapter = new ArrayAdapter<Contacto>(context, android.R.layout.simple_spinner_item, contactos);
+                    ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinner.setAdapter(adapter);
+                    spinner.setVisibility(View.VISIBLE);
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
@@ -373,15 +375,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        // Within {@code onPause()}, we remove location updates. Here, we resume receiving
-        // location updates if the user has requested them.
         if (requestingLocationUpdate && gotPermissions()) {
             startLocationUpdates();
         } else if (!gotPermissions()) {
             requestPermissions();
         }
-
-        updateUI();
+        this.spinnerConfing();
+        this.updateUI();
     }
 
     @Override

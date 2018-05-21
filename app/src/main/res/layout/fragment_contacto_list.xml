@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/list"
-    android:name="com.tracker.tracker.ItemFragment"
+    android:name="com.tracker.tracker.Fragment.ContactoFragment"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:clipToPadding="true"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ItemFragment"
-    tools:listitem="@layout/fragment_item" />
+    tools:context=".Fragment.ContactoFragment"
+    tools:listitem="@layout/fragment_contacto" />

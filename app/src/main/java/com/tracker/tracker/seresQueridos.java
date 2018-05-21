@@ -2,11 +2,13 @@ package com.tracker.tracker;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
+import com.tracker.tracker.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 
-public class seresQueridos extends AppCompatActivity implements ItemFragment.OnListFragmentInteractionListener {
+public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
 
     @Override
