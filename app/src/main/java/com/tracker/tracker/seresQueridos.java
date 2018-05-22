@@ -29,6 +29,4 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         Log.e("jejejeje", item.toString());
     }
 
-    public void selectSeresQueridos(View v){
-    }
 }

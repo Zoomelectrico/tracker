@@ -60,25 +60,7 @@ public class ContactoFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contacto_list, container, false);
-
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (columns <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
-            }
-            MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(this.getContactos(), listener);
-            recyclerView.setAdapter(adapter);
-
-        }
-        return view;
-    }
-
-    private List<Contacto> getContactos() {
+        final View view = inflater.inflate(R.layout.fragment_contacto_list, container, false);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
@@ -90,12 +72,25 @@ public class ContactoFragment extends Fragment {
                         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         l.add(c);
                     }
+                    if (view instanceof RecyclerView) {
+                        Context context = view.getContext();
+                        RecyclerView recyclerView = (RecyclerView) view;
+                        if (columns <= 1) {
+                            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                        } else {
+                            recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
+                        }
+                        MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(l, listener);
+                        recyclerView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+
+                    }
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
             }
         });
-        return l;
+        return view;
     }
 
     @Override
