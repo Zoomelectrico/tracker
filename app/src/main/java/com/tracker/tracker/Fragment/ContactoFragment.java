@@ -53,8 +53,6 @@ public class ContactoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.e("FRAGMENT", "AJA PAPI");
-
         if (getArguments() != null) {
             columns = getArguments().getInt(ARG_COLUMN_COUNT);
         }

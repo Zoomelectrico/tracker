@@ -61,8 +61,8 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
         public ViewHolder(View view) {
             super(view);
             this.view = view;
-            txtNombre = (TextView) view.findViewById(R.id.item_number);
-            txtTelf = (TextView) view.findViewById(R.id.content);
+            txtNombre = view.findViewById(R.id.item_number);
+            txtTelf = view.findViewById(R.id.content);
         }
 
         @Override

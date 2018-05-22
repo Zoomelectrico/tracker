@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -85,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser user;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
+
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
@@ -92,20 +94,25 @@ public class MainActivity extends AppCompatActivity
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
-    private Location currentLocation;
     private Boolean requestingLocationUpdate;
 
     // Botones
-    FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
+    private FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
     //Button  btnSelectSerQuerido;
 
     // Animaciones
-    Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
-    boolean isOpen = false;
+    private Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
+    private boolean isOpen = false;
 
     //Opciones en Spinner
     private Spinner spinner;
-    public ArrayList<Contacto> contactos;
+    private ArrayList<Contacto> contactos;
+
+    // Sms Data
+    private Location currentLocation;
+    private Location destination;
+    private Contacto contacto;
+    private Place placeDestionation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,10 +120,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -164,13 +171,13 @@ public class MainActivity extends AppCompatActivity
 
     private void spinnerConfing() {
         final Context context= this;
-        this.contactos.clear();
-        this.spinner = (Spinner) findViewById(R.id.spSeresQueridos);
+        this.spinner = findViewById(R.id.spSeresQueridos);
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
         contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
+                    contactos.clear();
                     for (DocumentSnapshot document : task.getResult()) {
                         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         contactos.add(c);
@@ -187,9 +194,9 @@ public class MainActivity extends AppCompatActivity
         this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                Log.e("SELECTED", String.valueOf(pos));
-                ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.txtContacto)).setText(contactos.get(pos).getNombre());
+                contacto = contactos.get(pos);
+                findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
+                ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
             }
 
             @Override
@@ -203,10 +210,9 @@ public class MainActivity extends AppCompatActivity
 
     private void fabConfig() {
         // Botones
-        fabAdd = (FloatingActionButton) findViewById(R.id.fabAdd);
-        fabAddPerson = (FloatingActionButton) findViewById(R.id.fabAddPerson);
-        fabAddLocation = (FloatingActionButton) findViewById(R.id.fabAddLocation);
-        //btnSelectSerQuerido = (Button) findViewById(R.id.btnSelectSerQuerido);
+        fabAdd = findViewById(R.id.fabAdd);
+        fabAddPerson = findViewById(R.id.fabAddPerson);
+        fabAddLocation = findViewById(R.id.fabAddLocation);
 
         // Animaciones
         fabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -254,10 +260,9 @@ public class MainActivity extends AppCompatActivity
 
     private void updateUI() {
         final Activity activity = this;
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        View header = ((NavigationView) findViewById(R.id.nav_view)).getHeaderView(0);
+        View header = navigationView.getHeaderView(0);
 
         // Personalizar la UI
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
@@ -283,9 +288,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
-
-        ((Button) findViewById(R.id.btnFindPlace)).setOnClickListener(listener);
-
+        findViewById(R.id.btnFindPlace).setOnClickListener(listener);
     }
 
     private void createLocationCallback() {
@@ -296,8 +299,19 @@ public class MainActivity extends AppCompatActivity
                 Location l = locationResult.getLastLocation();
                 currentLocation = locationResult.getLastLocation();
                 updateLocation(user, l);
+                if(destination != null) {
+                    if(l.distanceTo(destination) <= 50.0) {
+                        sendSMS();
+                    }
+                }
             }
         };
+    }
+
+    private void sendSMS() {
+        String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
+        SmsManager smsManager = SmsManager.getDefault();
+        smsManager.sendTextMessage(contacto.getTelf(), null,sms, null, null);
     }
 
     private void createLocationRequest() {
@@ -352,7 +366,6 @@ public class MainActivity extends AppCompatActivity
                                 Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                                 requestingLocationUpdate = false;
                         }
-
                         updateUI();
                     }
                 });
@@ -418,18 +431,20 @@ public class MainActivity extends AppCompatActivity
             case PLACE_PICKER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(this, data);
-                    Log.e("PLACE", place.getLatLng().toString());
+                    this.placeDestionation = place;
+                    this.destination = new Location("Google Place");
+                    this.destination.setLatitude(place.getLatLng().latitude);
+                    this.destination.setLongitude(place.getLatLng().longitude);
                     String toastMsg = String.format("Place: %s", place.getName());
                     Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
                 }
-
                 break;
         }
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -486,7 +501,7 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -497,8 +512,9 @@ public class MainActivity extends AppCompatActivity
 
     public boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        boolean b =ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-        return a && b;
+        boolean b = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean c = ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
+        return a && b && c;
     }
 
     private void requestPermissions() {
@@ -516,7 +532,7 @@ public class MainActivity extends AppCompatActivity
                         public void onClick(View view) {
                             // Request permission
                             ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS},
                                     REQUEST_PERMISSIONS_REQUEST_CODE);
                         }
                     });
