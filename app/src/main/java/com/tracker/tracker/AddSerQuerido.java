@@ -1,5 +1,6 @@
 package com.tracker.tracker;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -62,6 +63,8 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
             Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
             //Obtener información de los seres queridos
             new SeresQueridosAsync().execute(this.user);
+            Intent i = new Intent(this, MainActivity.class);
+            startActivity(i);
             finish();
         }
 

@@ -29,7 +29,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -49,6 +49,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -95,6 +96,7 @@ public class MainActivity extends AppCompatActivity
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
     private Boolean requestingLocationUpdate;
+    private GoogleApiClient mGoogleApiClient;
 
     // Botones
     private FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
@@ -171,6 +173,7 @@ public class MainActivity extends AppCompatActivity
 
     private void spinnerConfing() {
         final Context context= this;
+        this.spinner = null;
         this.spinner = findViewById(R.id.spSeresQueridos);
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
         contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Another interface callback
+
             }
 
 
@@ -270,7 +273,14 @@ public class MainActivity extends AppCompatActivity
 
         // Tarea Especial para la foto
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
-
+        /*
+        mGoogleApiClient = new GoogleApiClient
+                .Builder(this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .enableAutoManage(this, null)
+                .build();
+        */
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -312,6 +322,9 @@ public class MainActivity extends AppCompatActivity
         String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
         SmsManager smsManager = SmsManager.getDefault();
         smsManager.sendTextMessage(contacto.getTelf(), null,sms, null, null);
+        contacto = null;
+        destination = null;
+        placeDestionation = null;
     }
 
     private void createLocationRequest() {
@@ -393,8 +406,13 @@ public class MainActivity extends AppCompatActivity
         } else if (!gotPermissions()) {
             requestPermissions();
         }
-        this.spinnerConfing();
         this.updateUI();
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        this.spinnerConfing();
     }
 
     @Override
@@ -486,12 +504,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
                 startActivityForResult(intent, 0);
-                onStop();
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
                 startActivityForResult(intent, 0);
-                onStop();
                 break;
             case R.id.logout:
                 this.auth.signOut();
