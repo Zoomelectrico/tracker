@@ -71,7 +71,9 @@ public class ContactoFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
             }
-            recyclerView.setAdapter(new MyContactoRecyclerViewAdapter(this.getContactos(), listener));
+            MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(this.getContactos(), listener);
+            recyclerView.setAdapter(adapter);
+
         }
         return view;
     }

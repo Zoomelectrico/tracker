@@ -54,8 +54,8 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
-        public final TextView txtNombre;
-        public final TextView txtTelf;
+        public TextView txtNombre;
+        public TextView txtTelf;
         public Contacto item;
 
         public ViewHolder(View view) {
@@ -67,7 +67,7 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
 
         @Override
         public String toString() {
-            return super.toString() + " '" + txtTelf.getText() + "'";
+            return item.toString();
         }
     }
 }

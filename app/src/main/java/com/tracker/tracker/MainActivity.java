@@ -147,8 +147,6 @@ public class MainActivity extends AppCompatActivity
         this.settingsClient = LocationServices.getSettingsClient(this);
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
-        this.contactos = new ArrayList<>();
-
         this.fabConfig();
         this.spinnerConfing();
         this.createLocationCallback();
@@ -173,14 +171,14 @@ public class MainActivity extends AppCompatActivity
 
     private void spinnerConfing() {
         final Context context= this;
-        this.spinner = null;
+        this.contactos = null;
+        this.contactos = new ArrayList<>();
         this.spinner = findViewById(R.id.spSeresQueridos);
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
         contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if(task.isSuccessful()) {
-                    contactos.clear();
                     for (DocumentSnapshot document : task.getResult()) {
                         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         contactos.add(c);
@@ -273,24 +271,14 @@ public class MainActivity extends AppCompatActivity
 
         // Tarea Especial para la foto
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
-        /*
-        mGoogleApiClient = new GoogleApiClient
-                .Builder(this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .enableAutoManage(this, null)
-                .build();
-        */
+
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 // Construct an intent for the place picker
                 try {
-                    PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-                    Intent intent = intentBuilder.build(activity);
-                    // Start the intent by requesting a result,
-                    // identified by a request code.
+                    Intent intent = builder.build(activity);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
 
                 }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
@@ -306,11 +294,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                Location l = locationResult.getLastLocation();
                 currentLocation = locationResult.getLastLocation();
-                updateLocation(user, l);
+                updateLocation(user, currentLocation);
                 if(destination != null) {
-                    if(l.distanceTo(destination) <= 50.0) {
+                    if(currentLocation.distanceTo(destination) <= 30.0) {
                         sendSMS();
                     }
                 }
@@ -319,12 +306,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void sendSMS() {
-        String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(contacto.getTelf(), null,sms, null, null);
-        contacto = null;
-        destination = null;
-        placeDestionation = null;
+        if(contacto != null && destination != null && placeDestionation != null) {
+            String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(contacto.getTelf(), null,sms, null, null);
+            contacto = null;
+            destination = null;
+            placeDestionation = null;
+        }
     }
 
     private void createLocationRequest() {
@@ -384,20 +373,6 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void stopLocationUpdates() {
-        if (!requestingLocationUpdate) {
-            Log.d("", "stopLocationUpdates: updates never requested, no-op.");
-            return;
-        }
-        this.locationProviderClient.removeLocationUpdates(this.locationCallback)
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        requestingLocationUpdate = false;
-                    }
-                });
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -406,6 +381,7 @@ public class MainActivity extends AppCompatActivity
         } else if (!gotPermissions()) {
             requestPermissions();
         }
+        this.spinnerConfing();
         this.updateUI();
     }
 
