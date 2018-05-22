@@ -28,10 +28,10 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         // UI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
-        this.btnAdd = (Button) findViewById(R.id.btnAdd);
-        this.txtNombre = (EditText) findViewById(R.id.txtNombre);
-        this.txtPhone = (EditText) findViewById(R.id.txtPhone);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tbAddSer);
+        this.btnAdd = findViewById(R.id.btnAdd);
+        this.txtNombre = findViewById(R.id.txtNombre);
+        this.txtPhone = findViewById(R.id.txtPhone);
+        Toolbar toolbar = findViewById(R.id.tbAddSer);
         toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
 

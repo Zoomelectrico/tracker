@@ -1,4 +1,4 @@
-package com.tracker.tracker;
+package com.tracker.tracker.Fragment;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,35 +6,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tracker.tracker.ItemFragment.OnListFragmentInteractionListener;
+import com.tracker.tracker.Fragment.ContactoFragment.OnListFragmentInteractionListener;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.R;
 
 import java.util.List;
 
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContactoRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Contacto> values;
+    private final List<Contacto> contactos;
     private final OnListFragmentInteractionListener listener;
 
-    public MyItemRecyclerViewAdapter(List<Contacto> items, OnListFragmentInteractionListener listener) {
-        this.values = items;
+    public MyContactoRecyclerViewAdapter(List<Contacto> items, OnListFragmentInteractionListener listener) {
+        this.contactos = items;
         this.listener = listener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.fragment_contacto , parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.item = values.get(position);
-        holder.mIdView.setText((CharSequence) values.get(position));
-        holder.mContentView.setText((CharSequence) values.get(position));
+        holder.item = contactos.get(position);
+        holder.txtNombre.setText(contactos.get(position).getNombre());
+        holder.txtTelf.setText(contactos.get(position).getTelf());
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != listener) {
@@ -48,25 +49,25 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     @Override
     public int getItemCount() {
-        return values.size();
+        return contactos.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
+        public final View view;
+        public final TextView txtNombre;
+        public final TextView txtTelf;
         public Contacto item;
 
         public ViewHolder(View view) {
             super(view);
-            mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            this.view = view;
+            txtNombre = view.findViewById(R.id.item_number);
+            txtTelf = view.findViewById(R.id.content);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + txtTelf.getText() + "'";
         }
     }
 }

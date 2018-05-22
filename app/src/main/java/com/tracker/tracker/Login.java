@@ -56,7 +56,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Agrego al event Listener al Boton
-        this.btnLogin = (Button) findViewById(R.id.btnLogin);
+        this.btnLogin = findViewById(R.id.btnLogin);
         this.btnLogin.setOnClickListener(this);
 
         //Login with google
