@@ -49,7 +49,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +66,6 @@ import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.UserData;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static android.content.ContentValues.TAG;
 
@@ -91,16 +89,13 @@ public class MainActivity extends AppCompatActivity
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
-    private LocationManager locationManager;
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
     private Boolean requestingLocationUpdate;
-    private GoogleApiClient mGoogleApiClient;
 
     // Botones
     private FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
-    //Button  btnSelectSerQuerido;
 
     // Animaciones
     private Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
@@ -118,13 +113,19 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // UI
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(!gotPermissions()) {
+            requestPermissions();
+        }
+
+        //Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //Navegacion
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -147,13 +148,29 @@ public class MainActivity extends AppCompatActivity
         this.settingsClient = LocationServices.getSettingsClient(this);
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+        this.contactos = new ArrayList<>();
         this.fabConfig();
-        this.spinnerConfing();
         this.createLocationCallback();
         this.createLocationRequest();
         this.buildLocationSettingsRequest();
         this.updateUI();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.spinnerConfig();
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -169,10 +186,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void spinnerConfing() {
+    private void spinnerConfig() {
         final Context context= this;
-        this.contactos = null;
-        this.contactos = new ArrayList<>();
+        this.contactos.clear();
         this.spinner = findViewById(R.id.spSeresQueridos);
         CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
         contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -183,10 +199,17 @@ public class MainActivity extends AppCompatActivity
                         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
                         contactos.add(c);
                     }
-                    ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(adapter);
-                    spinner.setVisibility(View.VISIBLE);
+                    if(contactos.isEmpty()) {
+                        // Si no tiene a nadie lo mando a agregar uno
+                        Intent intent = new Intent(context, AddSerQuerido.class);
+                        startActivity(intent);
+                        Toast.makeText(context, "Añade un ser Querido para empezar a usar la App", Toast.LENGTH_SHORT).show();
+                    } else {
+                        ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinner.setAdapter(adapter);
+                        spinner.setVisibility(View.VISIBLE);
+                    }
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
@@ -195,6 +218,7 @@ public class MainActivity extends AppCompatActivity
         this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if (contactos.size() == 0) return;
                 contacto = contactos.get(pos);
                 findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
@@ -340,7 +364,7 @@ public class MainActivity extends AppCompatActivity
                             locationProviderClient.requestLocationUpdates(locationRequest,
                                     locationCallback, Looper.myLooper());
                         } catch (SecurityException e) {
-
+                            Log.e("Main", "Security Exception", e);
                         }
                     }
                 })
@@ -353,8 +377,6 @@ public class MainActivity extends AppCompatActivity
                                 Log.i("", "Location settings are not satisfied. Attempting to upgrade " +
                                         "location settings ");
                                 try {
-                                    // Show the dialog by calling startResolutionForResult(), and check the
-                                    // result in onActivityResult().
                                     ResolvableApiException rae = (ResolvableApiException) e;
                                     rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
                                 } catch (IntentSender.SendIntentException sie) {
@@ -371,29 +393,6 @@ public class MainActivity extends AppCompatActivity
                         updateUI();
                     }
                 });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (requestingLocationUpdate && gotPermissions()) {
-            startLocationUpdates();
-        } else if (!gotPermissions()) {
-            requestPermissions();
-        }
-        this.spinnerConfing();
-        this.updateUI();
-    }
-
-    @Override
-    public void onRestart() {
-        super.onRestart();
-        this.spinnerConfing();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     /**
