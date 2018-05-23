@@ -49,7 +49,6 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +66,6 @@ import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.UserData;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static android.content.ContentValues.TAG;
 
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         this.fabConfig();
-        this.spinnerConfing();
+        this.spinnerConfig();
         this.createLocationCallback();
         this.createLocationRequest();
         this.buildLocationSettingsRequest();
@@ -169,7 +167,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void spinnerConfing() {
+    private void spinnerConfig() {
         final Context context= this;
         this.contactos = null;
         this.contactos = new ArrayList<>();
@@ -382,14 +380,14 @@ public class MainActivity extends AppCompatActivity
         } else if (!gotPermissions()) {
             requestPermissions();
         }
-        this.spinnerConfing();
+        this.spinnerConfig();
         this.updateUI();
     }
 
     @Override
     public void onRestart() {
         super.onRestart();
-        this.spinnerConfing();
+        this.spinnerConfig();
     }
 
     @Override
