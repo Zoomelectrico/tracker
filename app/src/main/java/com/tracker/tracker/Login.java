@@ -38,14 +38,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private static final int MY_LOCATION_PERMISSION = 0;
+
     // Referencias a los servicios de Firebase
     private FirebaseAuth auth;
     private GoogleSignInClient googleSIClient;
+
     // Referencias para lograr la ubicación
     private FusedLocationProviderClient locationProviderClient;
     private Location currentLocation;
     private LocationManager locationManager;
     private boolean gps;
+
     // UI
     private Button btnLogin;
 
@@ -89,8 +92,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_PERMISSION);
-            } else {
-                // Permisos Finos
             }
 
             this.locationProviderClient.getLastLocation()
@@ -104,8 +105,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
                             }
                         }
                     });
-        } else {
-            Toast.makeText(this, "Debes activar el GPS", Toast.LENGTH_LONG);
         }
     }
 
@@ -116,8 +115,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     this.getLocation();
                     Log.d("Permissions", "ALL GOD");
-                } else {
-                    Log.e("Permissions", "Permisos Fallaron");
                 }
                 return;
             }
