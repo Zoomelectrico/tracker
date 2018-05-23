@@ -16,6 +16,16 @@
         android:padding="8dp"
         android:gravity="center">
 
+        <TextView
+            android:id="@+id/txtWelcome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configurar Viaje"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:padding="16dp"
+            android:layout_marginBottom="8dp"/>
+
         <Spinner
             android:id="@+id/spSeresQueridos"
             android:layout_height="30dp"
@@ -40,6 +50,111 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:text="@string/btnEscogerSitio" />
+
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/estadoViaje"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            card_view:cardElevation="5dp"
+            android:padding="8dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp"
+                android:gravity="center">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/txtContactoViaje"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Contacto:"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/txtContactoNombre"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/txtDestinoViaje"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Destino:"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/txtDestino"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/txtDistanceViaje"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Distacia para:"
+                        android:textStyle="bold"/>
+                    <TextView
+                        android:id="@+id/txtDistance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"/>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnCancelarViaje"
+                    android:layout_width="wrap_content"
+                    android:padding="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:text="Cancelar Viaje" />
+            </LinearLayout>
+
+
+
+
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
 
 
