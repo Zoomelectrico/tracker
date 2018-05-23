@@ -195,6 +195,7 @@ public class MainActivity extends AppCompatActivity
         this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if (contactos.size() == 0) return;
                 contacto = contactos.get(pos);
                 findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
