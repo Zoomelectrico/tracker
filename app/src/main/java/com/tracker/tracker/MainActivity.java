@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity
             PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
                     new Intent(DELIVERED), 0);
 
-            //---when the SMS has been sent---
+            //Cuando se envía el mensaje de texto-
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }, new IntentFilter(SENT));
 
-            //---when the SMS has been delivered---
+            //---Cuando se recibe el mensaje de texto---
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
@@ -417,9 +417,11 @@ public class MainActivity extends AppCompatActivity
                 }
             }, new IntentFilter(DELIVERED));
 
+            //Envío del mensaje de texto
             String sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
+            //Retornar la vista Main a la vista principal
             this.tripDescription.setVisibility(View.INVISIBLE);
             this.isViajando = false;
             contacto = null;
