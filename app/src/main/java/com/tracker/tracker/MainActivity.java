@@ -2,18 +2,22 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
@@ -66,18 +70,17 @@ import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.UserData;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     // Constantes
     private static final int PLACE_PICKER_REQUEST = 2;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     private final static String KEY_LOCATION = "location";
@@ -90,7 +93,6 @@ public class MainActivity extends AppCompatActivity
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
-    private LocationManager locationManager;
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
@@ -98,7 +100,6 @@ public class MainActivity extends AppCompatActivity
 
     // Botones
     private FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
-    //Button  btnSelectSerQuerido;
 
     // Animaciones
     private Animation fabOpen, fabClose, fabRotateClockwise, fabRotateCounter;
@@ -108,21 +109,30 @@ public class MainActivity extends AppCompatActivity
     private Spinner spinner;
     private ArrayList<Contacto> contactos;
 
-    // Sms Data
+    // Viaje
     private Location currentLocation;
     private Location destination;
     private Contacto contacto;
     private Place placeDestionation;
+    private CardView tripDescription;
+    private boolean isViajando = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // UI
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(!gotPermissions()) {
+            requestPermissions();
+        }
+
+        //Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //Navegacion
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -146,14 +156,29 @@ public class MainActivity extends AppCompatActivity
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         this.contactos = new ArrayList<>();
-
         this.fabConfig();
-        this.spinnerConfing();
         this.createLocationCallback();
         this.createLocationRequest();
         this.buildLocationSettingsRequest();
         this.updateUI();
+        this.startLocationUpdates();
 
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        this.spinnerConfig();
+    }
+
+    @Override
+    public void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -165,47 +190,64 @@ public class MainActivity extends AppCompatActivity
             if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
                 this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             }
-
         }
     }
 
-    private void spinnerConfing() {
-        final Context context= this;
-        this.spinner = findViewById(R.id.spSeresQueridos);
-        CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
-        contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if(task.isSuccessful()) {
-                    contactos.clear();
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
-                        contactos.add(c);
+    private void spinnerConfig() {
+        if(isViajando) {
+            this.spinner.setVisibility(View.GONE);
+            ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.GONE);
+            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
+            Log.d("Spinner", "viajando");
+        } else {
+            final Context context= this;
+            this.contactos.clear();
+            this.spinner = findViewById(R.id.spSeresQueridos);
+            CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
+            contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
+                            contactos.add(c);
+                        }
+                        if(contactos.isEmpty()) {
+                            // Si no tiene a nadie lo mando a agregar uno
+                            Intent intent = new Intent(context, AddSerQuerido.class);
+                            startActivity(intent);
+                            Toast.makeText(context, "Añade un ser Querido para empezar a usar la App", Toast.LENGTH_SHORT).show();
+                        } else {
+                            ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinner.setAdapter(adapter);
+                            findViewById(R.id.layoutCargando).setVisibility(View.GONE);
+                            findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
+                            spinner.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
                     }
-                    ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(adapter);
-                    spinner.setVisibility(View.VISIBLE);
-                } else {
-                    Log.d(TAG, "Error getting documents: ", task.getException());
                 }
-            }
-        });
-        this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                contacto = contactos.get(pos);
-                findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
-                ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
-            }
+            });
+            this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    if (contactos.size() == 0) return;
+                    if(!isViajando) {
+                        contacto = contactos.get(pos);
+                        findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
+                    } else {
+                        Toast.makeText(context,"Cancelar el viaje para escoger otro ser querido", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Another interface callback
-            }
-
-
-        });
+                }
+            });
+        }
     }
 
     private void fabConfig() {
@@ -263,6 +305,19 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
+        this.tripDescription = findViewById(R.id.estadoViaje);
+        ((Button) tripDescription.findViewById(R.id.btnCancelarViaje)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tripDescription.setVisibility(View.GONE);
+                spinner.setVisibility(View.VISIBLE);
+                ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
+                isViajando = false;
+                contacto = null;
+                destination = null;
+                placeDestionation = null;
+            }
+        });
 
         // Personalizar la UI
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
@@ -277,12 +332,8 @@ public class MainActivity extends AppCompatActivity
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 // Construct an intent for the place picker
                 try {
-                    PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-                    Intent intent = intentBuilder.build(activity);
-                    // Start the intent by requesting a result,
-                    // identified by a request code.
+                    Intent intent = builder.build(activity);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
-
                 }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.e("ERROR", e.getMessage(), e);
                 }
@@ -296,11 +347,12 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                Location l = locationResult.getLastLocation();
                 currentLocation = locationResult.getLastLocation();
-                updateLocation(user, l);
+                updateLocation(user, currentLocation);
                 if(destination != null) {
-                    if(l.distanceTo(destination) <= 50.0) {
+                    ((TextView) tripDescription.findViewById(R.id.txtDistance))
+                            .setText(String.valueOf(currentLocation.distanceTo(destination)));
+                    if(currentLocation.distanceTo(destination) <= 50.0) {
                         sendSMS();
                     }
                 }
@@ -309,9 +361,83 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void sendSMS() {
-        String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
-        SmsManager smsManager = SmsManager.getDefault();
-        smsManager.sendTextMessage(contacto.getTelf(), null,sms, null, null);
+        if(contacto != null && destination != null && placeDestionation != null) {
+            String SENT = "SMS_SENT";
+            String DELIVERED = "SMS_DELIVERED";
+
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(SENT), 0);
+
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(DELIVERED), 0);
+
+            //Cuando se envía el mensaje de texto-
+            registerReceiver(new BroadcastReceiver(){
+                @Override
+                public void onReceive(Context arg0, Intent arg1) {
+                    switch (getResultCode())
+                    {
+                        case Activity.RESULT_OK:
+                            Toast.makeText(getBaseContext(), "SMS enviado",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                            Toast.makeText(getBaseContext(), "Generic failure",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NO_SERVICE:
+                            Toast.makeText(getBaseContext(), "No service",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                            Toast.makeText(getBaseContext(), "Null PDU",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_RADIO_OFF:
+                            Toast.makeText(getBaseContext(), "Radio off",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }, new IntentFilter(SENT));
+
+            //---Cuando se recibe el mensaje de texto---
+            registerReceiver(new BroadcastReceiver(){
+                @Override
+                public void onReceive(Context arg0, Intent arg1) {
+                    switch (getResultCode())
+                    {
+                        case Activity.RESULT_OK:
+                            Toast.makeText(getBaseContext(), "SMS recibido",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            Toast.makeText(getBaseContext(), "SMS not delivered",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }, new IntentFilter(DELIVERED));
+
+            //Envío del mensaje de texto
+            boolean grado = (String.valueOf(placeDestionation.getName())).contains("°");
+            String sms;
+            if(grado) {
+                sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
+            } else {
+                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ". Mensaje enviado desde Tracker App";
+            }
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
+            //Retornar la vista Main a la vista principal
+            this.tripDescription.setVisibility(View.INVISIBLE);
+            this.isViajando = false;
+            contacto = null;
+            destination = null;
+            placeDestionation = null;
+            spinnerConfig();
+            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
+        }
     }
 
     private void createLocationRequest() {
@@ -338,7 +464,7 @@ public class MainActivity extends AppCompatActivity
                             locationProviderClient.requestLocationUpdates(locationRequest,
                                     locationCallback, Looper.myLooper());
                         } catch (SecurityException e) {
-
+                            Log.e("Main", "Security Exception", e);
                         }
                     }
                 })
@@ -351,8 +477,6 @@ public class MainActivity extends AppCompatActivity
                                 Log.i("", "Location settings are not satisfied. Attempting to upgrade " +
                                         "location settings ");
                                 try {
-                                    // Show the dialog by calling startResolutionForResult(), and check the
-                                    // result in onActivityResult().
                                     ResolvableApiException rae = (ResolvableApiException) e;
                                     rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
                                 } catch (IntentSender.SendIntentException sie) {
@@ -371,46 +495,11 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
-    private void stopLocationUpdates() {
-        if (!requestingLocationUpdate) {
-            Log.d("", "stopLocationUpdates: updates never requested, no-op.");
-            return;
-        }
-        this.locationProviderClient.removeLocationUpdates(this.locationCallback)
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        requestingLocationUpdate = false;
-                    }
-                });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (requestingLocationUpdate && gotPermissions()) {
-            startLocationUpdates();
-        } else if (!gotPermissions()) {
-            requestPermissions();
-        }
-        this.spinnerConfing();
-        this.updateUI();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    /**
-     * Stores activity data in the Bundle.
-     */
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
         super.onSaveInstanceState(savedInstanceState);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -433,10 +522,22 @@ public class MainActivity extends AppCompatActivity
                     Place place = PlacePicker.getPlace(this, data);
                     this.placeDestionation = place;
                     this.destination = new Location("Google Place");
+                    this.isViajando = true;
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
-                    String toastMsg = String.format("Place: %s", place.getName());
-                    Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                    if(contacto != null) {
+                        if(currentLocation == null) {
+                            Log.e("CurrentLocation", "null");
+                        } else {
+                            tripDescription = findViewById(R.id.estadoViaje);
+                            tripDescription.setVisibility(View.VISIBLE);
+                            ((TextView) tripDescription.findViewById(R.id.txtContactoNombre)).setText(contacto.getNombre());
+                            ((TextView) tripDescription.findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
+                            ((TextView) tripDescription.findViewById(R.id.txtDistance)).setText(String.valueOf(currentLocation.distanceTo(destination)));
+                        }
+                    } else {
+                        Toast.makeText(this, "Debes escoger un ser querido primero", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
         }
@@ -486,12 +587,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
                 startActivityForResult(intent, 0);
-                onStop();
+                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
                 startActivityForResult(intent, 0);
-                onStop();
+                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.logout:
                 this.auth.signOut();
@@ -537,19 +640,14 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
         } else {
-            Log.i("", "Requesting permission");
-            // Request permission. It's possible this can be auto answered if device policy
-            // sets the permission in a given state or the user denied the permission
-            // previously and checked "Never ask again".
             ActivityCompat.requestPermissions(MainActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.SEND_SMS},
                     REQUEST_PERMISSIONS_REQUEST_CODE);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if (grantResults.length <= 0) {
                 Log.i("", "User interaction was cancelled.");
@@ -558,8 +656,6 @@ public class MainActivity extends AppCompatActivity
                     Log.i("", "Permission granted, updates requested, starting location updates");
                     startLocationUpdates();
                 }
-            } else {
-
             }
         }
     }
@@ -571,14 +667,5 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
     }
-
-    //Método de entrada del botón
-    public void showSeresQueridos(View v){
-        Intent intent = new Intent(this, seresQueridos.class);
-        startActivityForResult(intent, 0);
-        onStop();
-    }
-
-
 }
 
