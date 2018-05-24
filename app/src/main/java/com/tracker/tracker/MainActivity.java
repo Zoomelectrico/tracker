@@ -376,7 +376,7 @@ public class MainActivity extends AppCompatActivity
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS sent",
+                            Toast.makeText(getBaseContext(), "SMS enviado",
                                     Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
@@ -406,7 +406,7 @@ public class MainActivity extends AppCompatActivity
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS delivered",
+                            Toast.makeText(getBaseContext(), "SMS recibido",
                                     Toast.LENGTH_SHORT).show();
                             break;
                         case Activity.RESULT_CANCELED:
