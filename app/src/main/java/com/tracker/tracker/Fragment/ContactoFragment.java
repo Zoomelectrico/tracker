@@ -81,9 +81,10 @@ public class ContactoFragment extends Fragment {
                             recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
                         }
                         MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(l, listener);
+                        LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
+                        llm.setOrientation(LinearLayoutManager.VERTICAL);
+                        recyclerView.setLayoutManager(llm);
                         recyclerView.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-
                     }
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());

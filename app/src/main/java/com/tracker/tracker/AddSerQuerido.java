@@ -62,7 +62,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
             new AddSerQueridoAsync(name, phone).execute(this.user);
             Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
             //Obtener información de los seres queridos
-            new SeresQueridosAsync().execute(this.user);
+            //new SeresQueridosAsync().execute(this.user);
             finish();
         }
 

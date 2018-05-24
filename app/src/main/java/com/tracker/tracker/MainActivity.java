@@ -221,6 +221,8 @@ public class MainActivity extends AppCompatActivity
                             ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             spinner.setAdapter(adapter);
+                            findViewById(R.id.layoutCargando).setVisibility(View.GONE);
+                            findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
                             spinner.setVisibility(View.VISIBLE);
                         }
                     } else {
@@ -418,7 +420,13 @@ public class MainActivity extends AppCompatActivity
             }, new IntentFilter(DELIVERED));
 
             //Envío del mensaje de texto
-            String sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
+            boolean grado = (String.valueOf(placeDestionation.getName())).contains("°");
+            String sms;
+            if(grado) {
+                sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
+            } else {
+                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ". Mensaje enviado desde Tracker App";
+            }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
             //Retornar la vista Main a la vista principal
@@ -579,11 +587,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
                 startActivityForResult(intent, 0);
-                this.spinnerConfig();
+                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
                 startActivityForResult(intent, 0);
+                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.logout:
                 this.auth.signOut();
