@@ -2,8 +2,11 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -13,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -70,7 +74,7 @@ import java.util.ArrayList;
 import static android.content.ContentValues.TAG;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     // Constantes
     private static final int PLACE_PICKER_REQUEST = 2;
@@ -112,6 +116,7 @@ public class MainActivity extends AppCompatActivity
     private Place placeDestionation;
     private CardView tripDescription;
     private boolean isViajando = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -309,7 +314,6 @@ public class MainActivity extends AppCompatActivity
                 contacto = null;
                 destination = null;
                 placeDestionation = null;
-
             }
         });
 
@@ -356,14 +360,73 @@ public class MainActivity extends AppCompatActivity
 
     private void sendSMS() {
         if(contacto != null && destination != null && placeDestionation != null) {
-            String sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ", " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
+            String SENT = "SMS_SENT";
+            String DELIVERED = "SMS_DELIVERED";
+
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(SENT), 0);
+
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(DELIVERED), 0);
+
+            //---when the SMS has been sent---
+            registerReceiver(new BroadcastReceiver(){
+                @Override
+                public void onReceive(Context arg0, Intent arg1) {
+                    switch (getResultCode())
+                    {
+                        case Activity.RESULT_OK:
+                            Toast.makeText(getBaseContext(), "SMS sent",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                            Toast.makeText(getBaseContext(), "Generic failure",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NO_SERVICE:
+                            Toast.makeText(getBaseContext(), "No service",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_NULL_PDU:
+                            Toast.makeText(getBaseContext(), "Null PDU",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case SmsManager.RESULT_ERROR_RADIO_OFF:
+                            Toast.makeText(getBaseContext(), "Radio off",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }, new IntentFilter(SENT));
+
+            //---when the SMS has been delivered---
+            registerReceiver(new BroadcastReceiver(){
+                @Override
+                public void onReceive(Context arg0, Intent arg1) {
+                    switch (getResultCode())
+                    {
+                        case Activity.RESULT_OK:
+                            Toast.makeText(getBaseContext(), "SMS delivered",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            Toast.makeText(getBaseContext(), "SMS not delivered",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+            }, new IntentFilter(DELIVERED));
+
+            String sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con tracker app";
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(contacto.getTelf(), null, sms, null, null);
+            smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
             this.tripDescription.setVisibility(View.INVISIBLE);
             this.isViajando = false;
             contacto = null;
             destination = null;
             placeDestionation = null;
+            spinnerConfig();
+            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
         }
     }
 
@@ -514,6 +577,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
                 startActivityForResult(intent, 0);
+                this.spinnerConfig();
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
@@ -590,6 +654,5 @@ public class MainActivity extends AppCompatActivity
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
     }
-
 }
 
