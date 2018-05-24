@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#03A9F4</color>
-    <color name="colorPrimaryDark">#01579B</color>
-    <color name="colorAccent">#F50057</color>
+    <!--&lt;!&ndash; Blue Primary &ndash;&gt;-->
+    <color name="colorPrimary">#0277bd</color><!---->
+    <color name="colorAccent">#58a5f0</color><!---->
+    <color name="colorPrimaryDark">#004c8c</color><!---->
+
+    <!--&lt;!&ndash; Orange Secondary &ndash;&gt;-->
+    <color name="secondaryColor">#ff7043</color><!---->
+    <color name="secondaryLightColor">#ffa270</color><!---->
+    <color name="secondaryDarkColor">#c63f17</color><!---->
+
+    <!-- Green Primary -->
+    <!--<color name="colorPrimary">#2ECC71</color>
+    <color name="colorPrimaryDark">#3E4B48</color>
+    <color name="colorAccent">#1E8248</color>-->
+
+    <!-- Blue Secondary -->
+    <!--<color name="secondaryColor">#2195f2</color>
+    <color name="secondaryLightColor">#6ec5ff</color>
+    <color name="secondaryDarkColor">#0068bf</color>-->
+
+    <!-- Grey -->
+    <color name="black">#313536</color>
+    <color name="lowContrastLight">#DBE3E4</color>
+    <color name="lowContrastDark">#525A5C</color>
 </resources>
