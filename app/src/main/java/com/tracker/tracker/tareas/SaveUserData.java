@@ -33,7 +33,9 @@ public class SaveUserData extends AsyncTask<Usuario, Void, Void> {
         uRef.set(user);
         if(u.haveContactos()) {
             for (Contacto c: u.getContactos()) {
-                db.collection("users/"+u.getUID()+"/contactos").add(c.toMap());
+                if(c.isNuevo()) {
+                    db.collection("users/"+u.getUID()+"/contactos").add(c.toMap());
+                }
             }
         }
         return null;

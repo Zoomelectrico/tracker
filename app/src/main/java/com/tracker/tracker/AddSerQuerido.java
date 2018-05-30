@@ -56,7 +56,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         boolean isLongEnough = phone.length() == 11;
 
         if(notEmpty && isAlpha && isNumeric && isLongEnough) {
-            this.usuario.addContacto(new Contacto(name, phone));
+            this.usuario.addContacto(new Contacto(name, phone, true));
             this.usuario.saveData(FirebaseFirestore.getInstance());
             finish();
         }

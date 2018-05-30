@@ -2,6 +2,7 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -9,13 +10,15 @@ public class Contacto implements Parcelable {
 
     private String nombre;
     private String telf;
+    private boolean nuevo;
 
-    public Contacto(String nombre, String telf) {
+    public Contacto(String nombre, String telf, boolean nuevo) {
         this.nombre = nombre;
         this.telf = telf;
+        this.nuevo = nuevo;
     }
 
-    public  Contacto(Parcel in) {
+    private Contacto(@NonNull Parcel in) {
         this.nombre = in.readString();
         this.telf = in.readString();
     }
@@ -24,17 +27,11 @@ public class Contacto implements Parcelable {
         return nombre;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
     public String getTelf() {
         return telf;
     }
 
-    public void setTelf(String telf) {
-        this.telf = telf;
-    }
+    public boolean isNuevo() { return this.nuevo; }
 
     @Override
     public String toString() {

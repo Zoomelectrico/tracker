@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if(task.isSuccessful()) {
                         for (DocumentSnapshot document : task.getResult()) {
-                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
+                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"), false);
                             contactos.add(c);
                         }
                         if(contactos.isEmpty()) {

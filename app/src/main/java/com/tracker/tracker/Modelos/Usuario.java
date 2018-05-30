@@ -141,7 +141,7 @@ public class Usuario implements Parcelable {
                                 if(task.isSuccessful()) {
                                     if(task.getResult() != null) {
                                         for (DocumentSnapshot documentC: task.getResult()) {
-                                            usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf")));
+                                            usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
                                             Log.e("USER", documentC.getString("nombre"));
                                         }
                                     }
