@@ -3,6 +3,7 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -116,15 +117,11 @@ public class Usuario implements Parcelable {
         this.UID = UID;
     }
 
-    public void setContactos(ArrayList<Contacto> contactos) {
-        this.contactos = contactos;
-    }
-
     public void saveData(FirebaseFirestore db) {
         new SaveUserData(db).execute(this);
     }
 
-    public static Usuario getUsuario(FirebaseFirestore db, String UID) {
+    public static Usuario getUsuario(@NonNull FirebaseFirestore db, @NonNull String UID) {
         final Usuario usuario = new Usuario();
         final DocumentReference user = db.document("users/"+UID);
         final CollectionReference contactos = db.collection("users/"+UID+"/contactos");
@@ -145,6 +142,7 @@ public class Usuario implements Parcelable {
                                     if(task.getResult() != null) {
                                         for (DocumentSnapshot documentC: task.getResult()) {
                                             usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf")));
+                                            Log.e("USER", documentC.getString("nombre"));
                                         }
                                     }
                                 }

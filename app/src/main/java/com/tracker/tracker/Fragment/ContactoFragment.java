@@ -50,13 +50,10 @@ public class ContactoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacto_list, container, false);
-        Bundle bundle = getArguments();
+        Bundle bundle = getActivity().getIntent().getExtras();
         if(bundle != null) {
             Usuario usuario = (Usuario) bundle.getParcelable("user");
             contactos = usuario.getContactos();
-            Log.e("contactos", contactos.toString());
-        } else {
-            Log.e("BUNDLE", "NULLL");
         }
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -67,8 +64,8 @@ public class ContactoFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
             }
             MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(contactos, listener);
-            recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }

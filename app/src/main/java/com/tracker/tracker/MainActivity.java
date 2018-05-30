@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity
     private CardView tripDescription;
     private boolean isViajando = false;
 
-
     private Usuario usuario;
 
     @Override
