@@ -16,7 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -66,8 +65,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.tareas.ProfilePicture;
-import com.tracker.tracker.tareas.UserData;
 
 import java.util.ArrayList;
 
@@ -118,6 +117,8 @@ public class MainActivity extends AppCompatActivity
     private boolean isViajando = false;
 
 
+    private Usuario usuario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // UI
@@ -125,29 +126,10 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if(!gotPermissions()) {
-            requestPermissions();
-        }
-
-        //Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //Navegacion
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        // Datos de la Aplicación
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
-        this.db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        this.db.setFirestoreSettings(settings);
-
+        this.navigationConfig();
+        this.permissionConfig();
+        this.firebaseConfig();
+        this.getUserData();
         updateValuesFromBundle(savedInstanceState);
 
         // Verificar GPS
@@ -162,7 +144,6 @@ public class MainActivity extends AppCompatActivity
         this.buildLocationSettingsRequest();
         this.updateUI();
         this.startLocationUpdates();
-
     }
 
     @Override
@@ -181,6 +162,10 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
     }
 
+    private void getUserData() {
+        this.usuario = Usuario.getUsuario(this.db, this.user.getUid());
+    }
+
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
@@ -191,6 +176,27 @@ public class MainActivity extends AppCompatActivity
                 this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             }
         }
+    }
+
+    private void firebaseConfig() {
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+        this.db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        this.db.setFirestoreSettings(settings);
+    }
+
+    private void navigationConfig() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
     }
 
     private void spinnerConfig() {
@@ -348,7 +354,6 @@ public class MainActivity extends AppCompatActivity
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
-                updateLocation(user, currentLocation);
                 if(destination != null) {
                     ((TextView) tripDescription.findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
@@ -365,55 +370,44 @@ public class MainActivity extends AppCompatActivity
             String SENT = "SMS_SENT";
             String DELIVERED = "SMS_DELIVERED";
 
-            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
-                    new Intent(SENT), 0);
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
 
-            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
-                    new Intent(DELIVERED), 0);
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
 
-            //Cuando se envía el mensaje de texto-
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS enviado",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS enviado", Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            Toast.makeText(getBaseContext(), "Generic failure",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Generic failure", Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            Toast.makeText(getBaseContext(), "No service",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Sin señal", Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
-                            Toast.makeText(getBaseContext(), "Null PDU",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Null PDU", Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            Toast.makeText(getBaseContext(), "Radio off",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Radio off", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
             }, new IntentFilter(SENT));
 
-            //---Cuando se recibe el mensaje de texto---
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS recibido",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS recibido", Toast.LENGTH_SHORT).show();
                             break;
                         case Activity.RESULT_CANCELED:
-                            Toast.makeText(getBaseContext(), "SMS not delivered",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS not delivered", Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
@@ -429,8 +423,8 @@ public class MainActivity extends AppCompatActivity
             }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
-            //Retornar la vista Main a la vista principal
-            this.tripDescription.setVisibility(View.INVISIBLE);
+
+            this.tripDescription.setVisibility(View.GONE);
             this.isViajando = false;
             contacto = null;
             destination = null;
@@ -461,8 +455,7 @@ public class MainActivity extends AppCompatActivity
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                         Log.i("", "All location settings are satisfied.");
                         try {
-                            locationProviderClient.requestLocationUpdates(locationRequest,
-                                    locationCallback, Looper.myLooper());
+                            locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                         } catch (SecurityException e) {
                             Log.e("Main", "Security Exception", e);
                         }
@@ -474,8 +467,6 @@ public class MainActivity extends AppCompatActivity
                         int statusCode = ((ApiException) e).getStatusCode();
                         switch (statusCode) {
                             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                Log.i("", "Location settings are not satisfied. Attempting to upgrade " +
-                                        "location settings ");
                                 try {
                                     ResolvableApiException rae = (ResolvableApiException) e;
                                     rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
@@ -504,15 +495,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
-            // Check for the integer request code originally supplied to startResolutionForResult().
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.i("", "User agreed to make required location settings changes.");
-                        // Nothing to do. startLocationupdates() gets called in onResume again.
                         break;
                     case Activity.RESULT_CANCELED:
-                        Log.i("", "User chose not to make required location settings changes.");
                         this.requestingLocationUpdate = false;
                         break;
                 }
@@ -555,62 +543,56 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        Intent intent;
+        Intent intent = new Intent();
         switch (id) {
             case R.id.add_place :
                 break;
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
-                startActivityForResult(intent, 0);
+                intent.putExtra("user", usuario);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
-                startActivityForResult(intent, 0);
+                intent.putExtra("user", usuario);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.logout:
                 this.auth.signOut();
                 intent = new Intent(this, Login.class);
-                startActivityForResult(intent, 0);
                 finish();
                 break;
         }
-
+        startActivity(intent);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    public void updateLocation(FirebaseUser user, Location l) {
-        new UserData(l).execute(user);
+    private void permissionConfig() {
+        if(!gotPermissions()) {
+            requestPermissions();
+        }
     }
 
     public boolean gotPermissions() {
@@ -621,12 +603,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void requestPermissions() {
-        boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(this,
+        boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.ACCESS_FINE_LOCATION);
 
-        // Provide an additional rationale to the user. This would happen if the user denied the
-        // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
             Log.i("", "Displaying permission rationale to provide additional context.");
             showSnackbar(R.string.permission_rationale,

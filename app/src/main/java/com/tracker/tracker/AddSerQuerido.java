@@ -1,18 +1,16 @@
 package com.tracker.tracker;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.tracker.tracker.tareas.AddSerQueridoAsync;
-import com.tracker.tracker.tareas.SeresQueridosAsync;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Usuario;
 
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
@@ -20,28 +18,27 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
     private Button btnAdd;
     private EditText txtNombre;
     private EditText txtPhone;
-    // Firebase
-    private FirebaseAuth auth;
-    private FirebaseUser user;
+
+    private Usuario usuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // UI
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
+
+        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+
         this.btnAdd = findViewById(R.id.btnAdd);
         this.txtNombre = findViewById(R.id.txtNombre);
         this.txtPhone = findViewById(R.id.txtPhone);
+
         Toolbar toolbar = findViewById(R.id.tbAddSer);
         toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        // Firebase
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
 
         // Add Event Listener
         this.btnAdd.setOnClickListener(this);
@@ -59,10 +56,8 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         boolean isLongEnough = phone.length() == 11;
 
         if(notEmpty && isAlpha && isNumeric && isLongEnough) {
-            new AddSerQueridoAsync(name, phone).execute(this.user);
-            Toast.makeText(this, "Ser querido registrado",Toast.LENGTH_SHORT).show();
-            //Obtener información de los seres queridos
-            //new SeresQueridosAsync().execute(this.user);
+            this.usuario.addContacto(new Contacto(name, phone));
+            this.usuario.saveData(FirebaseFirestore.getInstance());
             finish();
         }
 

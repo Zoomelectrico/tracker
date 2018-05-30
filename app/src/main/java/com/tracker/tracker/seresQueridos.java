@@ -8,16 +8,25 @@ import android.view.View;
 
 import com.tracker.tracker.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Usuario;
 
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Usuario usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("user", usuario);
+        ContactoFragment contactoFragment = new ContactoFragment();
+        contactoFragment.setArguments(bundle);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seres_queridos);
+
         Toolbar toolbar = findViewById(R.id.tbAddSer);
         toolbar.setTitle("Lista de Seres Queridos");
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
