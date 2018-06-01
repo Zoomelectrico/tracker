@@ -25,21 +25,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.tracker.tracker.Modelos.Usuario;
 
-
+/**
+ *
+ */
 public class Login extends AppCompatActivity implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     // Constantes
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
-
-    // Referencias a los servicios de Firebase
     private FirebaseAuth auth;
     private FirebaseFirestore db;
     private GoogleSignInClient googleSIClient;
-
-    // UI
     private Button btnLogin;
 
+    /**
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Inicio la UI
@@ -66,6 +67,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
 
     }
 
+    /**
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -82,8 +86,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
 
     /**
      * Metodo firebaseAuthWithGoogle(): Este método se entiende con la API de firebase para hacer login en su plataforma.
-     * Una vez que se ha hecho el login se guardan los datos del usuario en la db;
-     * */
+     * Una vez que se ha hecho el login se guardan los datos del usuario en la db
+     * @param acct {GoogleSignInAccount} acct _ SE
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -112,11 +117,17 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
                 });
     }
 
+    /**
+     *
+     */
     private void signIn() {
         Intent signInIntent = this.googleSIClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
+    /**
+     *
+     */
     @Override
     public void onClick(View v) {
         this.signIn();

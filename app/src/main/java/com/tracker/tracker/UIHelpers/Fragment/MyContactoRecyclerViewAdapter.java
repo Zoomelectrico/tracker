@@ -1,4 +1,4 @@
-package com.tracker.tracker.Fragment;
+package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,22 +6,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tracker.tracker.Fragment.ContactoFragment.OnListFragmentInteractionListener;
+import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment.OnListFragmentInteractionListener;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.R;
 
 import java.util.List;
 
+/**
+ *
+ */
 public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContactoRecyclerViewAdapter.ViewHolder> {
 
     private final List<Contacto> contactos;
     private final OnListFragmentInteractionListener listener;
 
+    /**
+     *
+     */
     public MyContactoRecyclerViewAdapter(List<Contacto> items, OnListFragmentInteractionListener listener) {
         this.contactos = items;
         this.listener = listener;
     }
 
+    /**
+     *
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -29,6 +38,9 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
         return new ViewHolder(view);
     }
 
+    /**
+     *
+     */
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.item = contactos.get(position);
@@ -48,11 +60,17 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
         });
     }
 
+    /**
+     *
+     */
     @Override
     public int getItemCount() {
         return contactos.size();
     }
 
+    /**
+     *
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public TextView txtNombre;

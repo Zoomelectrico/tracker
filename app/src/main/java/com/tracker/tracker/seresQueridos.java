@@ -4,15 +4,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 
-import com.tracker.tracker.Fragment.ContactoFragment;
+import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
+/**
+ *
+ */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
-
+    /**
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Usuario usuario = (Usuario) this.getIntent().getParcelableExtra("user");
@@ -33,6 +37,9 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
 
     }
 
+    /**
+     *
+     */
     @Override
     public void onListFragmentInteraction(Contacto item) {
         Log.e("jejejeje", item.toString());

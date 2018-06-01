@@ -12,15 +12,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
+/**
+ *
+ */
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
-    // UI
     private Button btnAdd;
     private EditText txtNombre;
     private EditText txtPhone;
-
     private Usuario usuario;
 
+    /**
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // UI
@@ -44,6 +48,9 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         this.btnAdd.setOnClickListener(this);
     }
 
+    /**
+     *
+     */
     @Override
     public void onClick(View v) {
         String name = String.valueOf(txtNombre.getText());

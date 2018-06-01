@@ -68,6 +68,15 @@ public class Usuario implements Parcelable {
         return contactos;
     }
 
+    /**
+     * Método getContacto:
+     * @param i el indice en que se encuentra el contacto
+     * @return el i-esimo contacto de la lista
+     */
+    public Contacto getContacto(int i) {
+        return this.contactos.get(i);
+    }
+
     public void addContacto(Contacto c) {
         this.contactos.add(c);
     }
@@ -76,7 +85,7 @@ public class Usuario implements Parcelable {
         return email;
     }
 
-    public void setEmail(String email) {
+    private void setEmail(String email) {
         this.email = email;
     }
 
@@ -105,15 +114,15 @@ public class Usuario implements Parcelable {
         }
     };
 
-    public void setNombre(String nombre) {
+    private void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public void setPhoto(String photo) {
+    private void setPhoto(String photo) {
         this.photo = photo;
     }
 
-    public void setUID(String UID) {
+    private void setUID(String UID) {
         this.UID = UID;
     }
 
@@ -142,7 +151,6 @@ public class Usuario implements Parcelable {
                                     if(task.getResult() != null) {
                                         for (DocumentSnapshot documentC: task.getResult()) {
                                             usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
-                                            Log.e("USER", documentC.getString("nombre"));
                                         }
                                     }
                                 }

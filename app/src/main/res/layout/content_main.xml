@@ -21,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:visibility="gone">
 
             <ProgressBar
                 android:id="@+id/pbMain"
@@ -35,7 +36,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:visibility="gone">
+            >
             <TextView
                 android:id="@+id/txtWelcome"
                 android:layout_width="wrap_content"
@@ -46,12 +47,10 @@
                 android:padding="16dp"
                 android:layout_marginBottom="8dp"/>
 
-            <Spinner
-                android:id="@+id/spSeresQueridos"
-                android:layout_height="30dp"
+            <com.thomashaertel.widget.MultiSpinner
+                android:id="@+id/spinnerMulti"
                 android:layout_width="match_parent"
-                android:padding="16dp"
-                android:visibility="gone" />
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/txtContacto"
@@ -61,7 +60,7 @@
                 android:textSize="14sp"
                 android:visibility="gone"
                 android:padding="8dp"
-                android:layout_marginTop="8dp"></TextView>
+                android:layout_marginTop="8dp"/>
 
             <Button
                 android:id="@+id/btnFindPlace"
@@ -158,7 +157,6 @@
                             android:layout_marginTop="8dp"/>
 
                     </LinearLayout>
-
                     <Button
                         android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
@@ -169,17 +167,7 @@
                         android:layout_weight="1"
                         android:text="Cancelar Viaje" />
                 </LinearLayout>
-
-
-
-
             </android.support.v7.widget.CardView>
         </LinearLayout>
-
-
-
     </LinearLayout>
-
-
-
 </android.support.constraint.ConstraintLayout>

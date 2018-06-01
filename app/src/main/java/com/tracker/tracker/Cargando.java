@@ -9,14 +9,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 
-// Esta Clase sirve como preloader a la App
-
+/**
+ *
+ */
 public class Cargando extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseUser user;
     private FirebaseFirestore db;
 
+    /**
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);

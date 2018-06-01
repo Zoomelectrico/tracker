@@ -30,11 +30,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,29 +51,25 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.tareas.ProfilePicture;
 
 import java.util.ArrayList;
 
-import static android.content.ContentValues.TAG;
+/**
+ * Controlador de la actividad principal
+ * Esta clase configura el menú, permite crear viaje, maneja el tema de la ubicación
+ */
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
-
-    // Constantes
     private static final int PLACE_PICKER_REQUEST = 2;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -84,7 +78,6 @@ public class MainActivity extends AppCompatActivity
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     private final static String KEY_LOCATION = "location";
 
-    // Datos de Firebase
     private FirebaseUser user;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -105,8 +98,9 @@ public class MainActivity extends AppCompatActivity
     private boolean isOpen = false;
 
     //Opciones en Spinner
-    private Spinner spinner;
+    private MultiSpinner spinner;
     private ArrayList<Contacto> contactos;
+    private ArrayAdapter<String> adapter;
 
     // Viaje
     private Location currentLocation;
@@ -118,17 +112,22 @@ public class MainActivity extends AppCompatActivity
 
     private Usuario usuario;
 
+    /**
+     * Método onCreate:
+     * @param savedInstanceState {Bundle}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // UI
+        this.firebaseConfig();
+        this.getUserData();
+
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         this.navigationConfig();
         this.permissionConfig();
-        this.firebaseConfig();
-        this.getUserData();
+
         updateValuesFromBundle(savedInstanceState);
 
         // Verificar GPS
@@ -149,6 +148,7 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
         this.spinnerConfig();
+        this.adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -161,6 +161,9 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
     }
 
+    /**
+     * Método: getUserData: Este método se encarga de obtener los datos del usuario de la DB y guardarlos en el modelo
+     */
     private void getUserData() {
         this.usuario = Usuario.getUsuario(this.db, this.user.getUid());
     }
@@ -177,6 +180,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Método firebaseConfig: Este método se encarga de iniciar la DB y obtener una instacia del servicio de Auth y se obtiene el usuario actual del sistema
+     */
     private void firebaseConfig() {
         this.auth = FirebaseAuth.getInstance();
         this.user = this.auth.getCurrentUser();
@@ -186,7 +192,9 @@ public class MainActivity extends AppCompatActivity
                 .build();
         this.db.setFirestoreSettings(settings);
     }
-
+    /**
+     * Método navigationConfig: Este método se encarga de crear el Toolbar y el menú de Hamburguesa
+     */
     private void navigationConfig() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -198,63 +206,52 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
     }
 
+    /**
+     *
+     */
     private void spinnerConfig() {
         if(isViajando) {
             this.spinner.setVisibility(View.GONE);
             ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.GONE);
             ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
-            Log.d("Spinner", "viajando");
         } else {
-            final Context context= this;
-            this.contactos.clear();
-            this.spinner = findViewById(R.id.spSeresQueridos);
-            CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
-            contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"), false);
-                            contactos.add(c);
-                        }
-                        if(contactos.isEmpty()) {
-                            // Si no tiene a nadie lo mando a agregar uno
-                            Intent intent = new Intent(context, AddSerQuerido.class);
-                            startActivity(intent);
-                            Toast.makeText(context, "Añade un ser Querido para empezar a usar la App", Toast.LENGTH_SHORT).show();
-                        } else {
-                            ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
-                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spinner.setAdapter(adapter);
-                            findViewById(R.id.layoutCargando).setVisibility(View.GONE);
-                            findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
-                            spinner.setVisibility(View.VISIBLE);
-                        }
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", task.getException());
+            this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+            this.adapter.add("Seleccione a sus Contactos");
+            if(usuario != null) {
+                if(this.usuario.haveContactos()) {
+                    for (Contacto c : this.usuario.getContactos()) {
+                        adapter.add(c.getNombre());
                     }
-                }
-            });
-            this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                    if (contactos.size() == 0) return;
-                    if(!isViajando) {
-                        contacto = contactos.get(pos);
-                        findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
-                        ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
-                    } else {
-                        Toast.makeText(context,"Cancelar el viaje para escoger otro ser querido", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
+                    this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
+                    this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
+                        @Override
+                        public void onItemsSelected(boolean[] selected) {
+                            contactos.clear();
+                            for (int i = 0; i < selected.length; i++) {
+                                if(selected[i]) {
+                                    contactos.add(usuario.getContacto(i-1));
+                                }
+                            }
+                            Log.e("Select", contactos.toString());
+                        }
+                    });
+                    boolean[] selectedItems = new boolean[adapter.getCount()];
+                    selectedItems[1] = true; // select second item
+                    spinner.setSelected(selectedItems);
+                    findViewById(R.id.layoutCargando).setVisibility(View.GONE);
+                    findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
+                } else {
 
                 }
-            });
+            } else {
+                Log.e("USUARIO", "NULL");
+            }
         }
     }
 
+    /**
+     * Método fabConfig: Este método se encarga de configurar el botón fab
+     */
     private void fabConfig() {
         // Botones
         fabAdd = findViewById(R.id.fabAdd);
@@ -305,6 +302,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    /**
+     *
+     */
     private void updateUI() {
         final Activity activity = this;
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -347,6 +347,9 @@ public class MainActivity extends AppCompatActivity
         findViewById(R.id.btnFindPlace).setOnClickListener(listener);
     }
 
+    /**
+     *
+     */
     private void createLocationCallback() {
         this.locationCallback = new LocationCallback() {
             @Override
@@ -364,6 +367,9 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
+    /**
+     *
+     */
     private void sendSMS() {
         if(contacto != null && destination != null && placeDestionation != null) {
             String SENT = "SMS_SENT";
@@ -433,6 +439,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     */
     private void createLocationRequest() {
         this.locationRequest = new LocationRequest();
         this.locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -440,12 +449,18 @@ public class MainActivity extends AppCompatActivity
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    /**
+     *
+     */
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(this.locationRequest);
         this.locationSettingsRequest = builder.build();
     }
 
+    /**
+     *
+     */
     private void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
         this.settingsClient.checkLocationSettings(this.locationSettingsRequest)
@@ -485,12 +500,18 @@ public class MainActivity extends AppCompatActivity
                 });
     }
 
+    /**
+     *
+     */
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    /**
+     *
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -530,6 +551,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -540,12 +564,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    /**
+     *
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -556,6 +586,9 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     *
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -588,12 +621,18 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     *
+     */
     private void permissionConfig() {
         if(!gotPermissions()) {
             requestPermissions();
         }
     }
 
+    /**
+     *
+     */
     public boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean b = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -601,6 +640,9 @@ public class MainActivity extends AppCompatActivity
         return a && b && c;
     }
 
+    /**
+     *
+     */
     private void requestPermissions() {
         boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.ACCESS_FINE_LOCATION);
@@ -624,6 +666,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
@@ -638,6 +683,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     */
     private void showSnackbar(final int mainTextStringId, final int actionStringId,View.OnClickListener listener) {
         Snackbar.make(
                 findViewById(android.R.id.content),
