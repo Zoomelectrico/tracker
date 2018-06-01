@@ -31,7 +31,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
 
-        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+        this.usuario = (Usuario) ((Bundle) this.getIntent().getParcelableExtra("user")).getParcelable("user");
 
         this.btnAdd = findViewById(R.id.btnAdd);
         this.txtNombre = findViewById(R.id.txtNombre);

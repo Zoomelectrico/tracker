@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -12,6 +14,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.R;
+import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
 import java.util.ArrayList;
@@ -85,7 +89,7 @@ public class Usuario implements Parcelable {
         return email;
     }
 
-    private void setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -114,15 +118,15 @@ public class Usuario implements Parcelable {
         }
     };
 
-    private void setNombre(String nombre) {
+    public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    private void setPhoto(String photo) {
+    public void setPhoto(String photo) {
         this.photo = photo;
     }
 
-    private void setUID(String UID) {
+    public void setUID(String UID) {
         this.UID = UID;
     }
 
@@ -130,36 +134,12 @@ public class Usuario implements Parcelable {
         new SaveUserData(db).execute(this);
     }
 
-    public static Usuario getUsuario(@NonNull FirebaseFirestore db, @NonNull String UID) {
-        final Usuario usuario = new Usuario();
-        final DocumentReference user = db.document("users/"+UID);
-        final CollectionReference contactos = db.collection("users/"+UID+"/contactos");
-        user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()) {
-                    final DocumentSnapshot document = task.getResult();
-                    if(document != null) {
-                        usuario.setNombre(document.getString("nombre"));
-                        usuario.setEmail(document.getString("email"));
-                        usuario.setPhoto(document.getString("photo"));
-                        usuario.setUID(document.getString("UID"));
-                        contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if(task.isSuccessful()) {
-                                    if(task.getResult() != null) {
-                                        for (DocumentSnapshot documentC: task.getResult()) {
-                                            usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        });
-        return usuario;
+    public void imageConfig(View header) {
+        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.photo);
+    }
+
+    @Override
+    public String toString() {
+        return this.nombre + " " + this.UID;
     }
 }

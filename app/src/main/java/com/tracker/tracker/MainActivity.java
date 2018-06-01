@@ -62,7 +62,9 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.tareas.ProfilePicture;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Controlador de la actividad principal
@@ -105,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Viaje
     private Location currentLocation;
     private Location destination;
-    private Contacto contacto;
     private Place placeDestionation;
     private CardView tripDescription;
     private boolean isViajando = false;
@@ -148,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume() {
         super.onResume();
         this.spinnerConfig();
-        this.adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -162,10 +162,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método: getUserData: Este método se encarga de obtener los datos del usuario de la DB y guardarlos en el modelo
+     * Método: getUserData: Este método se encarga de obtener el Objeto Parcelable del Usuario
      */
     private void getUserData() {
-        this.usuario = Usuario.getUsuario(this.db, this.user.getUid());
+        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
@@ -210,38 +210,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      */
     private void spinnerConfig() {
+        this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
+        this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        this.adapter.notifyDataSetChanged();
+        this.spinner.setDefaultText("Selecciona a tus seres queridos");
         if(isViajando) {
             this.spinner.setVisibility(View.GONE);
-            ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.GONE);
             ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
         } else {
-            this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-            this.adapter.add("Seleccione a sus Contactos");
             if(usuario != null) {
                 if(this.usuario.haveContactos()) {
                     for (Contacto c : this.usuario.getContactos()) {
                         adapter.add(c.getNombre());
                     }
-                    this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
                     this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
                         @Override
                         public void onItemsSelected(boolean[] selected) {
                             contactos.clear();
                             for (int i = 0; i < selected.length; i++) {
                                 if(selected[i]) {
-                                    contactos.add(usuario.getContacto(i-1));
+                                    contactos.add(usuario.getContacto(i));
                                 }
                             }
-                            Log.e("Select", contactos.toString());
                         }
                     });
-                    boolean[] selectedItems = new boolean[adapter.getCount()];
-                    selectedItems[1] = true; // select second item
-                    spinner.setSelected(selectedItems);
                     findViewById(R.id.layoutCargando).setVisibility(View.GONE);
                     findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
-                } else {
-
                 }
             } else {
                 Log.e("USUARIO", "NULL");
@@ -306,7 +300,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      */
     private void updateUI() {
-        final Activity activity = this;
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
@@ -314,13 +307,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((Button) tripDescription.findViewById(R.id.btnCancelarViaje)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopLocationUpdates();
                 tripDescription.setVisibility(View.GONE);
                 spinner.setVisibility(View.VISIBLE);
                 ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
                 isViajando = false;
-                contacto = null;
+                contactos.clear();
                 destination = null;
                 placeDestionation = null;
+                boolean[] bool = new boolean[usuario.getContactos().size()];
+                Arrays.fill(bool, false);
+                spinner.setSelected(bool);
             }
         });
 
@@ -328,16 +325,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
 
-        // Tarea Especial para la foto
-        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
+        this.usuario.imageConfig(header);
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                startLocationUpdates();
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                // Construct an intent for the place picker
                 try {
-                    Intent intent = builder.build(activity);
+                    Intent intent = builder.build(MainActivity.this);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
                 }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.e("ERROR", e.getMessage(), e);
@@ -360,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ((TextView) tripDescription.findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
-                        sendSMS();
+                        placeArrival();
                     }
                 }
             }
@@ -370,15 +366,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      *
      */
-    private void sendSMS() {
-        if(contacto != null && destination != null && placeDestionation != null) {
+    private void sendSMS(@NonNull Contacto contacto) {
+        if(destination != null && placeDestionation != null) {
             String SENT = "SMS_SENT";
             String DELIVERED = "SMS_DELIVERED";
 
             PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-
             PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
-
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
@@ -428,15 +422,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
-
-            this.tripDescription.setVisibility(View.GONE);
-            this.isViajando = false;
-            contacto = null;
-            destination = null;
-            placeDestionation = null;
-            spinnerConfig();
-            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * Método placeArrival:
+     */
+    private void placeArrival() {
+        for (Contacto contacto: contactos) {
+            sendSMS(contacto);
+        }
+        this.tripDescription.setVisibility(View.GONE);
+        this.isViajando = false;
+        destination = null;
+        placeDestionation = null;
+        this.contactos.clear();
+        boolean[] bool = new boolean[this.usuario.getContactos().size()];
+        Arrays.fill(bool, false);
+        this.spinner.setSelected(bool);
+        spinnerConfig();
+        ((TextView) findViewById(R.id.txtWelcome)).setVisibility(View.VISIBLE);
+        ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
     }
 
     /**
@@ -503,6 +509,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      *
      */
+    private void stopLocationUpdates() {
+        this.locationProviderClient.removeLocationUpdates(this.locationCallback);
+    }
+    /**
+     *
+     */
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
@@ -533,22 +545,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     this.isViajando = true;
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
-                    if(contacto != null) {
-                        if(currentLocation == null) {
-                            Log.e("CurrentLocation", "null");
-                        } else {
-                            tripDescription = findViewById(R.id.estadoViaje);
-                            tripDescription.setVisibility(View.VISIBLE);
-                            ((TextView) tripDescription.findViewById(R.id.txtContactoNombre)).setText(contacto.getNombre());
-                            ((TextView) tripDescription.findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
-                            ((TextView) tripDescription.findViewById(R.id.txtDistance)).setText(String.valueOf(currentLocation.distanceTo(destination)));
-                        }
+                    if(!contactos.isEmpty()) {
+                        tripDescription.setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
+                        ((TextView) findViewById(R.id.txtContactoViaje)).setText(getContactosText());
+                        ((TextView) findViewById(R.id.txtDistance)).setText(String.valueOf(destination.distanceTo(currentLocation)));
                     } else {
-                        Toast.makeText(this, "Debes escoger un ser querido primero", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Debe escoger al menos a un Ser Querido", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
         }
+    }
+
+    /**
+     *
+     */
+    private String getContactosText(){
+        StringBuilder sb = new StringBuilder();
+        if(contactos.size() < 3) {
+            for (Contacto contacto: contactos) {
+                sb.append(contacto.getNombre());
+                sb.append(", ");
+            }
+            sb.substring(0,sb.length()-1);
+        } else {
+            sb.append(contactos.get(0).getNombre());
+            sb.append(", ");
+            sb.append(contactos.get(1).getNombre());
+            sb.append("...");
+        }
+        return sb.toString();
     }
 
     /**
@@ -594,12 +621,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         Intent intent = new Intent();
+        Bundle bundle = new Bundle();
         switch (id) {
             case R.id.add_place :
                 break;
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
-                intent.putExtra("user", usuario);
+                bundle.putParcelable("user", usuario);
+                intent.putExtra("user", bundle);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;

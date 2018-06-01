@@ -21,8 +21,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
 /**
@@ -98,18 +102,31 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             FirebaseUser user = auth.getCurrentUser();
+                            final Usuario usuario = new Usuario();
                             if(user != null) {
-                                Usuario usuario = new Usuario(
-                                        user.getDisplayName(),
-                                        user.getEmail(),
-                                        user.getPhotoUrl().toString(),
-                                        user.getUid()
-                                );
+                                usuario.setNombre(user.getDisplayName());
+                                usuario.setEmail(user.getEmail());
+                                usuario.setPhoto(user.getPhotoUrl().toString());
+                                usuario.setUID(user.getUid());
                                 usuario.saveData(db);
                             }
-                            Intent intent = new Intent(Login.this, MainActivity.class);
-                            startActivity(intent);
-                            finish();
+                            final CollectionReference contactos = db.collection("users/"+user.getUid()+"/contactos");
+                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()) {
+                                        if(task.getResult() != null) {
+                                            for (DocumentSnapshot documentC: task.getResult()) {
+                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
+                                            }
+                                            Intent intent = new Intent(Login.this, MainActivity.class);
+                                            intent.putExtra("user", usuario);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }

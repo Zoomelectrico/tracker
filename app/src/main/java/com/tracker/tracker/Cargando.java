@@ -2,12 +2,22 @@ package com.tracker.tracker;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Usuario;
 
 /**
  *
@@ -35,15 +45,46 @@ public class Cargando extends AppCompatActivity {
                 .build();
         this.db.setFirestoreSettings(settings);
 
-        Intent intent;
         if(user != null) {
-            intent = new Intent(this, MainActivity.class);
+            final String UID = this.user.getUid();
+            final Usuario usuario = new Usuario();
+            final DocumentReference user = db.document("users/"+UID);
+            final CollectionReference contactos = db.collection("users/"+UID+"/contactos");
+            user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if(task.isSuccessful()) {
+                        final DocumentSnapshot document = task.getResult();
+                        if(document != null) {
+                            usuario.setNombre(document.getString("nombre"));
+                            usuario.setEmail(document.getString("email"));
+                            usuario.setPhoto(document.getString("photo"));
+                            usuario.setUID(document.getString("UID"));
+                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()) {
+                                        if(task.getResult() != null) {
+                                            for (DocumentSnapshot documentC: task.getResult()) {
+                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
+                                            }
+                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                            intent.putExtra("user", usuario);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            });
         } else {
-            intent = new Intent(this, Login.class);
+            Intent intent = new Intent(this, Login.class);
+            startActivity(intent);
+            this.finish();
         }
-
-        startActivity(intent);
-        this.finish();
     }
 
 }
