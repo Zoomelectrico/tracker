@@ -211,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void spinnerConfig() {
         this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
+        this.spinner.setVisibility(View.VISIBLE);
         this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         this.adapter.notifyDataSetChanged();
         this.spinner.setDefaultText("Selecciona a tus seres queridos");
