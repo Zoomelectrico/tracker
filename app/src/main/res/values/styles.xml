@@ -1,10 +1,30 @@
 <resources>
 
     <!-- Base application theme. -->
+    <!-- Light Theme / Day Mode -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="backgroundColor">#ffffff</item>
+        <item name="cardColor">@color/lowContrastLight</item>
+        <item name="textColor">@color/black</item>
+        <item name="tintColor">@color/lowContrastDark</item>
+        <item name="buttonColor">@color/secondaryColor</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Dark Theme / Night Mode -->
+    <style name="DarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/secondaryColor</item>
+        <item name="backgroundColor">@color/black</item>
+        <item name="cardColor">@color/lowContrastDark</item>
+        <item name="textColor">#ffffff</item>
+        <item name="tintColor">@color/lowContrastLight</item>
+        <item name="buttonColor">@color/secondaryColor</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
