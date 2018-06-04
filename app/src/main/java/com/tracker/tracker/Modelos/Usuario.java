@@ -2,24 +2,18 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.R;
 import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
 import java.util.ArrayList;
-
+/**
+ * Clase Usuario: esta es la clase usuario, que modela al objeto Usuario en la DB
+ */
 public class Usuario implements Parcelable {
     private String nombre;
     private String email;
@@ -27,6 +21,13 @@ public class Usuario implements Parcelable {
     private String UID;
     private ArrayList<Contacto> contactos;
 
+    /**
+     * Constructor de la Clase
+     * @param nombre {String}
+     * @param email {String}
+     * @param photo {String}
+     * @param UID {String}
+     */
     public Usuario(String nombre, String email, String photo, String UID) {
         this.nombre = nombre;
         this.email = email;
@@ -35,6 +36,10 @@ public class Usuario implements Parcelable {
         this.contactos = new ArrayList<>();
     }
 
+    /**
+     * Constructor de la clase:
+     * @param in {Parcel}
+     */
     public Usuario(Parcel in) {
        this.nombre = in.readString();
        this.email = in.readString();
@@ -43,7 +48,9 @@ public class Usuario implements Parcelable {
        this.contactos = new ArrayList<>();
        in.readTypedList(contactos, Contacto.CREATOR);
     }
-
+    /**
+     * Constructor de la Clase:
+     */
     public Usuario() {
         this.nombre = "";
         this.email = "";
@@ -52,22 +59,83 @@ public class Usuario implements Parcelable {
         this.contactos = new ArrayList<>();
     }
 
+    /**
+     * getNombre:
+     * @return nombre {String}
+     * */
     public String getNombre() {
         return nombre;
     }
 
+    /**
+     * getPhoto:
+     * @return photo {String}
+     * */
     public String getPhoto() {
         return photo;
     }
 
+    /**
+     * getUID:
+     * @return UID {String}
+     */
     public String getUID() {
         return UID;
     }
 
+    /**
+     * getEmail:
+     * @return Email {String}
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * setEmail:
+     * @param email {String}
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * setEmail:
+     * @param nombre {String}
+     */
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    /**
+     * setEmail:
+     * @param photo {String}
+     */
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    /**
+     * setEmail:
+     * @param UID {String}
+     */
+    public void setUID(String UID) {
+        this.UID = UID;
+    }
+
+
+    /**
+     * haveContactos:
+     * @return true si tiene contactos, false en caso contrario {boolean}
+     * */
     public boolean haveContactos(){
         return ! this.contactos.isEmpty();
     }
 
+    /**
+     * getContactos:
+     * @return contactos {ArrayList}
+     * */
     public ArrayList<Contacto> getContactos() {
         return contactos;
     }
@@ -81,16 +149,12 @@ public class Usuario implements Parcelable {
         return this.contactos.get(i);
     }
 
+    /**
+     * Método addContacto: Añade un contacto a la lista de contactos.
+     * @param c {Contacto}
+     * */
     public void addContacto(Contacto c) {
         this.contactos.add(c);
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     @Override
@@ -117,23 +181,18 @@ public class Usuario implements Parcelable {
             return new Usuario[size];
         }
     };
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setPhoto(String photo) {
-        this.photo = photo;
-    }
-
-    public void setUID(String UID) {
-        this.UID = UID;
-    }
-
+    /**
+     * Método saveData:
+     * @param db {FirebaseFirestore}
+     */
     public void saveData(FirebaseFirestore db) {
         new SaveUserData(db).execute(this);
     }
 
+    /**
+     * Método imageConfig:
+     * @param header {View}
+     */
     public void imageConfig(View header) {
         new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.photo);
     }

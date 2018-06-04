@@ -20,7 +20,7 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
 /**
- *
+ * Clase Cargando esta clase se encarga se cargar los datos de la app al inicio
  */
 public class Cargando extends AppCompatActivity {
 
@@ -29,7 +29,8 @@ public class Cargando extends AppCompatActivity {
     private FirebaseFirestore db;
 
     /**
-     *
+     * Método onCrate:
+     * @param savedInstanceState {Bundle}
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
