@@ -1,10 +1,15 @@
 package com.tracker.tracker;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 
+import com.google.instrumentation.stats.Tag;
 import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
@@ -14,6 +19,8 @@ import com.tracker.tracker.Modelos.Usuario;
  */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
+    ImageButton btnEditarContacto;
+    private static final String TAG = "ModifySQDialog";
     /**
      * Método onCreate:
      * @param savedInstanceState {Bundle}
@@ -36,6 +43,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
     }
 
     /**
@@ -45,5 +53,13 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
     public void onListFragmentInteraction(Contacto item) {
         Log.e("jejejeje", item.toString());
     }
+
+    public void onClickSQ(View v) {
+        Log.e(TAG,"hooooooooooooooooola");
+
+                ModifySQDialog dialog = new ModifySQDialog();
+                dialog.show(getFragmentManager(), "ModifySQDialog");
+    }
+
 
 }

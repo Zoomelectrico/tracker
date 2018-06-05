@@ -59,10 +59,11 @@
                 android:id="@+id/btnEditarContacto"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_edit"
-                android:background="?android:selectableItemBackground"
                 android:layout_gravity="center"
-                android:padding="4dp"/>
+                android:background="?android:selectableItemBackground"
+                android:onClick="onClickSQ"
+                android:padding="4dp"
+                android:src="@drawable/ic_edit" />
 
             <ImageButton
                 android:id="@+id/btnEliminarContacto"
