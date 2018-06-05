@@ -10,9 +10,12 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.tracker.tracker.Modelos.Usuario;
+
 public class Settings extends AppCompatActivity {
 
     private Switch nightModeSwitch;
+    private Usuario user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class Settings extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        this.user = (Usuario) this.getIntent().getParcelableExtra("user");
 
         nightModeSwitch = findViewById(R.id.nightModeSwitch);
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -45,9 +49,6 @@ public class Settings extends AppCompatActivity {
                 } else {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 }
-
-                // MainActivity.this.recreate();
-
                 Settings.this.recreate();
             }
         });
@@ -62,4 +63,18 @@ public class Settings extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        if(user != null) {
+            intent.putExtra("user", user);
+            startActivity(intent);
+            finish();
+        } else {
+            Log.e("", "CHUPALO");
+        }
+
+    }
+
 }

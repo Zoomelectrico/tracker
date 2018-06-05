@@ -2,7 +2,7 @@
 
     <!-- Base application theme. -->
     <!-- Light Theme / Day Mode -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/secondaryColor</item>
@@ -16,7 +16,7 @@
     </style>
 
     <!-- Dark Theme / Night Mode -->
-    <style name="DarkTheme" parent="Theme.AppCompat.DayNight">
+    <style name="DarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/secondaryColor</item>
