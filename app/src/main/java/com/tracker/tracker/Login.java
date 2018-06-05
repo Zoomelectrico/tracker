@@ -30,7 +30,7 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
 /**
- *
+ * Clase Login esta clase es el controlador de la pantalla de Login
  */
 public class Login extends AppCompatActivity implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -43,7 +43,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     private Button btnLogin;
 
     /**
-     *
+     * Método onCreate:
+     * @param savedInstanceState {Bundle}
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     }
 
     /**
-     *
+     * Método onActivityResult:
+     * @param requestCode {int}
+     * @param resultCode {int}
+     * @param data {Intent}
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -135,7 +139,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     }
 
     /**
-     *
+     * Método signIn: este método se encarga de crear el intento de autenticación con Firebae
      */
     private void signIn() {
         Intent signInIntent = this.googleSIClient.getSignInIntent();
@@ -143,7 +147,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     }
 
     /**
-     *
+     * Método onClick: este método es el listener del botón de Inicio de Sesión
+     * @param v {View}
      */
     @Override
     public void onClick(View v) {

@@ -174,6 +174,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
     }
 
+    /**
+     * Método: updateValuesFromBundle este metódo se encargada de actualizar valores relacionados a la ubicación
+     * @param savedInstanceState {Bundle}
+     */
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
@@ -198,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .build();
         this.db.setFirestoreSettings(settings);
     }
+
     /**
      * Método navigationConfig: Este método se encarga de crear el Toolbar y el menú de Hamburguesa
      */
@@ -213,10 +218,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método spinnerConfig: se encarga de configurar el Spinner para seleccionar a los Seres Queridos
+     * Se instancia el spinner, se cambia la visual, le configura el onClick
      */
     private void spinnerConfig() {
         this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
+        this.spinner.setVisibility(View.VISIBLE);
         this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         this.adapter.notifyDataSetChanged();
         this.spinner.setDefaultText("Selecciona a tus seres queridos");
@@ -303,7 +310,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método updateUI: este método se encarga de configurar la barra de navegación, el boton de places,
+     * el boton de cancelar viaje, y de adaptar la UI a una persona
      */
     private void updateUI() {
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -350,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método createLocationCallback: este método se encarga de crear el listener para los cambios de ubicación
      */
     private void createLocationCallback() {
         this.locationCallback = new LocationCallback() {
@@ -370,7 +378,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método sendSMS: este método se encarga de enviar un mensaje de texto a una persona.
+     * @param contacto {Contacto} el objecto contacto que referencia el destinatario del mensaje.
      */
     private void sendSMS(@NonNull Contacto contacto) {
         if(destination != null && placeDestionation != null) {
@@ -432,11 +441,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método placeArrival:
+     * Método placeArrival: este método es llamado cuando un persona llega a un determinado destino.
+     * Utilizar el metodo sendSMS para los mensajes de texto.
+     * Adicionalmente se encarga de actualizar la UI
      */
     private void placeArrival() {
         for (Contacto contacto: contactos) {
-            sendSMS(contacto);
+            this.sendSMS(contacto);
         }
         this.tripDescription.setVisibility(View.GONE);
         this.isViajando = false;
@@ -452,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método createLocationRequest: este método se encarga de crear un objecto para hacer la petición de la Ubicación
      */
     private void createLocationRequest() {
         this.locationRequest = new LocationRequest();
@@ -462,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método buildLocationSettingsRequest: este método se encarga de configurar las peticiones de ubicación
      */
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
@@ -471,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método startLocationUpdates: este método se encarga de empezar a escuchar los cambios de ubicación en el teléfono
      */
     private void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
@@ -513,11 +524,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método stopLocationUpdates: este método se encarga de terminar de escuchar los cambios de ubicación en el teléfono
      */
     private void stopLocationUpdates() {
         this.locationProviderClient.removeLocationUpdates(this.locationCallback);
     }
+
     /**
      *
      */
@@ -529,7 +541,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método onActivyResult: este método se encarga de decidir que hacer después de que se lleva a cabo un intento
+     * @param requestCode {int} el código de la petición
+     * @param resultCode {int} el código del resultado (OK | NOOK);
+     * @param data {Intent} el intento que inicia la actividad
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -566,7 +581,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método getContactosText: este método es un auxiliar para actualizar el card del viaje
      */
     private String getContactosText(){
         StringBuilder sb = new StringBuilder();
@@ -660,7 +675,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método permissionConfig: este método se encarga de revisar si se pidieron los permisos y si no se tienen pedirlos
      */
     private void permissionConfig() {
         if(!gotPermissions()) {
@@ -669,7 +684,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método gotPermissions: este es un métdo auxiliar que se encarga de revisar que se tengan los permisos
      */
     public boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -679,7 +694,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método requestPermissions: este es un método auxiliar que se encarga de perdir los permisos necesarios
      */
     private void requestPermissions() {
         boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
@@ -705,7 +720,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método onRequestPermissionsResult
+     * @param requestCode {int}
+     * @param permissions {String[]}
+     * @param grantResults {int[]}
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -722,7 +740,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método showSnackbar:
+     * @param mainTextStringId {int}
+     * @param actionStringId {int}
+     * @param listener {View.OnClickListener}
      */
     private void showSnackbar(final int mainTextStringId, final int actionStringId,View.OnClickListener listener) {
         Snackbar.make(

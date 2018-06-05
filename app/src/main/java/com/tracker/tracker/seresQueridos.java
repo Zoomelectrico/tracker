@@ -10,12 +10,13 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
 
 /**
- *
+ * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
  */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
     /**
-     *
+     * Método onCreate:
+     * @param savedInstanceState {Bundle}
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
