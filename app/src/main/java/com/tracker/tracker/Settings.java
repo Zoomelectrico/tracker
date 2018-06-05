@@ -46,9 +46,9 @@ public class Settings extends AppCompatActivity {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 }
 
-                Intent i = new Intent(getApplicationContext(), Settings.class);
-                startActivity(i);
-                finish();
+                // MainActivity.this.recreate();
+
+                Settings.this.recreate();
             }
         });
     }
