@@ -40,16 +40,17 @@
             android:orientation="vertical"
             android:gravity="center"
             >
+
             <TextView
                 android:id="@+id/txtWelcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:padding="16dp"
                 android:text="Configurar Viaje"
                 android:textAlignment="center"
-                android:textSize="24sp"
-                android:padding="16dp"
-                android:layout_marginBottom="8dp"
-                android:textColor="?attr/textColor"/>
+                android:textColor="?attr/textColor"
+                android:textSize="24sp" />
 
             <com.thomashaertel.widget.MultiSpinner
                 android:id="@+id/spinnerMulti"
@@ -176,17 +177,21 @@
                             android:textColor="?attr/textColor"/>
 
                     </LinearLayout>
-
                     <Button
                         android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="18dp"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
                         android:layout_marginTop="8dp"
-                        android:layout_weight="1"
+                        android:layout_marginBottom="18dp"
+                        android:layout_height="0dp"
                         android:gravity="center"
-                        android:padding="8dp"
-                        android:text="Cancelar Viaje" />
+                        android:layout_weight="1"
+                        android:text="Cancelar Viaje"
+                        android:textColor="#ffffff"
+                        android:background="?attr/buttonColor"/>
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
