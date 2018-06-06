@@ -23,13 +23,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:background="?attr/backgroundColor"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="8dp"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,14 +36,17 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/labelNombre" />
+            android:text="@string/labelNombre"
+            android:textColor="?attr/textColor"/>
 
         <EditText
             android:id="@+id/txtNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="?attr/buttonColor"
             android:ems="10"
             android:hint="Pedro Perez"
+            android:textColorHint="?attr/lowContrastTextColor"
             android:inputType="textPersonName" />
 
         <TextView
@@ -54,14 +54,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:text="@string/labelTelefono" />
+            android:text="@string/labelTelefono"
+            android:textColor="?attr/textColor" />
 
         <EditText
             android:id="@+id/txtPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="?attr/buttonColor"
             android:ems="10"
             android:hint="04245555555"
+            android:textColorHint="?attr/lowContrastTextColor"
             android:inputType="phone"
             android:padding="8dp" />
 
@@ -70,7 +73,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:background="@color/lowContrastLight"
+            android:background="?attr/cardColor"
+            android:textColor="?attr/textColor"
             android:onClick="onClick"
             android:padding="8dp"
             android:text="@string/btnAgregar" />

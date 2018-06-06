@@ -2,6 +2,7 @@ package com.tracker.tracker;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
@@ -20,6 +21,12 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            setTheme(R.style.DarkTheme);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
+
         Usuario usuario = (Usuario) this.getIntent().getParcelableExtra("user");
         Bundle bundle = new Bundle();
         bundle.putParcelable("user", usuario);
