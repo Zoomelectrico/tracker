@@ -10,6 +10,7 @@ public class Contacto implements Parcelable {
 
     private String nombre;
     private String telf;
+    private String id;
     private boolean nuevo;
 
     public Contacto(String nombre, String telf, boolean nuevo) {
@@ -21,6 +22,7 @@ public class Contacto implements Parcelable {
     private Contacto(@NonNull Parcel in) {
         this.nombre = in.readString();
         this.telf = in.readString();
+        this.id = in.readString();
     }
 
     public String getNombre() {
@@ -30,6 +32,8 @@ public class Contacto implements Parcelable {
     public String getTelf() {
         return telf;
     }
+
+    public String getId(){ return id; }
 
     public boolean isNuevo() { return this.nuevo; }
 
@@ -47,6 +51,7 @@ public class Contacto implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.nombre);
         dest.writeString(this.telf);
+        dest.writeString(this.id);
     }
 
     public static final Parcelable.Creator<Contacto> CREATOR
@@ -64,6 +69,7 @@ public class Contacto implements Parcelable {
         HashMap<String, Object> contacto = new HashMap<>();
         contacto.put("nombre", this.nombre);
         contacto.put("telf", this.telf);
+        contacto.put("id", this.id);
         return contacto;
     }
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -47,18 +48,27 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
     }
 
     /**
-     *
+     * Método que permite desplegar el Diálogo al hacer click en el usuario para modificarlo.
      */
     @Override
     public void onListFragmentInteraction(Contacto item) {
         Log.e("jejejeje", item.toString());
+
+        Bundle args = new Bundle();
+        args.putString("Nombre", item.getNombre());
+        args.putString("Telf", item.getTelf());
+
+        ModifySQDialog dialog = new ModifySQDialog();
+        dialog.setArguments(args);
+        dialog.show(getFragmentManager(), "ModifySQDialog");
     }
 
+    /**
+     * El objetivo del método es desplegar el dialogo haciendo click en el boton de lápiz.
+     * @param v
+     */
     public void onClickSQ(View v) {
-        Log.e(TAG,"hooooooooooooooooola");
-
-                ModifySQDialog dialog = new ModifySQDialog();
-                dialog.show(getFragmentManager(), "ModifySQDialog");
+        Log.e(TAG,"hooooooooooooooooola" );
     }
 
 
