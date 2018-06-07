@@ -41,17 +41,16 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".Login" />
         <activity
-            android:name=".AddSerQuerido"
-            android:parentActivityName=".MainActivity" />
+            android:name=".AddSerQuerido" />
         <activity
-            android:name=".seresQueridos"
-            android:parentActivityName=".MainActivity" />
+            android:name=".seresQueridos"/>
+
+        <activity android:name=".Settings" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
 
-        <activity android:name=".Settings"></activity>
     </application>
 
 </manifest>

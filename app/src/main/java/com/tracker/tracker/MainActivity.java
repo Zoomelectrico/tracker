@@ -229,13 +229,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
         this.spinner.setVisibility(View.VISIBLE);
         this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        this.adapter.notifyDataSetChanged();
         this.spinner.setDefaultText("Selecciona a tus seres queridos");
         if(isViajando) {
             this.spinner.setVisibility(View.GONE);
             ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
         } else {
             if(usuario != null) {
+                adapter.clear();
                 if(this.usuario.haveContactos()) {
                     for (Contacto c : this.usuario.getContactos()) {
                         adapter.add(c.getNombre());
@@ -278,15 +278,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fabAddPerson.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), AddSerQuerido.class);
-                startActivityForResult(intent, 0);
-                onStop();
+                Intent intent = new Intent(MainActivity.this, AddSerQuerido.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("user", usuario);
+                intent.putExtra("user", bundle);
+                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
+                startActivity(intent);
             }
         });
 
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Esta Funcionalidad no esta Disponible", Toast.LENGTH_SHORT).show();
                 // TODO: Navegar a la actividad para agregar ubicacion
             }
         });
@@ -647,32 +652,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        switch (id) {
-            case R.id.add_place :
-                break;
-            case R.id.add_seres:
-                intent = new Intent(this, AddSerQuerido.class);
-                bundle.putParcelable("user", usuario);
-                intent.putExtra("user", bundle);
-                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
-                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
-                break;
-            case R.id.seres:
-                intent = new Intent(this, seresQueridos.class);
-                intent.putExtra("user", usuario);
-                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
-                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
-                break;
-            case R.id.logout:
-                this.auth.signOut();
-                intent = new Intent(this, Login.class);
-                finish();
-                break;
+        if(isViajando) {
+            Toast.makeText(this, "Don't Text and Drive", Toast.LENGTH_SHORT).show();
+        } else {
+            int id = item.getItemId();
+            Intent intent = null;
+            Bundle bundle = new Bundle();
+            switch (id) {
+                case R.id.add_place :
+                    break;
+                case R.id.add_seres:
+                    intent = new Intent(this, AddSerQuerido.class);
+                    bundle.putParcelable("user", usuario);
+                    intent.putExtra("user", bundle);
+                    findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                    findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
+                    break;
+                case R.id.seres:
+                    intent = new Intent(this, seresQueridos.class);
+                    intent.putExtra("user", usuario);
+                    findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
+                    findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
+                    break;
+                case R.id.logout:
+                    this.auth.signOut();
+                    intent = new Intent(this, Login.class);
+                    finish();
+                    break;
+            }
+            if (intent != null) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Esta funcionalidad no esta Disponible", Toast.LENGTH_SHORT).show();
+            }
         }
-        startActivity(intent);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

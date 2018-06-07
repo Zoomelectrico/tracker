@@ -60,7 +60,6 @@ public class Settings extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -74,7 +73,5 @@ public class Settings extends AppCompatActivity {
         } else {
             Log.e("", "CHUPALO");
         }
-
     }
-
 }

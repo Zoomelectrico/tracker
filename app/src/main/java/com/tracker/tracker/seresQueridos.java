@@ -1,25 +1,16 @@
 package com.tracker.tracker;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageButton;
+import android.view.MenuItem;
 
-import com.google.instrumentation.stats.Tag;
 import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.UIHelpers.Fragment.MyContactoRecyclerViewAdapter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
@@ -74,4 +65,19 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "ModifySQDialog");
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
+    }
+
 }

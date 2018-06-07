@@ -1,10 +1,12 @@
 package com.tracker.tracker;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -93,6 +95,27 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
 
         if (!isLongEnough) {
             txtPhone.setError("El teléfono ingresado debe contener 11 dígitos");
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, MainActivity.class);
+        if(usuario != null) {
+            intent.putExtra("user", usuario);
+            startActivity(intent);
+            finish();
+        } else {
+            Log.e("", "CHUPALO");
         }
     }
 

@@ -91,7 +91,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
                 this.modificarSQ();
             break;
             case R.id.btnCancelar:
-
+                getDialog().dismiss();
             break;
             case R.id.btnEliminarSQ:
                 this.eliminarSQ();
