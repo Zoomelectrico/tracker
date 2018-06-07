@@ -380,6 +380,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     ((TextView) tripDescription.findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
+                        Log.e("placeArrival", contactos.toString());
                         placeArrival();
                     }
                 }

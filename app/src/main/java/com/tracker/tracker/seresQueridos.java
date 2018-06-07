@@ -77,7 +77,14 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
 
     @Override
     public void onBackPressed() {
-        this.finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        if(user != null) {
+            intent.putExtra("user", user);
+            startActivity(intent);
+            finish();
+        } else {
+            Log.e("", "CHUPALO");
+        }
     }
 
 }

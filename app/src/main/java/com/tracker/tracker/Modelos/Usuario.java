@@ -173,10 +173,15 @@ public class Usuario implements Parcelable {
     /**
      * eliminarContacto: elimina un contacto de la lista de contactos según la posición que se
      * especifique.
-     * @param position
+     * @param nombre
      */
-    public void eliminarContacto(int position){
-        this.contactos.remove(position);
+    public void eliminarContacto(String nombre, String telf){
+        for (Contacto c: contactos) {
+            if(nombre.equals(c.getNombre()) && telf.equals(c.getTelf())) {
+                contactos.remove(c);
+                break;
+            }
+        }
     }
 
     @Override

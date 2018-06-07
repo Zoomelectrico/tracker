@@ -17,14 +17,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.UIHelpers.Fragment.MyContactoRecyclerViewAdapter;
+
+import org.w3c.dom.Document;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -143,31 +149,29 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void eliminarSQ(){
-        final Context ActivityContext = getActivity();
-        final Activity act = this.getActivity();
         /**
          * Actualización de la lista de Contactos de SeresQueridos del usuario.
          */
-        ((seresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getInt("position"));
+        ((seresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getString("Nombre"), this.getArguments().getString("Telf"));
 
-        db.collection("users").document(this.user.getUid())
-                .collection("contactos").document(this.getArguments().getString("id"))
-        .delete()
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Log.e(TAG, "DocumentSnapshot successfully deleted!");
-                    getDialog().dismiss();
-                    act.recreate();
-                    Toast.makeText(ActivityContext, "Ser Querido eliminado.", Toast.LENGTH_LONG).show();
+        db.collection("users").document(this.user.getUid()).collection("contactos")
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if(task.isSuccessful()) {
+                  if(task.getResult() != null) {
+                      for (DocumentSnapshot document: task.getResult()) {
+                          if(document.getString("nombre").equals(getArguments().getString("Nombre")) && document.getString("telf").equals(getArguments().getString("Telf"))) {
+                              String ID = document.getId();
+                              db.document("users/"+user.getUid()+"/contactos/"+ID).delete();
+                              break;
+                          }
+                      }
+                  }
                 }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.e(TAG, "Error deleting document");
-                    Toast.makeText(ActivityContext, "Operación fallida.", Toast.LENGTH_LONG).show();
-                }
-            });
+            }
+        });
+        getDialog().dismiss();
+        this.getActivity().recreate();
     }
 }
