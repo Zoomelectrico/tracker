@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //Envío del mensaje de texto
             boolean grado = (String.valueOf(placeDestionation.getName())).contains("°");
-            String sms;
+            String sms = "";
             if(grado) {
                 sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
             } else {
