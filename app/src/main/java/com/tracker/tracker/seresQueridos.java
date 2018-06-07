@@ -24,7 +24,7 @@ import java.util.Map;
  * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
  */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
-
+    public Usuario user;
     ImageButton btnEditarContacto;
     String modifySomething;
     private static final String TAG = "ModifySQDialog";
@@ -35,6 +35,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Usuario usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+        this.user = usuario;
         Bundle bundle = new Bundle();
         bundle.putParcelable("user", usuario);
         ContactoFragment contactoFragment = new ContactoFragment();
@@ -58,20 +59,23 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
     @Override
     public void onListFragmentInteraction(Contacto item) {
         Bundle args = new Bundle();
+        args.putParcelable("user", user);
         args.putString("Nombre", item.getNombre());
         args.putString("Telf", item.getTelf());
         args.putString("id", item.getId());
+        args.putInt("position", item.getPosition());
 
         ModifySQDialog dialog = new ModifySQDialog();
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "ModifySQDialog");
+        Log.e(TAG, "onListFragmentInteraction: " + this.user.getContactos().toString());
     }
 
     /**
      * El objetivo del método es desplegar el dialogo haciendo click en el boton de lápiz.
-     * @param v
+     * @param
      */
-    public void onClickSQ(View v) {
+    public void onClickSQ() {
         Log.e(TAG,"hooooooooooooooooola" );
     }
 

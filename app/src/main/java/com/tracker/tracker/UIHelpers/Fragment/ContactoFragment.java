@@ -77,7 +77,6 @@ public class ContactoFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, columns));
             }
             MyContactoRecyclerViewAdapter adapter = new MyContactoRecyclerViewAdapter(contactos, listener);
-            adapter.notifyDataSetChanged();
             recyclerView.setAdapter(adapter);
         }
         return view;
@@ -111,5 +110,9 @@ public class ContactoFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(Contacto item);
+    }
+
+    public void refreshContactos(List<Contacto> contactos){
+        this.contactos = contactos;
     }
 }

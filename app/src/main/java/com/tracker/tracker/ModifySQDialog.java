@@ -1,6 +1,7 @@
 package com.tracker.tracker;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ import java.util.Map;
  */
 
 public class ModifySQDialog extends DialogFragment implements View.OnClickListener{
+    private Usuario usuario;
+
     private FirebaseAuth auth;
     private FirebaseUser user;
     private FirebaseFirestore db;
@@ -53,6 +56,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        this.usuario = (Usuario) this.getActivity().getIntent().getParcelableExtra("user");
         View view = inflater.inflate(R.layout.dialog_fragment_sq, container, false);
         /**
          * Pasar información del ser querido a los campos de Nombre y Teléfono
@@ -93,7 +97,6 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
                 this.eliminarSQ();
             break;
         }
-        getDialog().dismiss();
     }
 
     /**
@@ -102,11 +105,15 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void modificarSQ(){
+        final Context ActivityContext = getActivity();
+        final Activity act = this.getActivity();
+
         Map<String, Object> serQueridoModify = new HashMap<>();
         serQueridoModify.put("nombre", String.valueOf(txtModifyNombre.getText()));
         serQueridoModify.put("telf", String.valueOf(txtModifyPhone.getText()));
 
-        final Context ActivityContext = getActivity();
+        ((seresQueridos)getActivity()).user.modificarContacto(this.getArguments().getInt("position"),
+                String.valueOf(txtModifyNombre.getText()), String.valueOf(txtModifyPhone.getText()));
 
         db.collection("users").document(this.user.getUid())
             .collection("contactos").document(this.getArguments().getString("id"))
@@ -115,6 +122,8 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.e(TAG, "DocumentSnapshot successfully written!");
+                    getDialog().dismiss();
+                    act.recreate();
                     Toast.makeText(ActivityContext, "Ser Querido modificado.", Toast.LENGTH_LONG).show();
                 }
             })
@@ -133,6 +142,9 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      */
     private void eliminarSQ(){
         final Context ActivityContext = getActivity();
+        final Activity act = this.getActivity();
+
+        //((seresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getInt("position"));
 
         db.collection("users").document(this.user.getUid())
                 .collection("contactos").document(this.getArguments().getString("id"))
@@ -141,6 +153,8 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
                 @Override
                 public void onSuccess(Void aVoid) {
                     Log.e(TAG, "DocumentSnapshot successfully deleted!");
+                    getDialog().dismiss();
+                    act.recreate();
                     Toast.makeText(ActivityContext, "Ser Querido eliminado.", Toast.LENGTH_LONG).show();
                 }
             })

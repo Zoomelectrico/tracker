@@ -140,11 +140,6 @@ public class Usuario implements Parcelable {
         return contactos;
     }
 
-    public void modificarContacto(int position, String nombre, String telf){
-        this.contactos.get(position).setNombre(nombre);
-        this.contactos.get(position).setTelf(telf);
-    }
-
     /**
      * Método getContacto:
      * @param i el indice en que se encuentra el contacto
@@ -160,6 +155,28 @@ public class Usuario implements Parcelable {
      * */
     public void addContacto(Contacto c) {
         this.contactos.add(c);
+    }
+
+    /**
+     * modificarContacto: permite modificar la información de un serQuerido,
+     * el método va a la posición del contacto y modifica los datos segun los parámetros
+     * nombre y telf.
+     * @param position
+     * @param nombre
+     * @param telf
+     */
+    public void modificarContacto(int position, String nombre, String telf){
+        this.contactos.get(position).setNombre(nombre);
+        this.contactos.get(position).setTelf(telf);
+    }
+
+    /**
+     * eliminarContacto: elimina un contacto de la lista de contactos según la posición que se
+     * especifique.
+     * @param position
+     */
+    public void eliminarContacto(int position){
+        this.contactos.remove(position);
     }
 
     @Override
