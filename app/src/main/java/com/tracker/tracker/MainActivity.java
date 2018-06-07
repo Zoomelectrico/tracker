@@ -2,11 +2,9 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -18,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -32,9 +31,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,27 +54,29 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.thomashaertel.widget.MultiSpinner;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.tareas.ProfilePicture;
+import com.tracker.tracker.tareas.UserData;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-/**
- * Controlador de la actividad principal
- * Esta clase configura el menú, permite crear viaje, maneja el tema de la ubicación
- */
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+import static android.content.ContentValues.TAG;
 
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
+
+    // Constantes
     private static final int PLACE_PICKER_REQUEST = 2;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     private final static String KEY_LOCATION = "location";
 
+    // Datos de Firebase
     private FirebaseUser user;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
@@ -102,34 +106,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isOpen = false;
 
     //Opciones en Spinner
-    private MultiSpinner spinner;
+    private Spinner spinner;
     private ArrayList<Contacto> contactos;
-    private ArrayAdapter<String> adapter;
 
     // Viaje
     private Location currentLocation;
     private Location destination;
+    private Contacto contacto;
     private Place placeDestionation;
     private CardView tripDescription;
     private boolean isViajando = false;
 
-    private Usuario usuario;
 
-    /**
-     * Método onCreate:
-     * @param savedInstanceState {Bundle}
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.firebaseConfig();
-        this.getUserData();
-
+        // UI
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.navigationConfig();
-        this.permissionConfig();
+        if(!gotPermissions()) {
+            requestPermissions();
+        }
+
+        //Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //Navegacion
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Datos de la Aplicación
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+        this.db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        this.db.setFirestoreSettings(settings);
 
         updateValuesFromBundle(savedInstanceState);
 
@@ -164,17 +181,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
     }
 
-    /**
-     * Método: getUserData: Este método se encarga de obtener el Objeto Parcelable del Usuario
-     */
-    private void getUserData() {
-        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
-    }
-
-    /**
-     * Método: updateValuesFromBundle este metódo se encargada de actualizar valores relacionados a la ubicación
-     * @param savedInstanceState {Bundle}
-     */
     private void updateValuesFromBundle(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
@@ -187,75 +193,63 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     * Método firebaseConfig: Este método se encarga de iniciar la DB y obtener una instacia del servicio de Auth y se obtiene el usuario actual del sistema
-     */
-    private void firebaseConfig() {
-        this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
-        this.db = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        this.db.setFirestoreSettings(settings);
-    }
-
-    /**
-     * Método navigationConfig: Este método se encarga de crear el Toolbar y el menú de Hamburguesa
-     */
-    private void navigationConfig() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-    }
-
-    /**
-     * Método spinnerConfig: se encarga de configurar el Spinner para seleccionar a los Seres Queridos
-     * Se instancia el spinner, se cambia la visual, le configura el onClick
-     */
     private void spinnerConfig() {
-        this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
-        this.spinner.setVisibility(View.VISIBLE);
-        this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        this.adapter.notifyDataSetChanged();
-        this.spinner.setDefaultText("Selecciona a tus seres queridos");
         if(isViajando) {
             this.spinner.setVisibility(View.GONE);
+            ((TextView) findViewById(R.id.txtContacto)).setVisibility(View.GONE);
             ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
+            Log.d("Spinner", "viajando");
         } else {
-            if(usuario != null) {
-                if(this.usuario.haveContactos()) {
-                    for (Contacto c : this.usuario.getContactos()) {
-                        adapter.add(c.getNombre());
-                    }
-                    this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
-                        @Override
-                        public void onItemsSelected(boolean[] selected) {
-                            contactos.clear();
-                            for (int i = 0; i < selected.length; i++) {
-                                if(selected[i]) {
-                                    contactos.add(usuario.getContacto(i));
-                                }
-                            }
+            final Context context= this;
+            this.contactos.clear();
+            this.spinner = findViewById(R.id.spSeresQueridos);
+            CollectionReference contactosRef = db.collection("users/" + user.getUid() + "/contactos");
+            contactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"));
+                            contactos.add(c);
                         }
-                    });
-                    findViewById(R.id.layoutCargando).setVisibility(View.GONE);
-                    findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
+                        if(contactos.isEmpty()) {
+                            // Si no tiene a nadie lo mando a agregar uno
+                            Intent intent = new Intent(context, AddSerQuerido.class);
+                            startActivity(intent);
+                            Toast.makeText(context, "Añade un ser Querido para empezar a usar la App", Toast.LENGTH_SHORT).show();
+                        } else {
+                            ArrayAdapter<Contacto> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, contactos);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinner.setAdapter(adapter);
+                            findViewById(R.id.layoutCargando).setVisibility(View.GONE);
+                            findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
+                            spinner.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
                 }
-            } else {
-                Log.e("USUARIO", "NULL");
-            }
+            });
+            this.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                    if (contactos.size() == 0) return;
+                    if(!isViajando) {
+                        contacto = contactos.get(pos);
+                        findViewById(R.id.txtContacto).setVisibility(View.VISIBLE);
+                        ((TextView) findViewById(R.id.txtContacto)).setText(contacto.getNombre());
+                    } else {
+                        Toast.makeText(context,"Cancelar el viaje para escoger otro ser querido", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         }
     }
 
-    /**
-     * Método fabConfig: Este método se encarga de configurar el botón fab
-     */
     private void fabConfig() {
         // Botones
         fabAdd = findViewById(R.id.fabAdd);
@@ -306,11 +300,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    /**
-     * Método updateUI: este método se encarga de configurar la barra de navegación, el boton de places,
-     * el boton de cancelar viaje, y de adaptar la UI a una persona
-     */
     private void updateUI() {
+        final Activity activity = this;
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
@@ -318,17 +309,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((Button) tripDescription.findViewById(R.id.btnCancelarViaje)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                stopLocationUpdates();
                 tripDescription.setVisibility(View.GONE);
                 spinner.setVisibility(View.VISIBLE);
                 ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
                 isViajando = false;
-                contactos.clear();
+                contacto = null;
                 destination = null;
                 placeDestionation = null;
-                boolean[] bool = new boolean[usuario.getContactos().size()];
-                Arrays.fill(bool, false);
-                spinner.setSelected(bool);
             }
         });
 
@@ -336,15 +323,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
 
-        this.usuario.imageConfig(header);
+        // Tarea Especial para la foto
+        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.user.getPhotoUrl().toString());
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLocationUpdates();
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                // Construct an intent for the place picker
                 try {
-                    Intent intent = builder.build(MainActivity.this);
+                    Intent intent = builder.build(activity);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
                 }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.e("ERROR", e.getMessage(), e);
@@ -354,71 +342,78 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.btnFindPlace).setOnClickListener(listener);
     }
 
-    /**
-     * Método createLocationCallback: este método se encarga de crear el listener para los cambios de ubicación
-     */
     private void createLocationCallback() {
         this.locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
+                updateLocation(user, currentLocation);
                 if(destination != null) {
                     ((TextView) tripDescription.findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
-                        placeArrival();
+                        sendSMS();
                     }
                 }
             }
         };
     }
 
-    /**
-     * Método sendSMS: este método se encarga de enviar un mensaje de texto a una persona.
-     * @param contacto {Contacto} el objecto contacto que referencia el destinatario del mensaje.
-     */
-    private void sendSMS(@NonNull Contacto contacto) {
-        if(destination != null && placeDestionation != null) {
+    private void sendSMS() {
+        if(contacto != null && destination != null && placeDestionation != null) {
             String SENT = "SMS_SENT";
             String DELIVERED = "SMS_DELIVERED";
 
-            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0, new Intent(DELIVERED), 0);
+            PendingIntent sentPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(SENT), 0);
+
+            PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+                    new Intent(DELIVERED), 0);
+
+            //Cuando se envía el mensaje de texto-
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS enviado", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS enviado",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                            Toast.makeText(getBaseContext(), "Generic failure", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Generic failure",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_NO_SERVICE:
-                            Toast.makeText(getBaseContext(), "Sin señal", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "No service",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_NULL_PDU:
-                            Toast.makeText(getBaseContext(), "Null PDU", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Null PDU",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                         case SmsManager.RESULT_ERROR_RADIO_OFF:
-                            Toast.makeText(getBaseContext(), "Radio off", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Radio off",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
             }, new IntentFilter(SENT));
 
+            //---Cuando se recibe el mensaje de texto---
             registerReceiver(new BroadcastReceiver(){
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     switch (getResultCode())
                     {
                         case Activity.RESULT_OK:
-                            Toast.makeText(getBaseContext(), "SMS recibido", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS recibido",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                         case Activity.RESULT_CANCELED:
-                            Toast.makeText(getBaseContext(), "SMS not delivered", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "SMS not delivered",
+                                    Toast.LENGTH_SHORT).show();
                             break;
                     }
                 }
@@ -434,34 +429,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
+            //Retornar la vista Main a la vista principal
+            this.tripDescription.setVisibility(View.INVISIBLE);
+            this.isViajando = false;
+            contacto = null;
+            destination = null;
+            placeDestionation = null;
+            spinnerConfig();
+            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
         }
     }
 
-    /**
-     * Método placeArrival: este método es llamado cuando un persona llega a un determinado destino.
-     * Utilizar el metodo sendSMS para los mensajes de texto.
-     * Adicionalmente se encarga de actualizar la UI
-     */
-    private void placeArrival() {
-        for (Contacto contacto: contactos) {
-            this.sendSMS(contacto);
-        }
-        this.tripDescription.setVisibility(View.GONE);
-        this.isViajando = false;
-        destination = null;
-        placeDestionation = null;
-        this.contactos.clear();
-        boolean[] bool = new boolean[this.usuario.getContactos().size()];
-        Arrays.fill(bool, false);
-        this.spinner.setSelected(bool);
-        spinnerConfig();
-        ((TextView) findViewById(R.id.txtWelcome)).setVisibility(View.VISIBLE);
-        ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Método createLocationRequest: este método se encarga de crear un objecto para hacer la petición de la Ubicación
-     */
     private void createLocationRequest() {
         this.locationRequest = new LocationRequest();
         this.locationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
@@ -469,18 +447,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    /**
-     * Método buildLocationSettingsRequest: este método se encarga de configurar las peticiones de ubicación
-     */
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(this.locationRequest);
         this.locationSettingsRequest = builder.build();
     }
 
-    /**
-     * Método startLocationUpdates: este método se encarga de empezar a escuchar los cambios de ubicación en el teléfono
-     */
     private void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
         this.settingsClient.checkLocationSettings(this.locationSettingsRequest)
@@ -489,7 +461,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                         Log.i("", "All location settings are satisfied.");
                         try {
-                            locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                            locationProviderClient.requestLocationUpdates(locationRequest,
+                                    locationCallback, Looper.myLooper());
                         } catch (SecurityException e) {
                             Log.e("Main", "Security Exception", e);
                         }
@@ -501,6 +474,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         int statusCode = ((ApiException) e).getStatusCode();
                         switch (statusCode) {
                             case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                Log.i("", "Location settings are not satisfied. Attempting to upgrade " +
+                                        "location settings ");
                                 try {
                                     ResolvableApiException rae = (ResolvableApiException) e;
                                     rae.startResolutionForResult(MainActivity.this, REQUEST_CHECK_SETTINGS);
@@ -520,37 +495,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
     }
 
-    /**
-     * Método stopLocationUpdates: este método se encarga de terminar de escuchar los cambios de ubicación en el teléfono
-     */
-    private void stopLocationUpdates() {
-        this.locationProviderClient.removeLocationUpdates(this.locationCallback);
-    }
-
-    /**
-     *
-     */
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    /**
-     * Método onActivyResult: este método se encarga de decidir que hacer después de que se lleva a cabo un intento
-     * @param requestCode {int} el código de la petición
-     * @param resultCode {int} el código del resultado (OK | NOOK);
-     * @param data {Intent} el intento que inicia la actividad
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
+            // Check for the integer request code originally supplied to startResolutionForResult().
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
                     case Activity.RESULT_OK:
                         Log.i("", "User agreed to make required location settings changes.");
+                        // Nothing to do. startLocationupdates() gets called in onResume again.
                         break;
                     case Activity.RESULT_CANCELED:
+                        Log.i("", "User chose not to make required location settings changes.");
                         this.requestingLocationUpdate = false;
                         break;
                 }
@@ -563,42 +525,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     this.isViajando = true;
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
-                    if(!contactos.isEmpty()) {
-                        tripDescription.setVisibility(View.VISIBLE);
-                        ((TextView) findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
-                        ((TextView) findViewById(R.id.txtContactoViaje)).setText(getContactosText());
-                        ((TextView) findViewById(R.id.txtDistance)).setText(String.valueOf(destination.distanceTo(currentLocation)));
+                    if(contacto != null) {
+                        if(currentLocation == null) {
+                            Log.e("CurrentLocation", "null");
+                        } else {
+                            tripDescription = findViewById(R.id.estadoViaje);
+                            tripDescription.setVisibility(View.VISIBLE);
+                            ((TextView) tripDescription.findViewById(R.id.txtContactoNombre)).setText(contacto.getNombre());
+                            ((TextView) tripDescription.findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
+                            ((TextView) tripDescription.findViewById(R.id.txtDistance)).setText(String.valueOf(currentLocation.distanceTo(destination)));
+                        }
                     } else {
-                        Toast.makeText(this, "Debe escoger al menos a un Ser Querido", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Debes escoger un ser querido primero", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
         }
     }
 
-    /**
-     * Método getContactosText: este método es un auxiliar para actualizar el card del viaje
-     */
-    private String getContactosText(){
-        StringBuilder sb = new StringBuilder();
-        if(contactos.size() < 3) {
-            for (Contacto contacto: contactos) {
-                sb.append(contacto.getNombre());
-                sb.append(", ");
-            }
-            sb.substring(0,sb.length()-1);
-        } else {
-            sb.append(contactos.get(0).getNombre());
-            sb.append(", ");
-            sb.append(contactos.get(1).getNombre());
-            sb.append("...");
-        }
-        return sb.toString();
-    }
-
-    /**
-     *
-     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -609,77 +553,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     *
-     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
-    /**
-     *
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     *
-     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
         int id = item.getItemId();
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
+        Intent intent;
         switch (id) {
             case R.id.add_place :
                 break;
             case R.id.add_seres:
                 intent = new Intent(this, AddSerQuerido.class);
-                bundle.putParcelable("user", usuario);
-                intent.putExtra("user", bundle);
+                startActivityForResult(intent, 0);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.seres:
                 intent = new Intent(this, seresQueridos.class);
-                intent.putExtra("user", usuario);
+                startActivityForResult(intent, 0);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 break;
             case R.id.logout:
                 this.auth.signOut();
                 intent = new Intent(this, Login.class);
+                startActivityForResult(intent, 0);
                 finish();
                 break;
         }
-        startActivity(intent);
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    /**
-     * Método permissionConfig: este método se encarga de revisar si se pidieron los permisos y si no se tienen pedirlos
-     */
-    private void permissionConfig() {
-        if(!gotPermissions()) {
-            requestPermissions();
-        }
+    public void updateLocation(FirebaseUser user, Location l) {
+        new UserData(l).execute(user);
     }
 
-    /**
-     * Método gotPermissions: este es un métdo auxiliar que se encarga de revisar que se tengan los permisos
-     */
     public boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean b = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -687,13 +620,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return a && b && c;
     }
 
-    /**
-     * Método requestPermissions: este es un método auxiliar que se encarga de perdir los permisos necesarios
-     */
     private void requestPermissions() {
-        boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
+        boolean shouldProvideRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(this,
                         Manifest.permission.ACCESS_FINE_LOCATION);
 
+        // Provide an additional rationale to the user. This would happen if the user denied the
+        // request previously, but didn't check the "Don't ask again" checkbox.
         if (shouldProvideRationale) {
             Log.i("", "Displaying permission rationale to provide additional context.");
             showSnackbar(R.string.permission_rationale,
@@ -713,12 +646,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     * Método onRequestPermissionsResult
-     * @param requestCode {int}
-     * @param permissions {String[]}
-     * @param grantResults {int[]}
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
@@ -733,12 +660,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     * Método showSnackbar:
-     * @param mainTextStringId {int}
-     * @param actionStringId {int}
-     * @param listener {View.OnClickListener}
-     */
     private void showSnackbar(final int mainTextStringId, final int actionStringId,View.OnClickListener listener) {
         Snackbar.make(
                 findViewById(android.R.id.content),
