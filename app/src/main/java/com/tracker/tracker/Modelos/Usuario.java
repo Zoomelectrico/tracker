@@ -140,6 +140,11 @@ public class Usuario implements Parcelable {
         return contactos;
     }
 
+    public void modificarContacto(int position, String nombre, String telf){
+        this.contactos.get(position).setNombre(nombre);
+        this.contactos.get(position).setTelf(telf);
+    }
+
     /**
      * Método getContacto:
      * @param i el indice en que se encuentra el contacto

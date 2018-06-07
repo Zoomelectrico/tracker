@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.tracker.tracker.seresQueridos">
+    tools:context="com.tracker.tracker.ModifySQDialog">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/btnEditarContacto2"
+                    android:id="@+id/btnCancelar"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_alignParentBottom="true"
@@ -84,7 +84,7 @@
                     android:src="@drawable/ic_delete" />
 
                 <ImageButton
-                    android:id="@+id/btnEditarContacto3"
+                    android:id="@+id/btnEditarSQ"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_alignParentBottom="true"
@@ -96,14 +96,15 @@
                     android:padding="4dp"
                     android:src="@drawable/ic_confirm_icon" />
 
-                <ImageView
-                    android:id="@+id/imageView"
+                <ImageButton
+                    android:id="@+id/btnEliminarSQ"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
+                    android:background="?android:selectableItemBackground"
                     android:padding="4dp"
-                    android:src="@drawable/ic_baseline_delete_outline_24px" />
+                    android:src="@drawable/ic_baseline_delete_24px" />
 
             </LinearLayout>
 

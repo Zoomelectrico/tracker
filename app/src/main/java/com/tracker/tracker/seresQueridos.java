@@ -8,12 +8,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.google.instrumentation.stats.Tag;
 import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.UIHelpers.Fragment.MyContactoRecyclerViewAdapter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
@@ -21,6 +26,7 @@ import com.tracker.tracker.Modelos.Usuario;
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
     ImageButton btnEditarContacto;
+    String modifySomething;
     private static final String TAG = "ModifySQDialog";
     /**
      * Método onCreate:
@@ -44,7 +50,6 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
     }
 
     /**
@@ -52,11 +57,10 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
      */
     @Override
     public void onListFragmentInteraction(Contacto item) {
-        Log.e("jejejeje", item.toString());
-
         Bundle args = new Bundle();
         args.putString("Nombre", item.getNombre());
         args.putString("Telf", item.getTelf());
+        args.putString("id", item.getId());
 
         ModifySQDialog dialog = new ModifySQDialog();
         dialog.setArguments(args);

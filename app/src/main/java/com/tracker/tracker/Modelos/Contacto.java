@@ -11,6 +11,7 @@ public class Contacto implements Parcelable {
     private String nombre;
     private String telf;
     private String id;
+    private int position;
     private boolean nuevo;
 
     public Contacto(String nombre, String telf, boolean nuevo) {
@@ -34,6 +35,14 @@ public class Contacto implements Parcelable {
     }
 
     public String getId(){ return id; }
+
+    public void setId(String id){this.id = id;}
+
+    public void setPosition(Integer position){this.position = position;}
+
+    public void setNombre(String nombre){this.nombre = nombre;}
+
+    public void setTelf(String telf){this.telf = telf;}
 
     public boolean isNuevo() { return this.nuevo; }
 

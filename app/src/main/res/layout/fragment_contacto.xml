@@ -46,34 +46,6 @@
 
         </LinearLayout>
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_gravity="end"
-            android:padding="8dp"
-            android:layout_weight="1"
-            android:gravity="end">
-
-            <ImageButton
-                android:id="@+id/btnEditarContacto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="?android:selectableItemBackground"
-                android:onClick="onClickSQ"
-                android:padding="4dp"
-                android:src="@drawable/ic_edit" />
-
-            <ImageButton
-                android:id="@+id/btnEliminarContacto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_delete"
-                android:background="?android:selectableItemBackground"
-                android:layout_gravity="center"
-                android:padding="4dp"/>
-        </LinearLayout>
     </LinearLayout>
 
 </android.support.v7.widget.CardView>

@@ -67,7 +67,9 @@ public class Cargando extends AppCompatActivity {
                                     if(task.isSuccessful()) {
                                         if(task.getResult() != null) {
                                             for (DocumentSnapshot documentC: task.getResult()) {
-                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
+                                                Contacto serQuerido = new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false);
+                                                serQuerido.setId(documentC.getId());
+                                                usuario.addContacto(serQuerido);
                                             }
                                             Intent intent = new Intent(Cargando.this, MainActivity.class);
                                             intent.putExtra("user", usuario);
