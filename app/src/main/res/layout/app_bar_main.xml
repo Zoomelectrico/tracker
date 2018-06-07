@@ -30,9 +30,9 @@
         android:layout_marginBottom="160dp"
         android:layout_marginEnd="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/secondaryDarkColor"
+        app:backgroundTint="?attr/buttonColorDark"
         app:elevation="6dp"
-        app:rippleColor="@color/secondaryDarkColor"
+        app:rippleColor="?attr/buttonColor"
         app:srcCompat="@drawable/ic_add_place"
         app:pressedTranslationZ="12dp"
         android:visibility="invisible" />
@@ -45,9 +45,9 @@
         android:layout_marginBottom="90dp"
         android:layout_marginEnd="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/secondaryDarkColor"
+        app:backgroundTint="?attr/buttonColorDark"
         app:elevation="6dp"
-        app:rippleColor="@color/secondaryDarkColor"
+        app:rippleColor="?attr/buttonColor"
         app:srcCompat="@drawable/ic_add_ser"
         app:pressedTranslationZ="12dp"
         android:visibility="invisible" />
@@ -60,9 +60,9 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:tint="@android:color/white"
-        app:backgroundTint="@color/secondaryColor"
+        app:backgroundTint="?attr/buttonColor"
         app:elevation="6dp"
-        app:rippleColor="@color/secondaryDarkColor"
+        app:rippleColor="?attr/buttonColorDark"
         app:srcCompat="@android:drawable/ic_input_add"
         app:pressedTranslationZ="12dp" />
 
