@@ -8,21 +8,21 @@
             android:id="@+id/add_seres"
             android:icon="@drawable/ic_add_ser"
             android:title="@string/menu_principal_1"
-            android:color="@color/lowContrastDark" />
+            android:color="?attr/textColor" />
         <item
             android:id="@+id/add_place"
             android:icon="@drawable/ic_add_place"
             android:title="@string/menu_principal_2"
-            android:color="@color/lowContrastDark" />
+            android:color="?attr/textColor" />
         <item
             android:id="@+id/seres"
             android:icon="@drawable/ic_seres"
             android:title="@string/menu_principal_3"
-            android:color="@color/lowContrastDark" />
+            android:color="?attr/textColor" />
         <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_logout"
             android:title="@string/menu_principal_4"
-            android:color="@color/lowContrastDark" />
+            android:color="?attr/textColor" />
     </group>
 </menu>

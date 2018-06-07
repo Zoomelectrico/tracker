@@ -1,3 +1,21 @@
 <resources>
 
+    <style name="DarkTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">#1E2121</item>
+        <item name="colorPrimaryDark">#1E2121</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="backgroundColor">@color/black</item>
+        <item name="cardColor">@color/lowContrastDark</item>
+        <item name="textColor">#ffffff</item>
+        <item name="lowContrastTextColor">@color/lowContrastLight</item>
+        <item name="tintColor">@color/lowContrastLight</item>
+        <item name="buttonColor">@color/colorPrimary</item>
+        <item name="buttonColorDark">@color/colorPrimaryDark</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="android:colorForeground">@color/lowContrastLight</item>
+        <item name="android:navigationBarColor">#1E2121</item>
+        <item name="android:statusBarColor">#1E2121</item>
+    </style>
 </resources>
