@@ -40,7 +40,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
 
-        this.usuario = (Usuario) ((Bundle) this.getIntent().getParcelableExtra("user")).getParcelable("user");
+        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
 
         this.btnAdd = findViewById(R.id.btnAdd);
         this.txtNombre = findViewById(R.id.txtNombre);
@@ -73,6 +73,14 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
 
         if(notEmpty && isAlpha && isNumeric && isLongEnough) {
             this.usuario.addContacto(new Contacto(name, phone, true));
+            Intent intent = new Intent(this, MainActivity.class);
+            if(usuario != null) {
+                intent.putExtra("user", usuario);
+                startActivity(intent);
+                finish();
+            } else {
+                Log.e("", "CHUPALO");
+            }
             this.usuario.saveData(FirebaseFirestore.getInstance());
             finish();
         }

@@ -158,7 +158,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
+        Log.e("DALE VV", usuario.getContactos().toString());
         this.spinnerConfig();
+
     }
 
     @Override
@@ -280,8 +282,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddSerQuerido.class);
                 Bundle bundle = new Bundle();
-                bundle.putParcelable("user", usuario);
-                intent.putExtra("user", bundle);
+                intent.putExtra("user", usuario);
                 findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                 findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 startActivity(intent);
@@ -663,8 +664,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 case R.id.add_seres:
                     intent = new Intent(this, AddSerQuerido.class);
-                    bundle.putParcelable("user", usuario);
-                    intent.putExtra("user", bundle);
+                    intent.putExtra("user", usuario);
                     findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
                     findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                     break;
@@ -677,11 +677,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.logout:
                     this.auth.signOut();
                     intent = new Intent(this, Login.class);
-                    finish();
                     break;
             }
             if (intent != null) {
                 startActivity(intent);
+                finish();
             } else {
                 Toast.makeText(this, "Esta funcionalidad no esta Disponible", Toast.LENGTH_SHORT).show();
             }
