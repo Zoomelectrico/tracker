@@ -25,8 +25,6 @@ import java.util.Map;
  */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
     public Usuario user;
-    ImageButton btnEditarContacto;
-    String modifySomething;
     private static final String TAG = "ModifySQDialog";
     /**
      * Método onCreate:
@@ -68,16 +66,5 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         ModifySQDialog dialog = new ModifySQDialog();
         dialog.setArguments(args);
         dialog.show(getFragmentManager(), "ModifySQDialog");
-        Log.e(TAG, "onListFragmentInteraction: " + this.user.getContactos().toString());
     }
-
-    /**
-     * El objetivo del método es desplegar el dialogo haciendo click en el boton de lápiz.
-     * @param
-     */
-    public void onClickSQ() {
-        Log.e(TAG,"hooooooooooooooooola" );
-    }
-
-
 }
