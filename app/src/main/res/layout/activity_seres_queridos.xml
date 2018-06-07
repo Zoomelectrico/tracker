@@ -27,7 +27,7 @@
 
         <fragment
             android:id="@+id/seresQueridosFragment"
-            android:name="com.tracker.tracker.Fragment.ContactoFragment"
+            android:name="com.tracker.tracker.UIHelpers.Fragment.ContactoFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/fragment_contacto" />

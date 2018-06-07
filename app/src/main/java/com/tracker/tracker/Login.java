@@ -1,9 +1,6 @@
 package com.tracker.tracker;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
@@ -11,47 +8,44 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.Manifest;
-import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.tracker.tracker.tareas.UserData;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Usuario;
 
-
+/**
+ * Clase Login esta clase es el controlador de la pantalla de Login
+ */
 public class Login extends AppCompatActivity implements View.OnClickListener, ActivityCompat.OnRequestPermissionsResultCallback {
 
     // Constantes
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
-    private static final int MY_LOCATION_PERMISSION = 0;
-
-    // Referencias a los servicios de Firebase
     private FirebaseAuth auth;
+    private FirebaseFirestore db;
     private GoogleSignInClient googleSIClient;
-
-    // Referencias para lograr la ubicación
-    private FusedLocationProviderClient locationProviderClient;
-    private Location currentLocation;
-    private LocationManager locationManager;
-    private boolean gps;
-
-    // UI
     private Button btnLogin;
 
+    /**
+     * Método onCreate:
+     * @param savedInstanceState {Bundle}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Inicio la UI
@@ -70,70 +64,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
         this.googleSIClient = GoogleSignIn.getClient(this, gso);
         this.auth = FirebaseAuth.getInstance();
 
-        // GPS
-        // Verificar GPS
-        this.locationManager = (LocationManager) this.getApplicationContext().getSystemService(this.getApplicationContext().LOCATION_SERVICE);
-        gps = locationManager.isProviderEnabled(this.getApplicationContext().LOCATION_SERVICE);
+        this.db = FirebaseFirestore.getInstance();
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        this.db.setFirestoreSettings(settings);
 
-
-        // Location
-        this.getLocation();
     }
 
     /**
-     * Método getLocation(): Este metodo verifica los permisos para obtener la Ubicación.
-     * En caso de no tenerlos lo Pide.
-     * Luego busca la locación de la persona y la va actualizando
+     * Método onActivityResult:
+     * @param requestCode {int}
+     * @param resultCode {int}
+     * @param data {Intent}
      */
-    public void getLocation() {
-        Log.e("GPS|LOGIN", String.valueOf(gps));
-        if(gps) {
-            this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOCATION_PERMISSION);
-            }
-
-            this.locationProviderClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                currentLocation = location;
-                            } else {
-                                Log.e("LOCATION|LOGIN", "NULL");
-                            }
-                        }
-                    });
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_LOCATION_PERMISSION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    this.getLocation();
-                    Log.d("Permissions", "ALL GOD");
-                }
-                return;
-            }
-        }
-    }
-
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Verificamos que el resultado de la actividad este relacionado al IS
         if (requestCode == RC_SIGN_IN) {
-            // Creamos una tarea para
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                // Vamos a hacer la auth con Firebase
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 Log.e(TAG, "Google sign in failed", e);
@@ -142,33 +93,44 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
     }
 
     /**
-     * Metodo firebaseAuthWithGoogle(): Este método se entiende con la API de firebase
-     * para hacer login en su plataforma.
-     * */
+     * Metodo firebaseAuthWithGoogle(): Este método se entiende con la API de firebase para hacer login en su plataforma.
+     * Una vez que se ha hecho el login se guardan los datos del usuario en la db
+     * @param acct {GoogleSignInAccount} acct _ SE
+     */
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        // Credenciales de Google para hacer el login en firebase
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        // Empieza la autenticación
         this.auth.signInWithCredential(credential).addOnCompleteListener(this,
                 new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        // Cuando completa la tarea del login pregunto por su resultado
                         if (task.isSuccessful()) {
-                            // Como fue exitosa ya puedo obtener el usuario desde firebase
                             FirebaseUser user = auth.getCurrentUser();
-                            // Pregunto si la location is null
-                            if(currentLocation == null) {
-                                Log.e("LOCATION|LOGIN", "NULL");
-                                new UserData(null).execute(user);
-                            } else {
-                                new UserData(currentLocation).execute(user);
+                            final Usuario usuario = new Usuario();
+                            if(user != null) {
+                                usuario.setNombre(user.getDisplayName());
+                                usuario.setEmail(user.getEmail());
+                                usuario.setPhoto(user.getPhotoUrl().toString());
+                                usuario.setUID(user.getUid());
+                                usuario.saveData(db);
                             }
-                            // Listo mi Login, creo un intento para ir al main activity
-                            Intent intent = new Intent(Login.this, MainActivity.class);
-                            startActivity(intent);
-                            finish(); // Mato la actividad para evitar malgasto de recursos
+                            final CollectionReference contactos = db.collection("users/"+user.getUid()+"/contactos");
+                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()) {
+                                        if(task.getResult() != null) {
+                                            for (DocumentSnapshot documentC: task.getResult()) {
+                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
+                                            }
+                                            Intent intent = new Intent(Login.this, MainActivity.class);
+                                            intent.putExtra("user", usuario);
+                                            startActivity(intent);
+                                            finish();
+                                        }
+                                    }
+                                }
+                            });
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }
@@ -176,17 +138,20 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Ac
                 });
     }
 
+    /**
+     * Método signIn: este método se encarga de crear el intento de autenticación con Firebae
+     */
     private void signIn() {
-        // Intento de Login
         Intent signInIntent = this.googleSIClient.getSignInIntent();
-        // Comienza la actividad para obtener un resultado
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    // Listener del boton
+    /**
+     * Método onClick: este método es el listener del botón de Inicio de Sesión
+     * @param v {View}
+     */
     @Override
     public void onClick(View v) {
         this.signIn();
     }
-
 }
