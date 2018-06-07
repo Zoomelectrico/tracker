@@ -10,24 +10,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Usuario;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.tracker.tracker.tareas.AddSerQueridoAsync;
+import com.tracker.tracker.tareas.SeresQueridosAsync;
 
-/**
- *
- */
 public class AddSerQuerido extends AppCompatActivity implements View.OnClickListener{
 
+    // UI
     private Button btnAdd;
     private EditText txtNombre;
     private EditText txtPhone;
-    private Usuario usuario;
+    // Firebase
+    private FirebaseAuth auth;
+    private FirebaseUser user;
 
-    /**
-     *
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // UI
@@ -45,7 +44,6 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         this.btnAdd = findViewById(R.id.btnAdd);
         this.txtNombre = findViewById(R.id.txtNombre);
         this.txtPhone = findViewById(R.id.txtPhone);
-
         Toolbar toolbar = findViewById(R.id.tbAddSer);
         toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
@@ -53,13 +51,14 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Firebase
+        this.auth = FirebaseAuth.getInstance();
+        this.user = this.auth.getCurrentUser();
+
         // Add Event Listener
         this.btnAdd.setOnClickListener(this);
     }
 
-    /**
-     *
-     */
     @Override
     public void onClick(View v) {
         String name = String.valueOf(txtNombre.getText());
