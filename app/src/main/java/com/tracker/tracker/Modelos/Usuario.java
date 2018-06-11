@@ -218,10 +218,10 @@ public class Usuario implements Parcelable {
 
     /**
      * Método imageConfig:
-     * @param header {View}
+     * @param imageView {ImageView}
      */
-    public void imageConfig(View header) {
-        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.photo);
+    public void imageConfig(ImageView imageView) {
+        new ProfilePicture(imageView).execute(this.photo);
     }
 
     @Override

@@ -2,11 +2,9 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
@@ -19,7 +17,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.CardView;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
@@ -36,6 +33,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,15 +55,12 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.tareas.ProfilePicture;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -83,9 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final static String KEY_REQUESTING_LOCATION_UPDATES = "requesting-location-updates";
     private final static String KEY_LOCATION = "location";
 
-    private FirebaseUser user;
-    private FirebaseAuth auth;
     private FirebaseFirestore db;
+    private FirebaseAuth auth;
 
     // Datos de Ubicación
     private SettingsClient settingsClient;
@@ -105,13 +99,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Opciones en Spinner
     private MultiSpinner spinner;
     private ArrayList<Contacto> contactos;
-    private ArrayAdapter<String> adapter;
 
     // Viaje
-    private Location currentLocation;
-    private Location destination;
-    private Place placeDestionation;
-    private CardView tripDescription;
+    private Location currentLocation = null;
+    private Location destination = null;
+    private Place placeDestionation = null;
     private boolean isViajando = false;
 
     private Usuario usuario;
@@ -122,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             setTheme(R.style.DarkTheme);
         } else {
@@ -151,14 +142,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.createLocationRequest();
         this.buildLocationSettingsRequest();
         this.updateUI();
-        this.startLocationUpdates();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("DALE VV", usuario.getContactos().toString());
         this.spinnerConfig();
 
     }
@@ -177,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Método: getUserData: Este método se encarga de obtener el Objeto Parcelable del Usuario
      */
     private void getUserData() {
-        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+        this.usuario = this.getIntent().getParcelableExtra("user");
     }
 
     /**
@@ -201,7 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void firebaseConfig() {
         this.auth = FirebaseAuth.getInstance();
-        this.user = this.auth.getCurrentUser();
         this.db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setTimestampsInSnapshotsEnabled(true)
@@ -228,37 +215,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Se instancia el spinner, se cambia la visual, le configura el onClick
      */
     private void spinnerConfig() {
-        this.spinner = (MultiSpinner) findViewById(R.id.spinnerMulti);
-        this.spinner.setVisibility(View.VISIBLE);
-        this.adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
-        this.spinner.setDefaultText("Selecciona a tus seres queridos");
-        if(isViajando) {
-            this.spinner.setVisibility(View.GONE);
-            ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.GONE);
-        } else {
-            if(usuario != null) {
-                adapter.clear();
-                if(this.usuario.haveContactos()) {
-                    for (Contacto c : this.usuario.getContactos()) {
-                        adapter.add(c.getNombre());
-                    }
-                    this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
-                        @Override
-                        public void onItemsSelected(boolean[] selected) {
-                            contactos.clear();
-                            for (int i = 0; i < selected.length; i++) {
-                                if(selected[i]) {
-                                    contactos.add(usuario.getContacto(i));
-                                }
-                            }
-                        }
-                    });
-                    findViewById(R.id.layoutCargando).setVisibility(View.GONE);
-                    findViewById(R.id.layoutPrincipal).setVisibility(View.VISIBLE);
-                }
-            } else {
-                Log.e("USUARIO", "NULL");
+        this.spinner = findViewById(R.id.spinnerMulti);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+        if(this.usuario.haveContactos()) {
+            this.spinner.setDefaultText("Selecciona a tus seres queridos");
+            for (Contacto c : this.usuario.getContactos()) {
+                adapter.add(c.getNombre());
             }
+            this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
+                @Override
+                public void onItemsSelected(boolean[] selected) {
+                    startLocationUpdates();
+                    contactos.clear();
+                    for (int i = 0; i < selected.length; i++) {
+                        if(selected[i]) {
+                            contactos.add(usuario.getContacto(i));
+                        }
+                    }
+                    if(destination != null && placeDestionation != null) {
+                        isViajando = true;
+                        configTrip();
+                    } else {
+                        Toast.makeText(MainActivity.this, "No olvides seleccionar un destino", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        } else {
+            this.spinner.setDefaultText("Añade a un Ser Querido Primero");
+            Toast.makeText(MainActivity.this, "Debe añadir un ser Querido", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -283,8 +267,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(MainActivity.this, AddSerQuerido.class);
                 Bundle bundle = new Bundle();
                 intent.putExtra("user", usuario);
-                findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
-                findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
                 startActivity(intent);
             }
         });
@@ -327,15 +309,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View header = navigationView.getHeaderView(0);
-        this.tripDescription = findViewById(R.id.estadoViaje);
-        ((Button) tripDescription.findViewById(R.id.btnCancelarViaje)).setOnClickListener(new View.OnClickListener() {
+
+        findViewById(R.id.btnCancelarViaje).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stopLocationUpdates();
-                tripDescription.setVisibility(View.GONE);
-                spinner.setVisibility(View.VISIBLE);
-                ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
                 isViajando = false;
+                configTrip();
                 contactos.clear();
                 destination = null;
                 placeDestionation = null;
@@ -346,10 +326,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         // Personalizar la UI
-        ((TextView) header.findViewById(R.id.txtNombre)).setText(this.user.getDisplayName());
-        ((TextView) header.findViewById(R.id.txtEmail)).setText(this.user.getEmail());
+        ((TextView) findViewById(R.id.txtUserName)).setText(this.usuario.getNombre());
+        ((TextView) header.findViewById(R.id.txtNombre)).setText(this.usuario.getNombre());
+        ((TextView) header.findViewById(R.id.txtEmail)).setText(this.usuario.getEmail());
 
-        this.usuario.imageConfig(header);
+        if(this.usuario.getPhoto() != null || this.usuario.getPhoto().length() > 0) {
+            this.usuario.imageConfig((ImageView) findViewById(R.id.imgPhoto));
+            this.usuario.imageConfig((ImageView) header.findViewById(R.id.imgProfilePhoto));
+        } else {
+            Log.e("IMAGE", "MAMAGUEVO");
+        }
 
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -377,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
                 if(destination != null) {
-                    ((TextView) tripDescription.findViewById(R.id.txtDistance))
+                    ((TextView) findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
                         Log.e("placeArrival", contactos.toString());
@@ -460,17 +446,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (Contacto contacto: contactos) {
             this.sendSMS(contacto);
         }
-        this.tripDescription.setVisibility(View.GONE);
         this.isViajando = false;
         destination = null;
         placeDestionation = null;
-        this.contactos.clear();
+        contactos.clear();
         boolean[] bool = new boolean[this.usuario.getContactos().size()];
         Arrays.fill(bool, false);
         this.spinner.setSelected(bool);
-        spinnerConfig();
-        ((TextView) findViewById(R.id.txtWelcome)).setVisibility(View.VISIBLE);
-        ((Button) findViewById(R.id.btnFindPlace)).setVisibility(View.VISIBLE);
+        this.configTrip();
     }
 
     /**
@@ -575,44 +558,72 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Place place = PlacePicker.getPlace(this, data);
                     this.placeDestionation = place;
                     this.destination = new Location("Google Place");
-                    this.isViajando = true;
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
-                    if(!contactos.isEmpty()) {
-                        tripDescription.setVisibility(View.VISIBLE);
-                        ((TextView) findViewById(R.id.txtDestino)).setText(placeDestionation.getName());
-                        ((TextView) findViewById(R.id.txtContactoViaje)).setText(getContactosText());
-                        ((TextView) findViewById(R.id.txtDistance)).setText(String.valueOf(destination.distanceTo(currentLocation)));
+                    if(contactos.isEmpty()) {
+                        Toast.makeText(this, "Destino guardado", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(this, "Debe escoger al menos a un Ser Querido", Toast.LENGTH_SHORT).show();
+                        this.isViajando = true;
                     }
+                    this.configTrip();
                 }
                 break;
         }
     }
 
     /**
-     * Método getContactosText: este método es un auxiliar para actualizar el card del viaje
+     * Método configTrip:
+     */
+    private void configTrip() {
+        TextView txtDestino = findViewById(R.id.txtDestino);
+        TextView txtDistance = findViewById(R.id.txtDistance);
+        TextView txtContactos = findViewById(R.id.txtContactos);
+        TextView txtWelcome = findViewById(R.id.txtWelcome);
+        if(isViajando) {
+            findViewById(R.id.btnFindPlace).setVisibility(View.GONE);
+            findViewById(R.id.btnCancelarViaje).setVisibility(View.VISIBLE);
+            findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
+            findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
+            findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
+            txtWelcome.setVisibility(View.GONE);
+            txtDestino.setVisibility(View.VISIBLE);
+            txtDistance.setVisibility(View.VISIBLE);
+            txtContactos.setVisibility(View.VISIBLE);
+            txtContactos.setText(getContactosText());
+            txtDestino.setText(placeDestionation.getName());
+            txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
+        } else {
+            txtWelcome.setVisibility(View.VISIBLE);
+            findViewById(R.id.btnFindPlace).setVisibility(View.VISIBLE);
+            findViewById(R.id.btnCancelarViaje).setVisibility(View.GONE);
+            findViewById(R.id.layoutDestino).setVisibility(View.GONE);
+            findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
+        }
+
+    }
+
+    /**
+     *
      */
     private String getContactosText(){
         StringBuilder sb = new StringBuilder();
-        if(contactos.size() < 3) {
-            for (Contacto contacto: contactos) {
-                sb.append(contacto.getNombre());
-                sb.append(", ");
-            }
-            sb.substring(0,sb.length()-1);
-        } else {
+        if(contactos.size() > 3) {
             sb.append(contactos.get(0).getNombre());
             sb.append(", ");
             sb.append(contactos.get(1).getNombre());
             sb.append("...");
+        } else {
+            for (Contacto c: contactos) {
+              sb.append(c.getNombre());
+              sb.append(", ");
+            }
+            sb.substring(0, sb.length()-2);
         }
         return sb.toString();
     }
 
     /**
-     *
+     * Método onBackPressed:
      */
     @Override
     public void onBackPressed() {
@@ -625,7 +636,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método onCreateOptionsMenu:
+     * @param menu {Menu}
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -634,7 +646,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método onOptionsItemSelected
+     * @param item {MenuItem}
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -649,7 +662,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     *
+     * Método onNavigationItemSelected
+     * @param item {MenuItem}
      */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -659,21 +673,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             int id = item.getItemId();
             Intent intent = null;
-            Bundle bundle = new Bundle();
             switch (id) {
                 case R.id.add_place :
                     break;
                 case R.id.add_seres:
                     intent = new Intent(this, AddSerQuerido.class);
                     intent.putExtra("user", usuario);
-                    findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
-                    findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
+                    finish();
                     break;
                 case R.id.seres:
                     intent = new Intent(this, seresQueridos.class);
                     intent.putExtra("user", usuario);
-                    findViewById(R.id.layoutCargando).setVisibility(View.VISIBLE);
-                    findViewById(R.id.layoutPrincipal).setVisibility(View.GONE);
+                    finish();
                     break;
                 case R.id.logout:
                     this.auth.signOut();
@@ -703,6 +714,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Método gotPermissions: este es un métdo auxiliar que se encarga de revisar que se tengan los permisos
+     * Los permisos revisados son los siguiente: Ubicación y Mensaje de Texto
      */
     public boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -713,6 +725,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Método requestPermissions: este es un método auxiliar que se encarga de perdir los permisos necesarios
+     * Los permisos solicitados son los siguiente: Ubicación y Mensaje de Texto
      */
     private void requestPermissions() {
         boolean shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this,
