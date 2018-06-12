@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,9 +32,7 @@ import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -84,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // Datos de Ubicación
     private SettingsClient settingsClient;
     private FusedLocationProviderClient locationProviderClient;
+    @Nullable
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
@@ -101,10 +101,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ArrayList<Contacto> contactos;
 
     // Viaje
+    @Nullable
     private Location currentLocation = null;
+    @Nullable
     private Location destination = null;
+    @Nullable
     private Place placeDestionation = null;
     private boolean isViajando = false;
+    private boolean isLocationEnable = false;
 
     private Usuario usuario;
 
@@ -148,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume() {
         super.onResume();
         this.spinnerConfig();
-
     }
 
     @Override
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Método: updateValuesFromBundle este metódo se encargada de actualizar valores relacionados a la ubicación
      * @param savedInstanceState {Bundle}
      */
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
+    private void updateValuesFromBundle(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
                 this.requestingLocationUpdate = savedInstanceState.getBoolean(
@@ -218,14 +221,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.spinner = findViewById(R.id.spinnerMulti);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
         if(this.usuario.haveContactos()) {
-            this.spinner.setDefaultText("Selecciona a tus seres queridos");
             for (Contacto c : this.usuario.getContactos()) {
                 adapter.add(c.getNombre());
             }
             this.spinner.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
                 @Override
-                public void onItemsSelected(boolean[] selected) {
-                    startLocationUpdates();
+                public void onItemsSelected(@NonNull boolean[] selected) {
+                    if(!isLocationEnable) {
+                        startLocationUpdates();
+                        isLocationEnable = true;
+                    }
                     contactos.clear();
                     for (int i = 0; i < selected.length; i++) {
                         if(selected[i]) {
@@ -236,12 +241,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         isViajando = true;
                         configTrip();
                     } else {
-                        Toast.makeText(MainActivity.this, "No olvides seleccionar un destino", Toast.LENGTH_SHORT).show();
+                        Log.e("Contacto", "contacto good");
                     }
                 }
             });
         } else {
-            this.spinner.setDefaultText("Añade a un Ser Querido Primero");
             Toast.makeText(MainActivity.this, "Debe añadir un ser Querido", Toast.LENGTH_SHORT).show();
         }
     }
@@ -340,12 +344,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startLocationUpdates();
+                if(!isLocationEnable) {
+                    startLocationUpdates();
+                    isLocationEnable = true;
+                }
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 try {
                     Intent intent = builder.build(MainActivity.this);
                     startActivityForResult(intent, PLACE_PICKER_REQUEST);
-                }  catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                }  catch (@NonNull GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     Log.e("ERROR", e.getMessage(), e);
                 }
             }
@@ -359,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void createLocationCallback() {
         this.locationCallback = new LocationCallback() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
+            public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
                 if(destination != null) {
@@ -426,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //Envío del mensaje de texto
             boolean grado = (String.valueOf(placeDestionation.getName())).contains("°");
-            String sms = "";
+            String sms;
             if(grado) {
                 sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
             } else {
@@ -446,7 +453,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (Contacto contacto: contactos) {
             this.sendSMS(contacto);
         }
-        this.isViajando = false;
+        isViajando = false;
+        stopLocationUpdates();
         destination = null;
         placeDestionation = null;
         contactos.clear();
@@ -512,7 +520,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                                 requestingLocationUpdate = false;
                         }
-                        updateUI();
                     }
                 });
     }
@@ -521,13 +528,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Método stopLocationUpdates: este método se encarga de terminar de escuchar los cambios de ubicación en el teléfono
      */
     private void stopLocationUpdates() {
-        this.locationProviderClient.removeLocationUpdates(this.locationCallback);
+        isLocationEnable = false;
+        if(locationCallback != null) {
+            this.locationProviderClient.removeLocationUpdates(this.locationCallback);
+        } else {
+            Log.e("Location Callback", "IS NULL");
+        }
     }
 
     /**
      *
      */
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
         savedInstanceState.putParcelable("user", usuario);
@@ -541,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param data {Intent} el intento que inicia la actividad
      */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         switch (requestCode) {
             case REQUEST_CHECK_SETTINGS:
                 switch (resultCode) {
@@ -561,11 +573,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
                     if(contactos.isEmpty()) {
-                        Toast.makeText(this, "Destino guardado", Toast.LENGTH_SHORT).show();
+                        Log.e("Destino", "DESTINO GUARDADO");
                     } else {
                         this.isViajando = true;
+                        this.configTrip();
                     }
-                    this.configTrip();
                 }
                 break;
         }
@@ -590,14 +602,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            txtDestino.setText(placeDestionation.getName());
-            txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
+            if(placeDestionation != null && destination != null) {
+                txtDestino.setText(placeDestionation.getName());
+                txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
+            }
         } else {
             txtWelcome.setVisibility(View.VISIBLE);
             findViewById(R.id.btnFindPlace).setVisibility(View.VISIBLE);
             findViewById(R.id.btnCancelarViaje).setVisibility(View.GONE);
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
+            findViewById(R.id.layoutContacto).setVisibility(View.GONE);
         }
 
     }
@@ -617,7 +632,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
               sb.append(c.getNombre());
               sb.append(", ");
             }
-            sb.substring(0, sb.length()-2);
+            if(sb.length() > 4) {
+                sb.substring(0, sb.length() - 3);
+            }
         }
         return sb.toString();
     }
@@ -650,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param item {MenuItem}
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         if (item.getItemId() == R.id.action_settings) {
             Intent intent = new Intent(getApplicationContext(), Settings.class);
@@ -716,7 +733,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Método gotPermissions: este es un métdo auxiliar que se encarga de revisar que se tengan los permisos
      * Los permisos revisados son los siguiente: Ubicación y Mensaje de Texto
      */
-    public boolean gotPermissions() {
+    private boolean gotPermissions() {
         boolean a = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean b = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean c = ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED;
@@ -763,8 +780,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.i("", "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 if (requestingLocationUpdate) {
-                    Log.i("", "Permission granted, updates requested, starting location updates");
-                    startLocationUpdates();
+                    Log.d("Location Permission", "Granted");
                 }
             }
         }

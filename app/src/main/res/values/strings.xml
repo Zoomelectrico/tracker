@@ -18,4 +18,5 @@
     <string name="labelTelefono">Teléfono</string>
     <string name="labelNombre">Nombre</string>
     <string name="labelViaje">Iniciar Un Viaje</string>
+    <string name="labelSpinner">Selecciona a tus Seres Queridos</string>
 </resources>

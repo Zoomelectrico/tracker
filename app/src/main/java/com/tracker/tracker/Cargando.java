@@ -3,6 +3,7 @@ package com.tracker.tracker;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -39,6 +40,7 @@ public class Cargando extends AppCompatActivity {
     private static final int RC_SIGN_IN = 9001;
 
     private FirebaseAuth auth;
+    @Nullable
     private FirebaseUser user;
     private FirebaseFirestore db;
     private GoogleSignInClient googleSIClient;
@@ -59,14 +61,14 @@ public class Cargando extends AppCompatActivity {
         if(user != null) {
             loadUserData();
         } else {
-            this.btnLogin = (Button) findViewById(R.id.btnLogin);
+            this.btnLogin = findViewById(R.id.btnLogin);
             this.btnLogin.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     signIn();
                 }
             });
-            ((ProgressBar) findViewById(R.id.pbLoading)).setVisibility(View.GONE);
+            findViewById(R.id.pbLoading).setVisibility(View.GONE);
             this.btnLogin.setVisibility(View.VISIBLE);
         }
     }
@@ -169,7 +171,7 @@ public class Cargando extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             btnLogin.setVisibility(View.GONE);
-                            ((ProgressBar) findViewById(R.id.pbLoading)).setVisibility(View.VISIBLE);
+                            findViewById(R.id.pbLoading).setVisibility(View.VISIBLE);
                             FirebaseUser user = auth.getCurrentUser();
                             final Usuario usuario = new Usuario();
                             if(user != null) {
@@ -181,25 +183,23 @@ public class Cargando extends AppCompatActivity {
                                 }
                                 usuario.saveData(db);
                             }
-                            if(user.getUid() != null) {
-                                final CollectionReference contactos = db.collection("users/"+user.getUid()+"/contactos");
-                                contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                        if(task.isSuccessful()) {
-                                            if(task.getResult() != null) {
-                                                for (DocumentSnapshot documentC: task.getResult()) {
-                                                    usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
-                                                }
-                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                intent.putExtra("user", usuario);
-                                                startActivity(intent);
-                                                finish();
+                            final CollectionReference contactos = db.collection("users/"+user.getUid()+"/contactos");
+                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if(task.isSuccessful()) {
+                                        if(task.getResult() != null) {
+                                            for (DocumentSnapshot documentC: task.getResult()) {
+                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
                                             }
+                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                            intent.putExtra("user", usuario);
+                                            startActivity(intent);
+                                            finish();
                                         }
                                     }
-                                });
-                            }
+                                }
+                            });
                         } else {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                         }
