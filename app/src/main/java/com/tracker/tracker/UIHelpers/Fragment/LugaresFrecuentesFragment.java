@@ -1,4 +1,4 @@
-package com.tracker.tracker;
+package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,10 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tracker.tracker.R;
 import com.tracker.tracker.dummy.DummyContent;
 import com.tracker.tracker.dummy.DummyContent.DummyItem;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
