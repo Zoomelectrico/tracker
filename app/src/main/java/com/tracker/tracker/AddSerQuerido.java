@@ -1,6 +1,7 @@
 package com.tracker.tracker;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
@@ -14,6 +15,8 @@ import android.widget.EditText;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
+
+import java.util.Objects;
 
 /**
  *
@@ -40,7 +43,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_ser_querido);
 
-        this.usuario = (Usuario) this.getIntent().getParcelableExtra("user");
+        this.usuario = this.getIntent().getParcelableExtra("user");
 
         this.btnAdd = findViewById(R.id.btnAdd);
         this.txtNombre = findViewById(R.id.txtNombre);
@@ -50,7 +53,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
         toolbar.setTitle("Agregar un ser querido");
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Add Event Listener
@@ -107,7 +110,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
