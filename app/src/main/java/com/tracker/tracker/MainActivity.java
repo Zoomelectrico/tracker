@@ -31,8 +31,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,6 +60,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
@@ -99,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Opciones en Spinner
     private MultiSpinner spinner;
     private ArrayList<Contacto> contactos;
+    private Spinner spinnerLugares;
 
     // Viaje
     @Nullable
@@ -152,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onResume() {
         super.onResume();
         this.spinnerConfig();
+        this.spinnerLugaresConfig();
     }
 
     @Override
@@ -238,9 +243,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             contactos.add(usuario.getContacto(i));
                         }
                     }
-                    if(destination != null && placeDestionation != null) {
+
+                    if(destination != null && !contactos.isEmpty() && placeDestionation != null) {
                         isViajando = true;
-                        configTrip();
+                        configTrip(placeDestionation.getName());
                     } else {
                         Log.e("Contacto", "contacto good");
                     }
@@ -248,6 +254,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
         } else {
             Toast.makeText(MainActivity.this, "Debe añadir un ser Querido", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void spinnerLugaresConfig(){
+        this.spinnerLugares = findViewById(R.id.spinnerLugares);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+        adapter.add("Seleccione un destino frecuente");
+        if(this.usuario.haveFrecuentes()) {
+            for (Frecuente f : this.usuario.getFrecuentes()) {
+                adapter.add(f.getNombre());
+            }
+            this.spinnerLugares.setAdapter(adapter);
+            this.spinnerLugares.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(position >= 1){
+                        position--;
+                        if(!isLocationEnable) {
+                            startLocationUpdates();
+                            isLocationEnable = true;
+                        }
+
+                        Log.e(TAG, "La latitud es: " + String.valueOf((usuario.getFrecuente(position).getLatitud())));
+                        destination = new Location("Google Place");
+                        destination.setLatitude(usuario.getFrecuente(position).getLatitud());
+                        destination.setLongitude(usuario.getFrecuente(position).getLongitud());
+
+                        if(destination != null && !contactos.isEmpty()) {
+                            isViajando = true;
+                            configTrip(usuario.getFrecuente(position).getNombre());
+                        } else {
+                            Log.e("Lugar Frecuente", "Lugar good");
+                        }
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         }
     }
 
@@ -320,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 stopLocationUpdates();
                 isViajando = false;
-                configTrip();
+                configTrip("");
                 contactos.clear();
                 destination = null;
                 placeDestionation = null;
@@ -462,7 +509,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         boolean[] bool = new boolean[this.usuario.getContactos().size()];
         Arrays.fill(bool, false);
         this.spinner.setSelected(bool);
-        this.configTrip();
+        this.configTrip("");
     }
 
     /**
@@ -577,7 +624,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Log.e("Destino", "DESTINO GUARDADO");
                     } else {
                         this.isViajando = true;
-                        this.configTrip();
+                        this.configTrip(placeDestionation.getName());
                     }
                 }
                 break;
@@ -587,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Método configTrip:
      */
-    private void configTrip() {
+    private void configTrip(CharSequence placeName) {
         TextView txtDestino = findViewById(R.id.txtDestino);
         TextView txtDistance = findViewById(R.id.txtDistance);
         TextView txtContactos = findViewById(R.id.txtContactos);
@@ -603,8 +650,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            if(placeDestionation != null && destination != null) {
-                txtDestino.setText(placeDestionation.getName());
+            if( destination != null) {
+                txtDestino.setText(placeName);
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
             }
         } else {

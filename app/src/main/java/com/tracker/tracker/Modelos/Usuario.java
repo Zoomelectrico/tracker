@@ -196,6 +196,8 @@ public class Usuario implements Parcelable {
         return this.frecuentes.get(posicion);
     }
 
+    public boolean haveFrecuentes(){ return ! this.frecuentes.isEmpty();}
+
     public void setFrecuentes(ArrayList<Frecuente> frecuentes) {
         this.frecuentes = frecuentes;
     }
