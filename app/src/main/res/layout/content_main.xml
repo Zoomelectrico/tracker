@@ -85,7 +85,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="8dp"
+                    android:padding="10dp"
                     android:gravity="center"
                     android:background="?attr/cardColor">
 
@@ -109,7 +109,8 @@
                     <Spinner
                         android:id="@+id/spinnerLugares"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"/>
 
                     <TextView
                         android:layout_width="wrap_content"

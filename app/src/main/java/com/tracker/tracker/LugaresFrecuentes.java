@@ -1,23 +1,35 @@
 package com.tracker.tracker;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.places.Places;
 import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.UIHelpers.Fragment.LugaresFrecuentesFragment;
 
 import java.util.Objects;
 
+/**
+ * Clase LugaresFrecuentes: su funcionalidad es administrar los lugares frecuentes del usuario,
+ * permitiendo visualizar una lista de todos estos, crear nuevos, modificarlos o eliminarlos
+ * según el deseo del usuario.
+ */
 public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecuentesFragment.OnListFragmentInteractionListener {
 
     public Usuario user;
+
+    private FloatingActionButton fabAddLugarFrecuente;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +56,7 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        fabConfigLugaresFrecuentes();
     }
 
     @Override
@@ -70,5 +83,17 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
         } else {
             Log.e("", "CHUPALO");
         }
+    }
+
+    private void fabConfigLugaresFrecuentes (){
+        fabAddLugarFrecuente = findViewById(R.id.fabAddLugarFrecuente);
+
+        fabAddLugarFrecuente.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddLugarFrecuenteDialog addLF = new AddLugarFrecuenteDialog();
+                addLF.show(getFragmentManager(), "AddLugarFrecuenteDialogFragment");
+            }
+        });
     }
 }

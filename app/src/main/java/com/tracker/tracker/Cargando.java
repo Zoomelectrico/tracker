@@ -48,7 +48,7 @@ public class Cargando extends AppCompatActivity {
     private Button btnLogin;
 
     /**
-     * Método onCrate:
+     * Método onCreate:
      * @param savedInstanceState {Bundle}
      */
     @Override

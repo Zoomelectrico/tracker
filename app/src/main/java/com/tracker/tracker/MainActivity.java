@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Usuario usuario;
 
     /**
-     * Método onCreate:
+     * Metodo onCreate:
      * @param savedInstanceState {Bundle}
      */
     @Override
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método: getUserData: Este método se encarga de obtener el Objeto Parcelable del Usuario
+     * Metodo: getUserData: Este metodo se encarga de obtener el Objeto Parcelable del Usuario
      */
     private void getUserData() {
         this.usuario = this.getIntent().getParcelableExtra("user");
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método: updateValuesFromBundle este metódo se encargada de actualizar valores relacionados a la ubicación
+     * Metodo: updateValuesFromBundle este metódo se encargada de actualizar valores relacionados a la ubicación
      * @param savedInstanceState {Bundle}
      */
     private void updateValuesFromBundle(@Nullable Bundle savedInstanceState) {
@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método firebaseConfig: Este método se encarga de iniciar la DB y obtener una instacia del servicio de Auth y se obtiene el usuario actual del sistema
+     * Metodo firebaseConfig: Este metodo se encarga de iniciar la DB y obtener una instacia del servicio de Auth y se obtiene el usuario actual del sistema
      */
     private void firebaseConfig() {
         this.auth = FirebaseAuth.getInstance();
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método navigationConfig: Este método se encarga de crear el Toolbar y el menú de Hamburguesa
+     * Metodo navigationConfig: Este metodo se encarga de crear el Toolbar y el menú de Hamburguesa
      */
     private void navigationConfig() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método spinnerConfig: se encarga de configurar el Spinner para seleccionar a los Seres Queridos
+     * Metodo spinnerConfig: se encarga de configurar el Spinner para seleccionar a los Seres Queridos
      * Se instancia el spinner, se cambia la visual, le configura el onClick
      */
     private void spinnerConfig() {
@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método spinnerLugaresConfig: se encarga de configurar el Spinner para seleccionar a los lugares Frecuentes
+     * Metodo spinnerLugaresConfig: se encarga de configurar el Spinner para seleccionar a los lugares Frecuentes
      * Se instancia el spinner, se cambia la visual, le configura el onClick
      */
     private void spinnerLugaresConfig(){
@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método fabConfig: Este método se encarga de configurar el botón fab
+     * Metodo fabConfig: Este metodo se encarga de configurar el botón fab
      */
     private void fabConfig() {
         // Botones
@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método updateUI: este método se encarga de configurar la barra de navegación, el boton de places,
+     * Metodo updateUI: este metodo se encarga de configurar la barra de navegación, el boton de places,
      * el boton de cancelar viaje, y de adaptar la UI a una persona
      */
     private void updateUI() {
@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método createLocationCallback: este método se encarga de crear el listener para los cambios de ubicación
+     * Metodo createLocationCallback: este metodo se encarga de crear el listener para los cambios de ubicación
      */
     private void createLocationCallback() {
         this.locationCallback = new LocationCallback() {
@@ -434,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método sendSMS: este método se encarga de enviar un mensaje de texto a una persona.
+     * Metodo sendSMS: este metodo se encarga de enviar un mensaje de texto a una persona.
      * @param contacto {Contacto} el objecto contacto que referencia el destinatario del mensaje.
      */
     private void sendSMS(@NonNull Contacto contacto) {
@@ -497,7 +497,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método placeArrival: este método es llamado cuando un persona llega a un determinado destino.
+     * Metodo placeArrival: este metodo es llamado cuando un persona llega a un determinado destino.
      * Utilizar el metodo sendSMS para los mensajes de texto.
      * Adicionalmente se encarga de actualizar la UI
      */
@@ -517,7 +517,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método createLocationRequest: este método se encarga de crear un objecto para hacer la petición de la Ubicación
+     * Metodo createLocationRequest: este metodo se encarga de crear un objecto para hacer la petición de la Ubicación
      */
     private void createLocationRequest() {
         this.locationRequest = new LocationRequest();
@@ -527,7 +527,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método buildLocationSettingsRequest: este método se encarga de configurar las peticiones de ubicación
+     * Metodo buildLocationSettingsRequest: este metodo se encarga de configurar las peticiones de ubicación
      */
     private void buildLocationSettingsRequest() {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
@@ -536,7 +536,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método startLocationUpdates: este método se encarga de empezar a escuchar los cambios de ubicación en el teléfono
+     * Metodo startLocationUpdates: este metodo se encarga de empezar a escuchar los cambios de ubicación en el telefono
      */
     private void startLocationUpdates() {
         // Begin by checking if the device has the necessary location settings.
@@ -577,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método stopLocationUpdates: este método se encarga de terminar de escuchar los cambios de ubicación en el teléfono
+     * Metodo stopLocationUpdates: este metodo se encarga de terminar de escuchar los cambios de ubicación en el telefono
      */
     private void stopLocationUpdates() {
         isLocationEnable = false;
@@ -599,7 +599,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onActivyResult: este método se encarga de decidir que hacer después de que se lleva a cabo un intento
+     * Metodo onActivyResult: este metodo se encarga de decidir que hacer despues de que se lleva a cabo un intento
      * @param requestCode {int} el código de la petición
      * @param resultCode {int} el código del resultado (OK | NOOK);
      * @param data {Intent} el intento que inicia la actividad
@@ -636,7 +636,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método configTrip: establece los valores que toman los TextFields de la vista que se muestra
+     * Metodo configTrip: establece los valores que toman los TextFields de la vista que se muestra
      * cuando se tiene un viaje en curso.
      * Se le pasa el nombre del lugar destino como parámetro
      * @param placeName
@@ -695,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onBackPressed:
+     * Metodo onBackPressed:
      */
     @Override
     public void onBackPressed() {
@@ -708,7 +708,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onCreateOptionsMenu:
+     * Metodo onCreateOptionsMenu:
      * @param menu {Menu}
      */
     @Override
@@ -718,7 +718,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onOptionsItemSelected
+     * Metodo onOptionsItemSelected
      * @param item {MenuItem}
      */
     @Override
@@ -734,7 +734,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onNavigationItemSelected
+     * Metodo onNavigationItemSelected
      * @param item {MenuItem}
      */
     @SuppressWarnings("StatementWithEmptyBody")
@@ -779,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método permissionConfig: este método se encarga de revisar si se pidieron los permisos y si no se tienen pedirlos
+     * Metodo permissionConfig: este metodo se encarga de revisar si se pidieron los permisos y si no se tienen pedirlos
      */
     private void permissionConfig() {
         if(!gotPermissions()) {
@@ -788,7 +788,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método gotPermissions: este es un métdo auxiliar que se encarga de revisar que se tengan los permisos
+     * Metodo gotPermissions: este es un metdo auxiliar que se encarga de revisar que se tengan los permisos
      * Los permisos revisados son los siguiente: Ubicación y Mensaje de Texto
      */
     private boolean gotPermissions() {
@@ -799,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método requestPermissions: este es un método auxiliar que se encarga de perdir los permisos necesarios
+     * Metodo requestPermissions: este es un metodo auxiliar que se encarga de perdir los permisos necesarios
      * Los permisos solicitados son los siguiente: Ubicación y Mensaje de Texto
      */
     private void requestPermissions() {
@@ -826,7 +826,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método onRequestPermissionsResult
+     * Metodo onRequestPermissionsResult
      * @param requestCode {int}
      * @param permissions {String[]}
      * @param grantResults {int[]}
@@ -845,7 +845,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método showSnackbar:
+     * Metodo showSnackbar:
      * @param mainTextStringId {int}
      * @param actionStringId {int}
      * @param listener {View.OnClickListener}

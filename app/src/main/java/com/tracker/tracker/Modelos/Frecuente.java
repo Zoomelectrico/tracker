@@ -3,6 +3,8 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.GeoPoint;
+
 import java.util.HashMap;
 
 public class Frecuente implements Parcelable {
@@ -89,10 +91,10 @@ public class Frecuente implements Parcelable {
     }
 
     public HashMap<String, Object> toMap() {
+        GeoPoint coordenadas = new GeoPoint(this.getLatitud(), this.getLongitud());
         HashMap<String, Object> frecuentes = new HashMap<>();
         frecuentes.put("nombre", this.nombre);
-        frecuentes.put("latitud", this.latitud);
-        frecuentes.put("longitud", this.longitud);
+        frecuentes.put("coordenadas", coordenadas);
         frecuentes.put("direccion", this.direccion);
         return frecuentes;
     }
