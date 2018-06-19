@@ -257,6 +257,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /**
+     * Método spinnerLugaresConfig: se encarga de configurar el Spinner para seleccionar a los lugares Frecuentes
+     * Se instancia el spinner, se cambia la visual, le configura el onClick
+     */
     private void spinnerLugaresConfig(){
         this.spinnerLugares = findViewById(R.id.spinnerLugares);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
@@ -632,7 +636,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Método configTrip:
+     * Método configTrip: establece los valores que toman los TextFields de la vista que se muestra
+     * cuando se tiene un viaje en curso.
+     * Se le pasa el nombre del lugar destino como parámetro
+     * @param placeName
      */
     private void configTrip(CharSequence placeName) {
         TextView txtDestino = findViewById(R.id.txtDestino);
