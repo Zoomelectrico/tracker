@@ -3,7 +3,6 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,6 +19,7 @@ public class Usuario implements Parcelable {
     private String photo;
     private String UID;
     private ArrayList<Contacto> contactos;
+    private ArrayList<Frecuente> frecuentes;
 
     /**
      * Constructor de la Clase
@@ -34,6 +34,7 @@ public class Usuario implements Parcelable {
         this.photo = photo;
         this.UID = UID;
         this.contactos = new ArrayList<>();
+        this.frecuentes = new ArrayList<>();
     }
 
     /**
@@ -46,7 +47,9 @@ public class Usuario implements Parcelable {
        this.photo = in.readString();
        this.UID = in.readString();
        this.contactos = new ArrayList<>();
+       this.frecuentes = new ArrayList<>();
        in.readTypedList(contactos, Contacto.CREATOR);
+       in.readTypedList(frecuentes, Frecuente.CREATOR);
     }
     /**
      * Constructor de la Clase:
@@ -57,6 +60,7 @@ public class Usuario implements Parcelable {
         this.photo = "";
         this.UID = "";
         this.contactos = new ArrayList<>();
+        this.frecuentes = new ArrayList<>();
     }
 
     /**
@@ -184,6 +188,22 @@ public class Usuario implements Parcelable {
         }
     }
 
+    public ArrayList<Frecuente> getFrecuentes() {
+        return frecuentes;
+    }
+
+    public Frecuente getFrecuente(int posicion){
+        return this.frecuentes.get(posicion);
+    }
+
+    public void setFrecuentes(ArrayList<Frecuente> frecuentes) {
+        this.frecuentes = frecuentes;
+    }
+
+    public void addFrecuentes(Frecuente f){
+        this.frecuentes.add(f);
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -196,6 +216,7 @@ public class Usuario implements Parcelable {
         dest.writeString(this.photo);
         dest.writeString(this.UID);
         dest.writeTypedList(contactos);
+        dest.writeTypedList(frecuentes);
     }
 
     public static final Parcelable.Creator<Usuario> CREATOR

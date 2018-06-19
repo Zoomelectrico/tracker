@@ -2,17 +2,25 @@ package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.R;
-import com.tracker.tracker.dummy.DummyContent;
-import com.tracker.tracker.dummy.DummyContent.DummyItem;
+import com.tracker.tracker.Modelos.Frecuente;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * A fragment representing a list of Items.
@@ -22,11 +30,12 @@ import com.tracker.tracker.dummy.DummyContent.DummyItem;
  */
 public class LugaresFrecuentesFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
+    @Nullable
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
+    @Nullable
     private OnListFragmentInteractionListener mListener;
+    private List<Frecuente> frecuentes = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -35,7 +44,6 @@ public class LugaresFrecuentesFragment extends Fragment {
     public LugaresFrecuentesFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static LugaresFrecuentesFragment newInstance(int columnCount) {
         LugaresFrecuentesFragment fragment = new LugaresFrecuentesFragment();
@@ -49,6 +57,7 @@ public class LugaresFrecuentesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -58,6 +67,11 @@ public class LugaresFrecuentesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_lugaresfrecuentes_list, container, false);
+        Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();
+        if(bundle != null) {
+            Usuario usuario = bundle.getParcelable("user");
+            frecuentes = Objects.requireNonNull(usuario).getFrecuentes();
+        }
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -68,7 +82,7 @@ public class LugaresFrecuentesFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyLugaresFrecuentesRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyLugaresFrecuentesRecyclerViewAdapter(frecuentes, mListener));
         }
         return view;
     }
@@ -102,7 +116,6 @@ public class LugaresFrecuentesFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Frecuente item);
     }
 }

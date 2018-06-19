@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Usuario;
 
 /**
@@ -103,6 +104,7 @@ public class Cargando extends AppCompatActivity {
         final Usuario usuario = new Usuario();
         final DocumentReference user = db.document("users/"+UID);
         final CollectionReference contactos = db.collection("users/"+UID+"/contactos");
+        final CollectionReference frecuentes = db.collection("users/"+UID+"/frecuentes");
         user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -123,14 +125,29 @@ public class Cargando extends AppCompatActivity {
                                             serQuerido.setId(documentC.getId());
                                             usuario.addContacto(serQuerido);
                                         }
-                                        Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                        intent.putExtra("user", usuario);
-                                        startActivity(intent);
-                                        finish();
+                                        frecuentes.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if(task.isSuccessful()) {
+                                                    for (DocumentSnapshot documentF : task.getResult()) {
+                                                        Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
+                                                        usuario.addFrecuentes(frecuente);
+                                                    }
+                                                    Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                    intent.putExtra("user", usuario);
+                                                    startActivity(intent);
+                                                    finish();
+                                                    Toast.makeText(getApplicationContext(), "Se cargaron los lugares frecuentes", Toast.LENGTH_LONG).show();
+                                                }else{
+                                                    Toast.makeText(getApplicationContext(), "No se cargaron los lugares frecuentes", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             }
                         });
+
                     }
                 }
             }

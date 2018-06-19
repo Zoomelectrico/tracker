@@ -62,7 +62,7 @@ import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
+import static android.content.ContentValues.TAG;
 /**
  * Controlador de la actividad principal
  * Esta clase configura el menú, permite crear viaje, maneja el tema de la ubicación
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void getUserData() {
         this.usuario = this.getIntent().getParcelableExtra("user");
+        Log.e(TAG, "El usuario tiene si o no: " + this.usuario.getFrecuentes().toString() );
     }
 
     /**
@@ -691,7 +692,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int id = item.getItemId();
             Intent intent = null;
             switch (id) {
-                case R.id.add_place :
+                case R.id.frecuent_place:
+                    intent = new Intent(this, LugaresFrecuentes.class);
+                    intent.putExtra("user", usuario);
+                    finish();
                     break;
                 case R.id.add_seres:
                     intent = new Intent(this, AddSerQuerido.class);
