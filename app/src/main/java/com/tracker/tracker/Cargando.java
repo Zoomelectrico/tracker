@@ -130,7 +130,7 @@ public class Cargando extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                 if(task.isSuccessful()) {
                                                     for (DocumentSnapshot documentF : task.getResult()) {
-                                                        Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
+                                                        Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("id"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
                                                         usuario.addFrecuentes(frecuente);
                                                     }
                                                     Intent intent = new Intent(Cargando.this, MainActivity.class);

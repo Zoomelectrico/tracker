@@ -10,12 +10,14 @@ import java.util.HashMap;
 public class Frecuente implements Parcelable {
 
     private String nombre;
+    private String id;
     private Double latitud;
     private Double longitud;
     private String direccion;
 
-    public Frecuente(String Nombre, Double Latitud, Double Longitud, String Direccion){
+    public Frecuente(String Nombre, String id, Double Latitud, Double Longitud, String Direccion){
         this.nombre = Nombre;
+        this.id = id;
         this.latitud = Latitud;
         this.longitud = Longitud;
         this.direccion = Direccion;
@@ -23,6 +25,7 @@ public class Frecuente implements Parcelable {
 
     protected Frecuente(Parcel in) {
         this.nombre = in.readString();
+        this.id = in.readString();
         this.latitud = in.readDouble();
         this.longitud = in.readDouble();
         this.direccion = in.readString();
@@ -34,6 +37,14 @@ public class Frecuente implements Parcelable {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Double getLatitud() {
@@ -85,6 +96,7 @@ public class Frecuente implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.nombre);
+        dest.writeString(this.id);
         dest.writeDouble(this.latitud);
         dest.writeDouble(this.longitud);
         dest.writeString(this.direccion);
@@ -94,6 +106,7 @@ public class Frecuente implements Parcelable {
         GeoPoint coordenadas = new GeoPoint(this.getLatitud(), this.getLongitud());
         HashMap<String, Object> frecuentes = new HashMap<>();
         frecuentes.put("nombre", this.nombre);
+        frecuentes.put("id", this.id);
         frecuentes.put("coordenadas", coordenadas);
         frecuentes.put("direccion", this.direccion);
         return frecuentes;

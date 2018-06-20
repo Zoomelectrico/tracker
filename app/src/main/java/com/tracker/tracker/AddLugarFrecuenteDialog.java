@@ -117,12 +117,14 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
     private void agregarLugarFrecuente(){
         nombreLF = String.valueOf(this.txtLFNombre.getText());
         if(nombreLF.length() > 0 && place != null) {
-            Frecuente frecuente = new Frecuente(nombreLF, place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
+            Frecuente frecuente = new Frecuente(nombreLF, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
+            ((LugaresFrecuentes)getActivity()).user.addFrecuentes(frecuente);
+            getDialog().dismiss();
+            getActivity().recreate();
             frecuentes.add(frecuente.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
-                            Toast.makeText(getActivity(), "Se ha agregado el LugarFrecuente: "+nombreLF, Toast.LENGTH_LONG).show();
                             Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
                         }
                     })
@@ -132,7 +134,6 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                             Log.w(TAG, "Error adding document", e);
                         }
                     });
-            getDialog().dismiss();
         }
         if (nombreLF.length() <= 0) {
             txtLFNombre.setError("El campo de nombre no puede estar vacío");

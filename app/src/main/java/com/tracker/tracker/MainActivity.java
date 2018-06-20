@@ -51,6 +51,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -66,6 +67,8 @@ import com.tracker.tracker.Modelos.Usuario;
 import java.util.ArrayList;
 import java.util.Arrays;
 import static android.content.ContentValues.TAG;
+import static com.google.android.gms.location.places.Places.getGeoDataClient;
+
 /**
  * Controlador de la actividad principal
  * Esta clase configura el menú, permite crear viaje, maneja el tema de la ubicación
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Location destination = null;
     @Nullable
     private Place placeDestionation = null;
+    private String placeNombre = null;
     private boolean isViajando = false;
     private boolean isLocationEnable = false;
 
@@ -244,9 +248,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
 
-                    if(destination != null && !contactos.isEmpty() && placeDestionation != null) {
+                    if(destination != null && placeDestionation != null) {
+                        placeNombre = String.valueOf(placeDestionation.getName());
                         isViajando = true;
-                        configTrip(placeDestionation.getName());
+                        configTrip();
+                    } else if (destination != null) {
+                        isViajando = true;
+                        configTrip();
                     } else {
                         Log.e("Contacto", "contacto good");
                     }
@@ -273,21 +281,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             this.spinnerLugares.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    if(position >= 1){
-                        position--;
+                    if(position > 0){
                         if(!isLocationEnable) {
                             startLocationUpdates();
                             isLocationEnable = true;
                         }
-
-                        Log.e(TAG, "La latitud es: " + String.valueOf((usuario.getFrecuente(position).getLatitud())));
+                        position--;
                         destination = new Location("Google Place");
                         destination.setLatitude(usuario.getFrecuente(position).getLatitud());
                         destination.setLongitude(usuario.getFrecuente(position).getLongitud());
+                        placeNombre = usuario.getFrecuente(position).getNombre();
 
-                        if(destination != null && !contactos.isEmpty()) {
+                        if(destination != null && !contactos.isEmpty() && placeNombre != null) {
                             isViajando = true;
-                            configTrip(usuario.getFrecuente(position).getNombre());
+                            configTrip();
                         } else {
                             Log.e("Lugar Frecuente", "Lugar good");
                         }
@@ -371,13 +378,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 stopLocationUpdates();
                 isViajando = false;
-                configTrip("");
+                configTrip();
                 contactos.clear();
                 destination = null;
                 placeDestionation = null;
                 boolean[] bool = new boolean[usuario.getContactos().size()];
                 Arrays.fill(bool, false);
                 spinner.setSelected(bool);
+                spinnerLugaresConfig();
             }
         });
 
@@ -438,7 +446,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param contacto {Contacto} el objecto contacto que referencia el destinatario del mensaje.
      */
     private void sendSMS(@NonNull Contacto contacto) {
-        if(destination != null && placeDestionation != null) {
+        if(destination != null && placeNombre != null) {
             String SENT = "SMS_SENT";
             String DELIVERED = "SMS_DELIVERED";
 
@@ -483,13 +491,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }, new IntentFilter(DELIVERED));
 
-            //Envío del mensaje de texto
-            boolean grado = (String.valueOf(placeDestionation.getName())).contains("°");
+            //Envío del mensaje de texto. El texto está condicionado a la existencia del caracter °
+            boolean grado = placeNombre.contains("°");
             String sms;
             if(grado) {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
+                if( placeDestionation != null) {
+                    sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestionation.getAddress() + ". Mensaje enviado con Tracker App";
+                } else {
+                    sms = "Hola " + contacto.getNombre() + ", ya llegue al destino. Mensaje enviado con Tracker App";
+                }
             } else {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestionation.getName() + ". Mensaje enviado desde Tracker App";
+                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeNombre + ". Mensaje enviado desde Tracker App";
             }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
@@ -509,11 +521,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         stopLocationUpdates();
         destination = null;
         placeDestionation = null;
+        placeNombre = null;
         contactos.clear();
         boolean[] bool = new boolean[this.usuario.getContactos().size()];
         Arrays.fill(bool, false);
         this.spinner.setSelected(bool);
-        this.configTrip("");
+        this.configTrip();
+        this.spinnerLugaresConfig();
     }
 
     /**
@@ -621,14 +635,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(this, data);
                     this.placeDestionation = place;
+                    this.placeNombre = String.valueOf(place.getName());
                     this.destination = new Location("Google Place");
                     this.destination.setLatitude(place.getLatLng().latitude);
                     this.destination.setLongitude(place.getLatLng().longitude);
                     if(contactos.isEmpty()) {
                         Log.e("Destino", "DESTINO GUARDADO");
+                        Toast.makeText(MainActivity.this, "Destino guardado", Toast.LENGTH_LONG).show();
                     } else {
                         this.isViajando = true;
-                        this.configTrip(placeDestionation.getName());
+                        this.configTrip();
                     }
                 }
                 break;
@@ -639,9 +655,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Metodo configTrip: establece los valores que toman los TextFields de la vista que se muestra
      * cuando se tiene un viaje en curso.
      * Se le pasa el nombre del lugar destino como parámetro
-     * @param placeName
      */
-    private void configTrip(CharSequence placeName) {
+    private void configTrip() {
         TextView txtDestino = findViewById(R.id.txtDestino);
         TextView txtDistance = findViewById(R.id.txtDistance);
         TextView txtContactos = findViewById(R.id.txtContactos);
@@ -657,8 +672,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            if( destination != null) {
-                txtDestino.setText(placeName);
+            if( destination != null && placeNombre != null) {
+                txtDestino.setText(placeNombre);
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
             }
         } else {

@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Places;
@@ -93,6 +94,7 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
             public void onClick(View v) {
                 AddLugarFrecuenteDialog addLF = new AddLugarFrecuenteDialog();
                 addLF.show(getFragmentManager(), "AddLugarFrecuenteDialogFragment");
+                Toast.makeText(getApplicationContext(), "Se agregó un nuevo lugar frecuente", Toast.LENGTH_SHORT);
             }
         });
     }
