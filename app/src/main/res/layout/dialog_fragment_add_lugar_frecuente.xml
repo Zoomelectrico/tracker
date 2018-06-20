@@ -8,10 +8,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="304dp"
+        android:layout_height="390dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:padding="10dp">
+        android:padding="10dp"
+        android:background="?attr/backgroundColor">
 
         <TextView
             android:layout_width="match_parent"
@@ -19,14 +20,15 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_marginTop="15dp"
-            android:text="Añadir LugarFrecuente"
+            android:text="Añadir Lugar Frecuente"
             android:textAlignment="center"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="?attr/textColor"/>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="223dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
             android:layout_marginTop="10dp"
@@ -37,35 +39,44 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/labelNombre" />
+                android:text="@string/labelNombre"
+                android:textColor="?attr/textColor"/>
 
             <EditText
                 android:id="@+id/txtLFNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Pedro Perez"
-                android:inputType="textPersonName" />
+                android:hint="Nombre del Lugar"
+                android:inputType="textPersonName"
+                android:textColorHint="?attr/lowContrastTextColor"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/labelCoordenadas"/>
+                android:text="@string/labelCoordenadas"
+                android:textAlignment="center"
+                android:layout_marginTop="15dp"
+                android:textColor="?attr/textColor" />
 
             <TextView
                 android:id="@+id/txtLFCoordenadas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:textAlignment="center" />
+                android:textAlignment="center"
+                android:layout_marginBottom="15dp"
+                android:textSize="9pt"
+                android:textColor="?attr/textColor" />
 
             <Button
                 android:id="@+id/btnLFFindPlace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="?attr/colorAccent"
+                android:background="?attr/cardColor"
                 android:padding="16dp"
+                android:layout_marginBottom="5dp"
                 android:text="@string/btnEscogerSitio"
                 android:textColor="?attr/textColor" />
 
@@ -81,9 +92,10 @@
                     android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="?attr/backgroundColor"
                     android:padding="4dp"
-                    android:src="@drawable/ic_delete" />
+                    android:src="@drawable/ic_delete"
+                    android:textColor="?attr/textColor" />
 
                 <ImageButton
                     android:id="@+id/btnAgregarLF"
@@ -91,10 +103,11 @@
                     android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="?attr/backgroundColor"
                     android:cropToPadding="false"
                     android:padding="4dp"
-                    android:src="@drawable/ic_confirm_icon" />
+                    android:src="@drawable/ic_confirm_icon"
+                    android:textColor="?attr/textColor" />
 
             </LinearLayout>
 
