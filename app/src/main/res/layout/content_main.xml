@@ -119,7 +119,7 @@
                         android:textColor="?attr/textColor"
                         android:textAlignment="center"
                         android:text="Escoge un destino frecuente" />
-                    
+
                     <Spinner
                         android:id="@+id/spinnerLugares"
                         android:layout_width="match_parent"
