@@ -99,6 +99,13 @@
                         android:textAlignment="center"
                         android:textColor="?attr/textColor"
                         android:textSize="24sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"
+                        android:textAlignment="center"
+                        android:text="Escoge los Seres Queridos" />
                     <com.thomashaertel.widget.MultiSpinner
                         android:id="@+id/spinnerMulti"
                         android:layout_width="match_parent"
@@ -106,11 +113,19 @@
                         android:textColor="?attr/textColor"
                         android:text="@string/labelSpinner"/>
 
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"
+                        android:textAlignment="center"
+                        android:text="Escoge un destino frecuente" />
+                    
                     <Spinner
                         android:id="@+id/spinnerLugares"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="?attr/textColor"/>
+                        android:spinnerMode="dialog"
+                        android:text="@string/labelSpinner"/>
 
                     <TextView
                         android:layout_width="wrap_content"

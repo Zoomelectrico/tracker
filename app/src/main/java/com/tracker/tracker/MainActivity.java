@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void spinnerLugaresConfig(){
         this.spinnerLugares = findViewById(R.id.spinnerLugares);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item);
         adapter.add("Seleccione un destino frecuente");
         if(this.usuario.haveFrecuentes()) {
             for (Frecuente f : this.usuario.getFrecuentes()) {
