@@ -2,59 +2,58 @@ package com.tracker.tracker;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
-import android.widget.Switch;
+import android.view.View;
+import android.widget.Toast;
 
+import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.UIHelpers.Fragment.RutineFragment;
 
 import java.util.Objects;
 
-public class Settings extends AppCompatActivity {
+public class Rutine extends AppCompatActivity implements RutineFragment.OnListFragmentInteractionListener {
 
-    private Switch nightModeSwitch;
-    private Usuario user;
+    public Usuario user;
+
+    private FloatingActionButton fabAddRutina;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             setTheme(R.style.DarkTheme);
         } else {
             setTheme(R.style.AppTheme);
         }
+
+        Usuario usuario = this.getIntent().getParcelableExtra("user");
+        this.user = usuario;
+        Bundle bundle = new Bundle();
+        RutineFragment rutineFragment = new RutineFragment();
+        rutineFragment.setArguments(bundle);
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
+        setContentView(R.layout.activity_rutine);
 
-        Toolbar toolbar = findViewById(R.id.tbSettings);
-        toolbar.setTitle("Configuración");
+        Toolbar toolbar = findViewById(R.id.tbRutine);
+        toolbar.setTitle("Rutinas");
+
         setSupportActionBar(toolbar);
-
         Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.user = this.getIntent().getParcelableExtra("user");
+        fabConfigRutinas();
+    }
 
-        nightModeSwitch = findViewById(R.id.nightModeSwitch);
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
-            nightModeSwitch.setChecked(true);
-        }
-        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                }
-                Settings.this.recreate();
-            }
-        });
+    @Override
+    public void onListFragmentInteraction(Rutina item) {
+
     }
 
     @Override
@@ -76,5 +75,17 @@ public class Settings extends AppCompatActivity {
         } else {
             Log.e("", "CHUPALO");
         }
+    }
+
+    private void fabConfigRutinas (){
+        fabAddRutina = findViewById(R.id.fabAddRutina);
+
+        fabAddRutina.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddRoutineDialog addRoutineDialog = new AddRoutineDialog();
+                addRoutineDialog.show(getFragmentManager(), "AddRoutineDialog");
+            }
+        });
     }
 }

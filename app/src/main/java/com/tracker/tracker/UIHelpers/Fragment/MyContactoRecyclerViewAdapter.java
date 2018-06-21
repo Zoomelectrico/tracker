@@ -1,6 +1,8 @@
 package com.tracker.tracker.UIHelpers.Fragment;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,8 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.R;
 
 import java.util.List;
+
+
 
 /**
  *
@@ -31,8 +35,9 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
     /**
      *
      */
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_contacto , parent, false);
         return new ViewHolder(view);
@@ -42,7 +47,7 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
      *
      */
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.item = contactos.get(position);
         holder.item.setPosition(position);
         holder.txtNombre.setText(
@@ -73,12 +78,13 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
      *
      */
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
         public final View view;
         public TextView txtNombre;
         public TextView txtTelf;
         public Contacto item;
 
-        public ViewHolder(View view) {
+        public ViewHolder(@NonNull View view) {
             super(view);
             this.view = view;
             txtNombre = view.findViewById(R.id.item_number);

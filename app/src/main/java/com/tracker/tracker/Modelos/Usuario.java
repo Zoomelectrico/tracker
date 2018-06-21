@@ -2,15 +2,18 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.view.View;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.tracker.tracker.R;
 import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
+
 /**
  * Clase Usuario: esta es la clase usuario, que modela al objeto Usuario en la DB
  */
@@ -20,6 +23,8 @@ public class Usuario implements Parcelable {
     private String photo;
     private String UID;
     private ArrayList<Contacto> contactos;
+    private ArrayList<Frecuente> frecuentes;
+    private ArrayList<Rutina> rutinas;
 
     /**
      * Constructor de la Clase
@@ -34,19 +39,25 @@ public class Usuario implements Parcelable {
         this.photo = photo;
         this.UID = UID;
         this.contactos = new ArrayList<>();
+        this.frecuentes = new ArrayList<>();
+        this.rutinas = new ArrayList<>();
     }
 
     /**
      * Constructor de la clase:
      * @param in {Parcel}
      */
-    public Usuario(Parcel in) {
+    private Usuario(Parcel in) {
        this.nombre = in.readString();
        this.email = in.readString();
        this.photo = in.readString();
        this.UID = in.readString();
        this.contactos = new ArrayList<>();
+       this.frecuentes = new ArrayList<>();
+       this.rutinas = new ArrayList<>();
        in.readTypedList(contactos, Contacto.CREATOR);
+       in.readTypedList(frecuentes, Frecuente.CREATOR);
+       in.readTypedList(rutinas, Rutina.CREATOR);
     }
     /**
      * Constructor de la Clase:
@@ -57,6 +68,8 @@ public class Usuario implements Parcelable {
         this.photo = "";
         this.UID = "";
         this.contactos = new ArrayList<>();
+        this.frecuentes = new ArrayList<>();
+        this.rutinas = new ArrayList<>();
     }
 
     /**
@@ -149,6 +162,16 @@ public class Usuario implements Parcelable {
         return this.contactos.get(i);
     }
 
+    public Contacto getContactoById(String id){
+        Contacto contact = null;
+        for(Contacto c: this.contactos){
+            if (c.getId().equals(id)) {
+                contact = c;
+            }
+        }
+        return contact;
+    }
+
     /**
      * Método addContacto: Añade un contacto a la lista de contactos.
      * @param c {Contacto}
@@ -175,7 +198,7 @@ public class Usuario implements Parcelable {
      * especifique.
      * @param nombre
      */
-    public void eliminarContacto(String nombre, String telf){
+    public void eliminarContacto(@NonNull String nombre, @NonNull String telf){
         for (Contacto c: contactos) {
             if(nombre.equals(c.getNombre()) && telf.equals(c.getTelf())) {
                 contactos.remove(c);
@@ -184,23 +207,95 @@ public class Usuario implements Parcelable {
         }
     }
 
+    /**
+     * Método getFrecuentes devuelve la lista de lugares frecuentes que tiene el usuario
+     * Se usa para poder mostrar la lista de lugares frecuentes en el fragment list
+     * @return
+     */
+    public ArrayList<Frecuente> getFrecuentes() {
+        return frecuentes;
+    }
+
+    /**
+     * Metodo getFrecuente: devuelve un lugar frecuente ubicado en la posicion que se pasa por parámetro
+     * @param posicion
+     * @return
+     */
+    public Frecuente getFrecuente(int posicion){
+        return this.frecuentes.get(posicion);
+    }
+
+    public Frecuente getFrecuenteById(String id){
+        Frecuente frecuent = null;
+        for(Frecuente f: this.getFrecuentes()){
+            if (f.getId().equals(id)) {
+                frecuent = f;
+            }
+        }
+        return frecuent;
+    }
+
+    /**
+     * Metodo haveFrecuentes: permite saber si la lista esta vacia
+     * @return
+     */
+    public boolean haveFrecuentes(){ return ! this.frecuentes.isEmpty();}
+
+    /**
+     * Metodo setFrecuentes: establece una lista de lugares frecuentes al usuario.
+     * @param frecuentes
+     */
+    public void setFrecuentes(ArrayList<Frecuente> frecuentes) {
+        this.frecuentes = frecuentes;
+    }
+
+    /**
+     * metodo addFrecuntes: agrega un lugar frecuente al final de la lista
+     * @param f
+     */
+    public void addFrecuentes(Frecuente f){
+        this.frecuentes.add(f);
+    }
+
+    /**
+     * metodo getRutinas: permite obtener la lista de rutinas del usuario
+     * @return
+     */
+    public ArrayList<Rutina> getRutinas() {
+        return rutinas;
+    }
+
+    /**
+     * Metodo setRutinas: determina una lista de rutinas
+     * @param rutinas
+     */
+    public void setRutinas(ArrayList<Rutina> rutinas) {
+        this.rutinas = rutinas;
+    }
+
+    public void addRutina(Rutina rutina){
+        this.rutinas.add(rutina);
+    }
+
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.nombre);
         dest.writeString(this.email);
         dest.writeString(this.photo);
         dest.writeString(this.UID);
         dest.writeTypedList(contactos);
+        dest.writeTypedList(frecuentes);
+        dest.writeTypedList(rutinas);
     }
 
     public static final Parcelable.Creator<Usuario> CREATOR
             = new Parcelable.Creator<Usuario>() {
-        public Usuario createFromParcel(Parcel in) {
+        public Usuario createFromParcel(@NonNull Parcel in) {
             return new Usuario(in);
         }
 
@@ -212,18 +307,19 @@ public class Usuario implements Parcelable {
      * Método saveData:
      * @param db {FirebaseFirestore}
      */
-    public void saveData(FirebaseFirestore db) {
+    public void saveData(@NonNull FirebaseFirestore db) {
         new SaveUserData(db).execute(this);
     }
 
     /**
      * Método imageConfig:
-     * @param header {View}
+     * @param imageView {ImageView}
      */
-    public void imageConfig(View header) {
-        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.photo);
+    public void imageConfig(ImageView imageView) {
+        new ProfilePicture(imageView).execute(this.photo);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return this.nombre + " " + this.UID;

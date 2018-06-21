@@ -59,7 +59,7 @@ public class Contacto implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.nombre);
         dest.writeString(this.telf);
         dest.writeString(this.id);
@@ -67,7 +67,7 @@ public class Contacto implements Parcelable {
 
     public static final Parcelable.Creator<Contacto> CREATOR
             = new Parcelable.Creator<Contacto>() {
-        public Contacto createFromParcel(Parcel in) {
+        public Contacto createFromParcel(@NonNull Parcel in) {
             return new Contacto(in);
         }
 
@@ -76,6 +76,7 @@ public class Contacto implements Parcelable {
         }
     };
 
+    @NonNull
     public HashMap<String, Object> toMap() {
         HashMap<String, Object> contacto = new HashMap<>();
         contacto.put("nombre", this.nombre);
