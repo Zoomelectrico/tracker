@@ -8,7 +8,7 @@
     <string name="action_settings">Settings</string>
     <string name="permission_rationale">Coño papi da permiso</string>
     <string name="menu_principal_1">Agregar Ser Querido</string>
-    <string name="menu_principal_2">Agregar Lugar</string>
+    <string name="menu_principal_2">Lugares Frecuentes</string>
     <string name="menu_principal_3">Seres Queridos</string>
     <string name="menu_principal_4">Cerrar Sesión</string>
     <string name="btnIngresar">Ingresar</string>
@@ -17,4 +17,10 @@
     <string name="btnEscogerSitio">Escoger Sitio</string>
     <string name="labelTelefono">Teléfono</string>
     <string name="labelNombre">Nombre</string>
+    <string name="labelViaje">Iniciar Un Viaje</string>
+    <string name="labelSpinner">Selecciona a tus Seres Queridos</string>
+    <string name="labelCoordenadas">Coordenadas</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

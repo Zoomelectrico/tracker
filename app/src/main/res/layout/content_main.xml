@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,112 +11,168 @@
     android:background="?attr/backgroundColor">
 
     <LinearLayout
-        android:layout_margin="8dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="8dp"
-        android:gravity="center"
-        android:background="?attr/backgroundColor">
+        android:padding="8dp">
 
         <LinearLayout
-            android:id="@+id/layoutCargando"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
-            android:visibility="gone"
+            android:padding="8dp"
             android:background="?attr/backgroundColor">
-
-            <ProgressBar
-                android:id="@+id/pbMain"
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layoutPrincipal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center"
-            >
-
-            <TextView
-                android:id="@+id/txtWelcome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:padding="16dp"
-                android:text="Configurar Viaje"
-                android:textAlignment="center"
-                android:textColor="?attr/textColor"
-                android:textSize="24sp" />
-
-            <com.thomashaertel.widget.MultiSpinner
-                android:id="@+id/spinnerMulti"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="?attr/textColor" />
-
-            <TextView
-                android:id="@+id/txtContacto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:textSize="14sp"
-                android:visibility="gone"
-                android:padding="8dp"
-                android:layout_marginTop="8dp"
-                android:textColor="?attr/textColor"/>
-
-            <Button
-                android:id="@+id/btnFindPlace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="?attr/cardColor"
-                android:padding="16dp"
-                android:text="@string/btnEscogerSitio"
-                android:textColor="?attr/textColor" />
 
             <android.support.v7.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/estadoViaje"
+                android:layout_gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                card_view:cardElevation="3dp"
+                android:background="?attr/cardColor"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="8dp"
+                    android:background="?attr/cardColor">
+
+                    <ImageView
+                        android:id="@+id/imgPhoto"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="8dp"
+                        app:srcCompat="@mipmap/ic_launcher"
+                        android:gravity="end"/>
+                    <TextView
+                        android:id="@+id/txtUserName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:gravity="start"
+                        android:text="Jose Quevedo"
+                        android:textAlignment="textStart"
+                        android:textColor="?attr/textColor"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="?attr/backgroundColor"
+            android:gravity="center">
+
+            <android.support.v7.widget.CardView
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:padding="16dp"
                 card_view:cardElevation="5dp"
-                android:padding="8dp"
-                android:visibility="gone"
                 android:background="?attr/cardColor">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="8dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="30dp"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="30dp"
                     android:gravity="center"
                     android:background="?attr/cardColor">
+
+                    <TextView
+                        android:id="@+id/txtWelcome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:padding="16dp"
+                        android:text="@string/labelViaje"
+                        android:textAlignment="center"
+                        android:textColor="?attr/textColor"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"
+                        android:textAlignment="center"
+                        android:text="Escoge los Seres Queridos"
+                        android:layout_marginBottom="7dp" />
+
+                    <com.thomashaertel.widget.MultiSpinner
+                        android:id="@+id/spinnerMulti"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"
+                        android:text="@string/labelSpinner"
+                        android:layout_marginBottom="15dp"
+                        android:textSize="8pt" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/textColor"
+                        android:textAlignment="center"
+                        android:text="Escoge un destino frecuente"
+                        android:layout_marginBottom="7dp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerLugares"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dialog"
+                        android:text="@string/labelSpinner" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textSize="14sp"
+                        android:visibility="gone"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp"
+                        android:textColor="?attr/textColor"/>
+                    <Button
+                        android:id="@+id/btnFindPlace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:background="?attr/buttonColor"
+                        android:padding="16dp"
+                        android:text="@string/btnEscogerSitio"
+                        android:textColor="#ffffff" />
+
                     <LinearLayout
+                        android:id="@+id/layoutContacto"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:background="?attr/cardColor">
+                        android:background="?attr/cardColor"
+                        android:visibility="gone">
                         <TextView
-                            android:id="@+id/txtContactoViaje"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAlignment="center"
                             android:textSize="14sp"
                             android:padding="8dp"
                             android:layout_marginTop="8dp"
-                            android:text="Contacto:"
+                            android:text="Contactos:"
                             android:textStyle="bold"
                             android:textColor="?attr/textColor"/>
                         <TextView
-                            android:id="@+id/txtContactoNombre"
+                            android:id="@+id/txtContactos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAlignment="center"
@@ -125,12 +182,13 @@
                             android:textColor="?attr/textColor"/>
                     </LinearLayout>
                     <LinearLayout
+                        android:id="@+id/layoutDestino"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:background="?attr/cardColor">
+                        android:background="?attr/cardColor"
+                        android:visibility="gone">
                         <TextView
-                            android:id="@+id/txtDestinoViaje"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAlignment="center"
@@ -151,12 +209,13 @@
                             android:textColor="?attr/textColor"/>
                     </LinearLayout>
                     <LinearLayout
+                        android:id="@+id/layoutDistancia"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:background="?attr/cardColor">
+                        android:background="?attr/cardColor"
+                        android:visibility="gone">
                         <TextView
-                            android:id="@+id/txtDistanceViaje"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAlignment="center"
@@ -178,22 +237,31 @@
 
                     </LinearLayout>
                     <Button
+                        android:id="@+id/btnAddLugarFrecuente"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"
+                        android:text="Agregar como Lugar Frecuente"
+                        android:textColor="?attr/textColor"
+                        android:background="?attr/buttonColor"
+                        android:visibility="gone"/>
+                    <Button
                         android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp"
-                        android:paddingLeft="12dp"
-                        android:paddingRight="12dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="18dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:padding="8dp"
+                        android:layout_marginTop="4dp"
                         android:gravity="center"
-                        android:layout_weight="1"
                         android:text="Cancelar Viaje"
-                        android:textColor="#ffffff"
-                        android:background="?attr/buttonColor"/>
+                        android:textColor="?attr/textColor"
+                        android:background="?attr/buttonColor"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
     </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

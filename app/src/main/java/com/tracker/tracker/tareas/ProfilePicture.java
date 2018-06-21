@@ -3,6 +3,7 @@ package com.tracker.tracker.tareas;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -16,6 +17,7 @@ public class ProfilePicture extends AsyncTask <String, Void, Bitmap>  {
         this.profilePic = img;
     }
 
+    @Nullable
     @Override
     protected Bitmap doInBackground(String... urls) {
         String url = urls[0];
