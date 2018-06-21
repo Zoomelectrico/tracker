@@ -229,6 +229,17 @@
 
                     </LinearLayout>
                     <Button
+                        android:id="@+id/btnAddLugarFrecuente"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"
+                        android:text="Agregar como Lugar Frecuente"
+                        android:textColor="?attr/textColor"
+                        android:background="?attr/buttonColor"
+                        android:visibility="gone"/>
+                    <Button
                         android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

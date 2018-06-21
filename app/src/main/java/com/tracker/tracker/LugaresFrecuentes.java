@@ -92,7 +92,11 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
         fabAddLugarFrecuente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putBoolean("haveDestino", false);
+
                 AddLugarFrecuenteDialog addLF = new AddLugarFrecuenteDialog();
+                addLF.setArguments(args);
                 addLF.show(getFragmentManager(), "AddLugarFrecuenteDialogFragment");
                 Toast.makeText(getApplicationContext(), "Se agregó un nuevo lugar frecuente", Toast.LENGTH_SHORT);
             }

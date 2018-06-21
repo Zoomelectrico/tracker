@@ -14,6 +14,7 @@ public class Frecuente implements Parcelable {
     private Double latitud;
     private Double longitud;
     private String direccion;
+    private Boolean isFrecuente;
 
     public Frecuente(String Nombre, String id, Double Latitud, Double Longitud, String Direccion){
         this.nombre = Nombre;
@@ -21,6 +22,7 @@ public class Frecuente implements Parcelable {
         this.latitud = Latitud;
         this.longitud = Longitud;
         this.direccion = Direccion;
+        this.isFrecuente = false;
     }
 
     protected Frecuente(Parcel in) {
@@ -71,6 +73,14 @@ public class Frecuente implements Parcelable {
         this.direccion = direccion;
     }
 
+    public Boolean getFrecuente() {
+        return isFrecuente;
+    }
+
+    public void setFrecuente(Boolean frecuente) {
+        isFrecuente = frecuente;
+    }
+
     @Override
     public String toString() {
         return this.nombre;
@@ -109,6 +119,7 @@ public class Frecuente implements Parcelable {
         frecuentes.put("id", this.id);
         frecuentes.put("coordenadas", coordenadas);
         frecuentes.put("direccion", this.direccion);
+        frecuentes.put("isFrecuente", this.isFrecuente);
         return frecuentes;
     }
 }

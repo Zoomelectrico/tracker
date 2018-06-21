@@ -55,6 +55,10 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
     private String nombreLF;
     private String direccion;
     private Place place;
+    private Frecuente destino;
+    private String destionID;
+    private Double destinoLat;
+    private Double destinoLong;
 
     @Nullable
     @Override
@@ -76,6 +80,8 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                     case R.id.btnAgregarLF:
                         agregarLugarFrecuente();
                         break;
+                    case R.id.btnCancelar:
+                        getDialog().dismiss();
                 }
 
             }
@@ -84,6 +90,16 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         view.findViewById(R.id.btnAgregarLF).setOnClickListener(listener);
         this.txtLFCoordenadas = view.findViewById(R.id.txtLFCoordenadas);
         this.txtLFNombre = view.findViewById(R.id.txtLFNombre);
+        /**
+         * Ocultar el boton de seleccionar destino si ya se pasa desde el MainActivity
+         */
+        if(this.getArguments().getBoolean("haveDestino")){
+            this.destino = new Frecuente(null, this.getArguments().getString("id"), this.getArguments().getDouble("destLat"),
+                    this.getArguments().getDouble("destLon"), this.getArguments().getString("destDireccion"));
+            this.destino.setFrecuente(true);
+            txtLFCoordenadas.setText("[" + String.valueOf(this.destino.getLatitud()) + ", " + String.valueOf(this.destino.getLongitud()) + "]");
+            view.findViewById(R.id.btnLFFindPlace).setVisibility(View.GONE);
+        }
         /**
          * Especificaciones de la base de datos
          */
@@ -109,6 +125,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
                 this.txtLFCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
         }
@@ -116,12 +133,17 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
 
     private void agregarLugarFrecuente(){
         nombreLF = String.valueOf(this.txtLFNombre.getText());
-        if(nombreLF.length() > 0 && place != null) {
-            Frecuente frecuente = new Frecuente(nombreLF, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
-            ((LugaresFrecuentes)getActivity()).user.addFrecuentes(frecuente);
-            getDialog().dismiss();
-            getActivity().recreate();
-            frecuentes.add(frecuente.toMap())
+        if(nombreLF.length() > 0 && destino != null) {
+            destino.setNombre(nombreLF);
+            if(!this.getArguments().getBoolean("haveDestino")){
+                ((LugaresFrecuentes)getActivity()).user.addFrecuentes(destino);
+                getDialog().dismiss();
+                getActivity().recreate();
+            } else{
+                ((MainActivity)getActivity()).usuario.addFrecuentes(destino);
+                getDialog().dismiss();
+            }
+            frecuentes.add(destino.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
