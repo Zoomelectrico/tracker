@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LocationCallback locationCallback;
     private LocationRequest locationRequest;
     private LocationSettingsRequest locationSettingsRequest;
-    private Boolean requestingLocationUpdate;
 
     // Botones
     private FloatingActionButton fabAdd, fabAddPerson, fabAddLocation;
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // Viaje
     @Nullable
-    private Location currentLocation = null;
+    private Location currentLocation;
     @Nullable
     private Location destination = null;
     @Nullable
@@ -136,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         updateValuesFromBundle(savedInstanceState);
 
         // Verificar GPS
-        this.requestingLocationUpdate = true;
         this.settingsClient = LocationServices.getSettingsClient(this);
         this.locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -177,10 +175,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      */
     private void updateValuesFromBundle(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(KEY_REQUESTING_LOCATION_UPDATES)) {
-                this.requestingLocationUpdate = savedInstanceState.getBoolean(
-                        KEY_REQUESTING_LOCATION_UPDATES);
-            }
             if (savedInstanceState.keySet().contains(KEY_LOCATION)) {
                 this.currentLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             }
@@ -344,10 +338,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isLocationEnable) {
-                    startLocationUpdates();
-                    isLocationEnable = true;
-                }
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
                 try {
                     Intent intent = builder.build(MainActivity.this);
@@ -370,11 +360,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
                 if(destination != null) {
-                    ((TextView) findViewById(R.id.txtDistance))
-                            .setText(String.valueOf(currentLocation.distanceTo(destination)));
-                    if(currentLocation.distanceTo(destination) <= 50.0) {
-                        Log.e("placeArrival", contactos.toString());
-                        placeArrival();
+                    if (currentLocation != null) {
+                        ((TextView) findViewById(R.id.txtDistance))
+                                .setText(String.valueOf(currentLocation.distanceTo(destination)));
+                        if(currentLocation.distanceTo(destination) <= 50.0) {
+                            Log.e("placeArrival", contactos.toString());
+                            placeArrival();
+                        }
                     }
                 }
             }
@@ -492,9 +484,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
                     @Override
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                        Log.i("", "All location settings are satisfied.");
+                        Log.e("COÑO MARICO", "QUE PEO");
                         try {
-                            locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                            if (locationCallback != null) {
+                                locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                            }
                         } catch (SecurityException e) {
                             Log.e("Main", "Security Exception", e);
                         }
@@ -518,7 +512,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         "fixed here. Fix in Settings.";
                                 Log.e("", errorMessage);
                                 Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                                requestingLocationUpdate = false;
                         }
                     }
                 });
@@ -540,7 +533,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      *
      */
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-        savedInstanceState.putBoolean(KEY_REQUESTING_LOCATION_UPDATES, requestingLocationUpdate);
         savedInstanceState.putParcelable(KEY_LOCATION, currentLocation);
         savedInstanceState.putParcelable("user", usuario);
         super.onSaveInstanceState(savedInstanceState);
@@ -561,12 +553,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Log.i("", "User agreed to make required location settings changes.");
                         break;
                     case Activity.RESULT_CANCELED:
-                        this.requestingLocationUpdate = false;
                         break;
                 }
                 break;
             case PLACE_PICKER_REQUEST:
                 if (resultCode == RESULT_OK) {
+                    if(!isLocationEnable) {
+                        startLocationUpdates();
+                        isLocationEnable = true;
+                    }
                     Place place = PlacePicker.getPlace(this, data);
                     this.placeDestionation = place;
                     this.destination = new Location("Google Place");
@@ -597,17 +592,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
-            txtWelcome.setVisibility(View.GONE);
+            txtWelcome.setText((CharSequence) "Viajando");
             txtDestino.setVisibility(View.VISIBLE);
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            if(placeDestionation != null && destination != null) {
+            if(placeDestionation != null && currentLocation != null && destination != null) {
                 txtDestino.setText(placeDestionation.getName());
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
             }
+            if(currentLocation == null) {
+                Log.e("CURRENT LOCATION", "NULL");
+            }
         } else {
-            txtWelcome.setVisibility(View.VISIBLE);
+            txtWelcome.setText((CharSequence) "Configurar Viaje");
             findViewById(R.id.btnFindPlace).setVisibility(View.VISIBLE);
             findViewById(R.id.btnCancelarViaje).setVisibility(View.GONE);
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
@@ -627,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             sb.append(", ");
             sb.append(contactos.get(1).getNombre());
             sb.append("...");
-        } else {
+        } else if(contactos.size() > 0) {
             for (Contacto c: contactos) {
               sb.append(c.getNombre());
               sb.append(", ");
@@ -777,11 +775,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
             if (grantResults.length <= 0) {
+                isViajando = false;
+                configTrip();
+                Toast.makeText(this, "Sin la ubicación no podemos hacer mucho :(", Toast.LENGTH_LONG).show();
                 Log.i("", "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (requestingLocationUpdate) {
-                    Log.d("Location Permission", "Granted");
-                }
+                Log.d("Location Permission", "Granted");
             }
         }
     }
