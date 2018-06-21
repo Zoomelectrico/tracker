@@ -134,7 +134,7 @@ public class Cargando extends AppCompatActivity {
                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                 if(task.isSuccessful()) {
                                                     for (DocumentSnapshot documentF : task.getResult()) {
-                                                        Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("id"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
+                                                        Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("placeId"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
                                                         frecuente.setId(documentF.getId());
                                                         usuario.addFrecuentes(frecuente);
                                                     }
@@ -230,19 +230,66 @@ public class Cargando extends AppCompatActivity {
                                 }
                                 usuario.saveData(db);
                             }
-                            final CollectionReference contactos = db.collection("users/"+user.getUid()+"/contactos");
+                            final String userId = user.getUid();
+                            final CollectionReference contactos = db.collection("users/"+userId+"/contactos");
+                            final CollectionReference frecuentes = db.collection("users/"+userId+"/frecuentes");
+                            final CollectionReference rutinas = db.collection("users/"+userId+"/rutinas");
                             contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if(task.isSuccessful()) {
                                         if(task.getResult() != null) {
                                             for (DocumentSnapshot documentC: task.getResult()) {
-                                                usuario.addContacto(new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false));
+                                                Contacto serQuerido = new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false);
+                                                serQuerido.setId(documentC.getId());
+                                                usuario.addContacto(serQuerido);
                                             }
-                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                            intent.putExtra("user", usuario);
-                                            startActivity(intent);
-                                            finish();
+                                            frecuentes.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if(task.isSuccessful()) {
+                                                        for (DocumentSnapshot documentF : task.getResult()) {
+                                                            Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("placeId"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
+                                                            frecuente.setId(documentF.getId());
+                                                            usuario.addFrecuentes(frecuente);
+                                                        }
+                                                        rutinas.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    for (DocumentSnapshot documentR : task.getResult()) {
+                                                                        final ArrayList<Contacto> rContactosList = new ArrayList<>();
+                                                                        final CollectionReference rContactosRef = db.collection("users/" + userId + "/rutinas/" + documentR.getId() + "/seresQueridos");
+                                                                        final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
+                                                                        Log.e(TAG, "El nombre de los lugares de la rutina son: " + rutina.getrNombre());
+
+                                                                        rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                                if (task.isSuccessful()) {
+                                                                                    for (DocumentSnapshot documentRS : task.getResult()) {
+                                                                                        rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
+                                                                                    }
+                                                                                    rutina.setrSeresQueridos(rContactosList);
+                                                                                    usuario.addRutina(rutina);
+                                                                                    Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                                                    intent.putExtra("user", usuario);
+                                                                                    startActivity(intent);
+                                                                                    finish();
+                                                                                }
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                } else {
+                                                                    Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
+                                                                }
+                                                            }
+                                                        });
+                                                    }else{
+                                                        Toast.makeText(getApplicationContext(), "No se cargaron los lugares frecuentes", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 }
