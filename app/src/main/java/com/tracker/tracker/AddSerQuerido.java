@@ -67,10 +67,11 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         String name = String.valueOf(txtNombre.getText());
         String phone = String.valueOf(txtPhone.getText());
+        String accentedChars = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸ";
 
         // Booleans
         boolean notEmpty = name.length() > 0 && phone.length() > 0;
-        boolean isAlpha = name.matches("[ a-zA-Z]+");
+        boolean isAlpha = name.matches("[ a-zA-Z" + accentedChars + "]+");
         boolean isNumeric = android.text.TextUtils.isDigitsOnly(phone);
         boolean isLongEnough = phone.length() == 11;
 
@@ -82,7 +83,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
                 startActivity(intent);
                 finish();
             } else {
-                Log.e("", "CHUPALO");
+                Log.e("", "Error en AddSerQuerido.java");
             }
             this.usuario.saveData(FirebaseFirestore.getInstance());
             finish();
@@ -126,7 +127,7 @@ public class AddSerQuerido extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
             finish();
         } else {
-            Log.e("", "CHUPALO");
+            Log.e("", "Error en AddSerQuerido.java");
         }
     }
 
