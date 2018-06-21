@@ -85,7 +85,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="10dp"
+                    android:paddingTop="20dp"
                     android:paddingBottom="30dp"
                     android:paddingLeft="30dp"
                     android:paddingRight="30dp"
@@ -109,15 +109,18 @@
                         android:textColor="?attr/textColor"
                         android:textAlignment="center"
                         android:text="Escoge los Seres Queridos"
-                        android:layout_marginBottom="7dp" />
+                        android:layout_marginBottom="7dp"
+                        android:layout_marginTop="10dp" />
 
                     <com.thomashaertel.widget.MultiSpinner
                         android:id="@+id/spinnerMulti"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="?attr/textColor"
-                        android:text="@string/labelSpinner"
                         android:layout_marginBottom="15dp"
+                        android:cursorVisible="true"
+                        android:scrollbars="none"
+                        android:text="@string/labelSpinner"
+                        android:textColor="?attr/textColor"
                         android:textSize="8pt" />
 
                     <TextView
@@ -152,7 +155,7 @@
                         android:background="?attr/buttonColor"
                         android:padding="16dp"
                         android:text="@string/btnEscogerSitio"
-                        android:textColor="#ffffff" />
+                        android:textColor="@color/white" />
 
                     <LinearLayout
                         android:id="@+id/layoutContacto"
@@ -240,28 +243,36 @@
                         android:id="@+id/btnAddLugarFrecuente"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:layout_marginTop="2dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="10dp"
                         android:gravity="center"
-                        android:text="Agregar como Lugar Frecuente"
-                        android:textColor="?attr/textColor"
+                        android:text="Agregar a Lugares Frecuentes"
+                        android:textColor="@color/white"
                         android:background="?attr/buttonColor"
                         android:visibility="gone"/>
                     <Button
                         android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="8dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
                         android:layout_marginTop="4dp"
                         android:gravity="center"
                         android:text="Cancelar Viaje"
                         android:textColor="?attr/textColor"
-                        android:background="?attr/buttonColor"
+                        android:background="?attr/cardColorAlternate"
                         android:visibility="gone"/>
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
         </LinearLayout>
+
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
