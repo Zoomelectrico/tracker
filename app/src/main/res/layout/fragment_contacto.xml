@@ -21,8 +21,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="start"
-            android:paddingVertical="6dp"
-            android:paddingHorizontal="10dp"
+            android:padding="4dp"
             android:layout_weight="3">
 
             <TextView

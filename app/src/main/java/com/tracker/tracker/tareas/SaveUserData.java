@@ -2,9 +2,11 @@ package com.tracker.tracker.tareas;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
@@ -19,7 +21,6 @@ public class SaveUserData extends AsyncTask<Usuario, Void, Void> {
         this.db = db;
     }
 
-    @Nullable
     @Override
     protected Void doInBackground(@NonNull Usuario... usuarios) {
         final Usuario u = usuarios[0];

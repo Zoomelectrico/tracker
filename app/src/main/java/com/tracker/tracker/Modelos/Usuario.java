@@ -2,10 +2,11 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.tracker.tracker.R;
 import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
@@ -19,7 +20,6 @@ public class Usuario implements Parcelable {
     private String photo;
     private String UID;
     private ArrayList<Contacto> contactos;
-    private ArrayList<Frecuente> frecuentes;
 
     /**
      * Constructor de la Clase
@@ -34,22 +34,19 @@ public class Usuario implements Parcelable {
         this.photo = photo;
         this.UID = UID;
         this.contactos = new ArrayList<>();
-        this.frecuentes = new ArrayList<>();
     }
 
     /**
      * Constructor de la clase:
      * @param in {Parcel}
      */
-    private Usuario(Parcel in) {
+    public Usuario(Parcel in) {
        this.nombre = in.readString();
        this.email = in.readString();
        this.photo = in.readString();
        this.UID = in.readString();
        this.contactos = new ArrayList<>();
-       this.frecuentes = new ArrayList<>();
        in.readTypedList(contactos, Contacto.CREATOR);
-       in.readTypedList(frecuentes, Frecuente.CREATOR);
     }
     /**
      * Constructor de la Clase:
@@ -60,7 +57,6 @@ public class Usuario implements Parcelable {
         this.photo = "";
         this.UID = "";
         this.contactos = new ArrayList<>();
-        this.frecuentes = new ArrayList<>();
     }
 
     /**
@@ -179,7 +175,7 @@ public class Usuario implements Parcelable {
      * especifique.
      * @param nombre
      */
-    public void eliminarContacto(@NonNull String nombre, @NonNull String telf){
+    public void eliminarContacto(String nombre, String telf){
         for (Contacto c: contactos) {
             if(nombre.equals(c.getNombre()) && telf.equals(c.getTelf())) {
                 contactos.remove(c);
@@ -188,42 +184,23 @@ public class Usuario implements Parcelable {
         }
     }
 
-    public ArrayList<Frecuente> getFrecuentes() {
-        return frecuentes;
-    }
-
-    public Frecuente getFrecuente(int posicion){
-        return this.frecuentes.get(posicion);
-    }
-
-    public boolean haveFrecuentes(){ return ! this.frecuentes.isEmpty();}
-
-    public void setFrecuentes(ArrayList<Frecuente> frecuentes) {
-        this.frecuentes = frecuentes;
-    }
-
-    public void addFrecuentes(Frecuente f){
-        this.frecuentes.add(f);
-    }
-
     @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.nombre);
         dest.writeString(this.email);
         dest.writeString(this.photo);
         dest.writeString(this.UID);
         dest.writeTypedList(contactos);
-        dest.writeTypedList(frecuentes);
     }
 
     public static final Parcelable.Creator<Usuario> CREATOR
             = new Parcelable.Creator<Usuario>() {
-        public Usuario createFromParcel(@NonNull Parcel in) {
+        public Usuario createFromParcel(Parcel in) {
             return new Usuario(in);
         }
 
@@ -235,19 +212,18 @@ public class Usuario implements Parcelable {
      * Método saveData:
      * @param db {FirebaseFirestore}
      */
-    public void saveData(@NonNull FirebaseFirestore db) {
+    public void saveData(FirebaseFirestore db) {
         new SaveUserData(db).execute(this);
     }
 
     /**
      * Método imageConfig:
-     * @param imageView {ImageView}
+     * @param header {View}
      */
-    public void imageConfig(ImageView imageView) {
-        new ProfilePicture(imageView).execute(this.photo);
+    public void imageConfig(View header) {
+        new ProfilePicture((ImageView) header.findViewById(R.id.imgProfilePhoto)).execute(this.photo);
     }
 
-    @NonNull
     @Override
     public String toString() {
         return this.nombre + " " + this.UID;
