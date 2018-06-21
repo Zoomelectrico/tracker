@@ -1,20 +1,17 @@
 package com.tracker.tracker;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,12 +25,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.UIHelpers.Fragment.MyContactoRecyclerViewAdapter;
-
-import org.w3c.dom.Document;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Clases: ModifySQDialog: esta clase se encarga de manipular el dialogo para modificar los datos
@@ -44,6 +39,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
     private Usuario usuario;
 
     private FirebaseAuth auth;
+    @Nullable
     private FirebaseUser user;
     private FirebaseFirestore db;
 
@@ -61,12 +57,9 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      */
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        this.usuario = (Usuario) this.getActivity().getIntent().getParcelableExtra("user");
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        this.usuario = this.getActivity().getIntent().getParcelableExtra("user");
         View view = inflater.inflate(R.layout.dialog_fragment_sq, container, false);
-        /**
-         * Pasar información del ser querido a los campos de Nombre y Teléfono
-         */
         txtModifyNombre = view.findViewById(R.id.txtModifyNombre);
         txtModifyPhone = view.findViewById(R.id.txtModifyPhone);
         txtModifyNombre.setText(this.getArguments().getString("Nombre"));
@@ -91,7 +84,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(@NonNull View v) {
         switch(v.getId()){
             case R.id.btnEditarSQ:
                 this.modificarSQ();
@@ -112,19 +105,16 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      */
     private void modificarSQ(){
         final Context ActivityContext = getActivity();
-        final Activity act = this.getActivity();
+        final AppCompatActivity act = (AppCompatActivity) this.getActivity();
 
         Map<String, Object> serQueridoModify = new HashMap<>();
         serQueridoModify.put("nombre", String.valueOf(txtModifyNombre.getText()));
         serQueridoModify.put("telf", String.valueOf(txtModifyPhone.getText()));
-        /**
-         * Actualización de la lista de Contactos de SeresQueridos del usuario
-         */
         ((seresQueridos)getActivity()).user.modificarContacto(this.getArguments().getInt("position"),
                 String.valueOf(txtModifyNombre.getText()), String.valueOf(txtModifyPhone.getText()));
 
         db.collection("users").document(this.user.getUid())
-            .collection("contactos").document(this.getArguments().getString("id"))
+            .collection("contactos").document(Objects.requireNonNull(this.getArguments().getString("id")))
             .set(serQueridoModify)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
@@ -149,9 +139,6 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void eliminarSQ(){
-        /**
-         * Actualización de la lista de Contactos de SeresQueridos del usuario.
-         */
         ((seresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getString("Nombre"), this.getArguments().getString("Telf"));
 
         db.collection("users").document(this.user.getUid()).collection("contactos")
@@ -161,7 +148,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
                 if(task.isSuccessful()) {
                   if(task.getResult() != null) {
                       for (DocumentSnapshot document: task.getResult()) {
-                          if(document.getString("nombre").equals(getArguments().getString("Nombre")) && document.getString("telf").equals(getArguments().getString("Telf"))) {
+                          if(Objects.requireNonNull(document.getString("nombre")).equals(getArguments().getString("Nombre")) && Objects.requireNonNull(document.getString("telf")).equals(getArguments().getString("Telf"))) {
                               String ID = document.getId();
                               db.document("users/"+user.getUid()+"/contactos/"+ID).delete();
                               break;

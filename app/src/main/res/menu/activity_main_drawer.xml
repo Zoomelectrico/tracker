@@ -10,7 +10,7 @@
             android:title="@string/menu_principal_1"
             android:color="?attr/textColor" />
         <item
-            android:id="@+id/add_place"
+            android:id="@+id/frecuent_place"
             android:icon="@drawable/ic_add_place"
             android:title="@string/menu_principal_2"
             android:color="?attr/textColor" />
