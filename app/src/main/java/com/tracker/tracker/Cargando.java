@@ -261,7 +261,7 @@ public class Cargando extends AppCompatActivity {
                                                                         final ArrayList<Contacto> rContactosList = new ArrayList<>();
                                                                         final CollectionReference rContactosRef = db.collection("users/" + userId + "/rutinas/" + documentR.getId() + "/seresQueridos");
                                                                         final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
-                                                                        Log.e(TAG, "El nombre de los lugares de la rutina son: " + rutina.getrNombre());
+                                                                        //Log.e(TAG, "El nombre de los lugares de la rutina son: " + rutina.getrNombre());
 
                                                                         rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                                                             @Override
