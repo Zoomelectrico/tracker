@@ -126,6 +126,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
                 destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
+
                 this.txtLFCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
         }

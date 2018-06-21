@@ -85,7 +85,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="30dp"
+                    android:paddingLeft="30dp"
+                    android:paddingRight="30dp"
                     android:gravity="center"
                     android:background="?attr/cardColor">
 
@@ -105,27 +108,32 @@
                         android:layout_height="wrap_content"
                         android:textColor="?attr/textColor"
                         android:textAlignment="center"
-                        android:text="Escoge los Seres Queridos" />
+                        android:text="Escoge los Seres Queridos"
+                        android:layout_marginBottom="7dp" />
+
                     <com.thomashaertel.widget.MultiSpinner
                         android:id="@+id/spinnerMulti"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="?attr/textColor"
-                        android:text="@string/labelSpinner"/>
+                        android:text="@string/labelSpinner"
+                        android:layout_marginBottom="15dp"
+                        android:textSize="8pt" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textColor="?attr/textColor"
                         android:textAlignment="center"
-                        android:text="Escoge un destino frecuente" />
+                        android:text="Escoge un destino frecuente"
+                        android:layout_marginBottom="7dp" />
 
                     <Spinner
                         android:id="@+id/spinnerLugares"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:spinnerMode="dialog"
-                        android:text="@string/labelSpinner"/>
+                        android:text="@string/labelSpinner" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -141,10 +149,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:background="?attr/colorAccent"
+                        android:background="?attr/buttonColor"
                         android:padding="16dp"
                         android:text="@string/btnEscogerSitio"
-                        android:textColor="?attr/textColor" />
+                        android:textColor="#ffffff" />
 
                     <LinearLayout
                         android:id="@+id/layoutContacto"

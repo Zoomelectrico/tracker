@@ -45,7 +45,7 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
         holder.item = frecuentes.get(position);
         holder.txtNombreF.setText(frecuentes.get(position).getNombre());
         Log.e(TAG, "Lo que deberia mostrar es: position " + position + frecuentes.get(position).getNombre());
-        holder.txtCoordenadasF.setText(String.valueOf(frecuentes.get(position).getLatitud()) + ", " + String.valueOf(frecuentes.get(position).getLongitud()));
+        // holder.txtCoordenadasF.setText(String.valueOf(frecuentes.get(position).getLatitud()) + ", " + String.valueOf(frecuentes.get(position).getLongitud()));
         holder.txtDireccionF.setText(frecuentes.get(position).getDireccion());
 
         holder.view.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +68,7 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
         public TextView txtNombreF;
-        public TextView txtCoordenadasF;
+        // public TextView txtCoordenadasF;
         public TextView txtDireccionF;
         public Frecuente item;
 
@@ -76,7 +76,7 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
             super(view);
             this.view = view;
             txtNombreF = view.findViewById(R.id.frecNombre);
-            txtCoordenadasF = view.findViewById(R.id.frecCoordenadas);
+            // txtCoordenadasF = view.findViewById(R.id.frecCoordenadas);
             txtDireccionF = view.findViewById(R.id.frecDireccion);
         }
 
