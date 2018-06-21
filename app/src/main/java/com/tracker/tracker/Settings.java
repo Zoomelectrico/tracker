@@ -1,7 +1,6 @@
 package com.tracker.tracker;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
@@ -12,8 +11,6 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import com.tracker.tracker.Modelos.Usuario;
-
-import java.util.Objects;
 
 public class Settings extends AppCompatActivity {
 
@@ -35,10 +32,10 @@ public class Settings extends AppCompatActivity {
         toolbar.setTitle("Configuración");
         setSupportActionBar(toolbar);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        this.user = this.getIntent().getParcelableExtra("user");
+        this.user = (Usuario) this.getIntent().getParcelableExtra("user");
 
         nightModeSwitch = findViewById(R.id.nightModeSwitch);
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
@@ -58,7 +55,7 @@ public class Settings extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;

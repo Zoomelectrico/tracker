@@ -3,7 +3,6 @@ package com.tracker.tracker.UIHelpers.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,17 +17,14 @@ import com.tracker.tracker.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
  */
 public class ContactoFragment extends Fragment {
 
-    @Nullable
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int columns = 1;
-    @Nullable
     private OnListFragmentInteractionListener listener;
     private List<Contacto> contactos = new ArrayList<>();
 
@@ -40,7 +36,6 @@ public class ContactoFragment extends Fragment {
     /**
      *
      */
-    @NonNull
     @SuppressWarnings("unused")
     public static ContactoFragment newInstance(int columnCount) {
         ContactoFragment fragment = new ContactoFragment();
@@ -68,10 +63,10 @@ public class ContactoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contacto_list, container, false);
-        Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();
+        Bundle bundle = getActivity().getIntent().getExtras();
         if(bundle != null) {
-            Usuario usuario = bundle.getParcelable("user");
-            contactos = Objects.requireNonNull(usuario).getContactos();
+            Usuario usuario = (Usuario) bundle.getParcelable("user");
+            contactos = usuario.getContactos();
         }
         if (view instanceof RecyclerView) {
             Context context = view.getContext();

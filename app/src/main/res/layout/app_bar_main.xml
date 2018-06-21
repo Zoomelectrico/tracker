@@ -33,7 +33,7 @@
         app:backgroundTint="?attr/buttonColorDark"
         app:elevation="6dp"
         app:rippleColor="?attr/buttonColor"
-        android:src="@drawable/ic_add_place"
+        app:srcCompat="@drawable/ic_add_place"
         app:pressedTranslationZ="12dp"
         android:visibility="invisible" />
 
@@ -48,7 +48,7 @@
         app:backgroundTint="?attr/buttonColorDark"
         app:elevation="6dp"
         app:rippleColor="?attr/buttonColor"
-        android:src="@drawable/ic_add_ser"
+        app:srcCompat="@drawable/ic_add_ser"
         app:pressedTranslationZ="12dp"
         android:visibility="invisible" />
 

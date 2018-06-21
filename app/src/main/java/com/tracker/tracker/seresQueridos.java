@@ -1,27 +1,23 @@
 package com.tracker.tracker;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
-
-import java.util.Objects;
 
 /**
  * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
  */
 public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
-
     public Usuario user;
-
+    private static final String TAG = "ModifySQDialog";
     /**
      * Método onCreate:
      * @param savedInstanceState {Bundle}
@@ -34,7 +30,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
             setTheme(R.style.AppTheme);
         }
 
-        Usuario usuario = this.getIntent().getParcelableExtra("user");
+        Usuario usuario = (Usuario) this.getIntent().getParcelableExtra("user");
         this.user = usuario;
         Bundle bundle = new Bundle();
         bundle.putParcelable("user", usuario);
@@ -48,7 +44,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
         toolbar.setTitle("Lista de Seres Queridos");
 
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
@@ -57,7 +53,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
      * Método que permite desplegar el Diálogo al hacer click en el usuario para modificarlo.
      */
     @Override
-    public void onListFragmentInteraction(@NonNull Contacto item) {
+    public void onListFragmentInteraction(Contacto item) {
         Bundle args = new Bundle();
         args.putParcelable("user", user);
         args.putString("Nombre", item.getNombre());
@@ -71,7 +67,7 @@ public class seresQueridos extends AppCompatActivity implements ContactoFragment
     }
 
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
