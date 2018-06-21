@@ -3,6 +3,7 @@
     <declare-styleable name="ds">
         <attr name="backgroundColor" format="color"/>
         <attr name="cardColor" format="color"/>
+        <attr name="cardColorAlternate" format="color"/>
         <attr name="textColor" format="color"/>
         <attr name="lowContrastTextColor" format="color"/>
         <attr name="tintColor" format="color"/>
