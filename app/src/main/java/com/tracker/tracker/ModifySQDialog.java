@@ -110,7 +110,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
         Map<String, Object> serQueridoModify = new HashMap<>();
         serQueridoModify.put("nombre", String.valueOf(txtModifyNombre.getText()));
         serQueridoModify.put("telf", String.valueOf(txtModifyPhone.getText()));
-        ((seresQueridos)getActivity()).user.modificarContacto(this.getArguments().getInt("position"),
+        ((SeresQueridos)getActivity()).user.modificarContacto(this.getArguments().getInt("position"),
                 String.valueOf(txtModifyNombre.getText()), String.valueOf(txtModifyPhone.getText()));
 
         db.collection("users").document(this.user.getUid())
@@ -139,7 +139,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void eliminarSQ(){
-        ((seresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getString("Nombre"), this.getArguments().getString("Telf"));
+        ((SeresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getString("Nombre"), this.getArguments().getString("Telf"));
 
         db.collection("users").document(this.user.getUid()).collection("contactos")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

@@ -9,20 +9,26 @@
             android:icon="@drawable/ic_add_ser"
             android:title="@string/menu_principal_1"
             android:color="?attr/textColor" />
-        <item
-            android:id="@+id/frecuent_place"
-            android:icon="@drawable/ic_add_place"
-            android:title="@string/menu_principal_2"
-            android:color="?attr/textColor" />
+
         <item
             android:id="@+id/seres"
             android:icon="@drawable/ic_seres"
+            android:title="@string/menu_principal_2"
+            android:color="?attr/textColor" />
+        <item
+            android:id="@+id/frecuent_place"
+            android:icon="@drawable/ic_add_place"
             android:title="@string/menu_principal_3"
+            android:color="?attr/textColor" />
+        <item
+            android:id="@+id/rutine"
+            android:icon="@drawable/ic_baseline_directions_car_24px"
+            android:title="@string/menu_principal_4"
             android:color="?attr/textColor" />
         <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_logout"
-            android:title="@string/menu_principal_4"
+            android:title="@string/menu_principal_5"
             android:color="?attr/textColor" />
     </group>
 </menu>

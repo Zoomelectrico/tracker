@@ -33,7 +33,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -52,7 +51,6 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,7 +65,7 @@ import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import static android.content.ContentValues.TAG;
+
 import static com.google.android.gms.location.places.Places.getGeoDataClient;
 
 /**
@@ -369,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putBoolean("haveDestino", true);
-                args.putString("id", destino.getId());
+                args.putString("id", destino.getPlaceId());
                 args.putDouble("destLat", destino.getLatitud());
                 args.putDouble("destLon", destino.getLongitud());
                 args.putString("destDireccion", destino.getDireccion());
@@ -770,6 +768,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int id = item.getItemId();
             Intent intent = null;
             switch (id) {
+                case R.id.rutine:
+                    intent = new Intent(this, Rutine.class);
+                    intent.putExtra("user", usuario);
+                    finish();
+                    break;
                 case R.id.frecuent_place:
                     intent = new Intent(this, LugaresFrecuentes.class);
                     intent.putExtra("user", usuario);
@@ -781,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     finish();
                     break;
                 case R.id.seres:
-                    intent = new Intent(this, seresQueridos.class);
+                    intent = new Intent(this, SeresQueridos.class);
                     intent.putExtra("user", usuario);
                     finish();
                     break;

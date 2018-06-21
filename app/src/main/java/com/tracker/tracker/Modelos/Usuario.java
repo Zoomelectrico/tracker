@@ -3,6 +3,7 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -10,6 +11,9 @@ import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
 import java.util.ArrayList;
+
+import static android.content.ContentValues.TAG;
+
 /**
  * Clase Usuario: esta es la clase usuario, que modela al objeto Usuario en la DB
  */
@@ -20,6 +24,7 @@ public class Usuario implements Parcelable {
     private String UID;
     private ArrayList<Contacto> contactos;
     private ArrayList<Frecuente> frecuentes;
+    private ArrayList<Rutina> rutinas;
 
     /**
      * Constructor de la Clase
@@ -35,6 +40,7 @@ public class Usuario implements Parcelable {
         this.UID = UID;
         this.contactos = new ArrayList<>();
         this.frecuentes = new ArrayList<>();
+        this.rutinas = new ArrayList<>();
     }
 
     /**
@@ -48,8 +54,10 @@ public class Usuario implements Parcelable {
        this.UID = in.readString();
        this.contactos = new ArrayList<>();
        this.frecuentes = new ArrayList<>();
+       this.rutinas = new ArrayList<>();
        in.readTypedList(contactos, Contacto.CREATOR);
        in.readTypedList(frecuentes, Frecuente.CREATOR);
+       in.readTypedList(rutinas, Rutina.CREATOR);
     }
     /**
      * Constructor de la Clase:
@@ -61,6 +69,7 @@ public class Usuario implements Parcelable {
         this.UID = "";
         this.contactos = new ArrayList<>();
         this.frecuentes = new ArrayList<>();
+        this.rutinas = new ArrayList<>();
     }
 
     /**
@@ -153,6 +162,16 @@ public class Usuario implements Parcelable {
         return this.contactos.get(i);
     }
 
+    public Contacto getContactoById(String id){
+        Contacto contact = null;
+        for(Contacto c: this.contactos){
+            if (c.getId().equals(id)) {
+                contact = c;
+            }
+        }
+        return contact;
+    }
+
     /**
      * Método addContacto: Añade un contacto a la lista de contactos.
      * @param c {Contacto}
@@ -188,22 +207,74 @@ public class Usuario implements Parcelable {
         }
     }
 
+    /**
+     * Método getFrecuentes devuelve la lista de lugares frecuentes que tiene el usuario
+     * Se usa para poder mostrar la lista de lugares frecuentes en el fragment list
+     * @return
+     */
     public ArrayList<Frecuente> getFrecuentes() {
         return frecuentes;
     }
 
+    /**
+     * Metodo getFrecuente: devuelve un lugar frecuente ubicado en la posicion que se pasa por parámetro
+     * @param posicion
+     * @return
+     */
     public Frecuente getFrecuente(int posicion){
         return this.frecuentes.get(posicion);
     }
 
+    public Frecuente getFrecuenteById(String id){
+        Frecuente frecuent = null;
+        for(Frecuente f: this.getFrecuentes()){
+            if (f.getId().equals(id)) {
+                frecuent = f;
+            }
+        }
+        return frecuent;
+    }
+
+    /**
+     * Metodo haveFrecuentes: permite saber si la lista esta vacia
+     * @return
+     */
     public boolean haveFrecuentes(){ return ! this.frecuentes.isEmpty();}
 
+    /**
+     * Metodo setFrecuentes: establece una lista de lugares frecuentes al usuario.
+     * @param frecuentes
+     */
     public void setFrecuentes(ArrayList<Frecuente> frecuentes) {
         this.frecuentes = frecuentes;
     }
 
+    /**
+     * metodo addFrecuntes: agrega un lugar frecuente al final de la lista
+     * @param f
+     */
     public void addFrecuentes(Frecuente f){
         this.frecuentes.add(f);
+    }
+
+    /**
+     * metodo getRutinas: permite obtener la lista de rutinas del usuario
+     * @return
+     */
+    public ArrayList<Rutina> getRutinas() {
+        return rutinas;
+    }
+
+    /**
+     * Metodo setRutinas: determina una lista de rutinas
+     * @param rutinas
+     */
+    public void setRutinas(ArrayList<Rutina> rutinas) {
+        this.rutinas = rutinas;
+    }
+
+    public void addRutina(Rutina rutina){
+        this.rutinas.add(rutina);
     }
 
     @Override
@@ -219,6 +290,7 @@ public class Usuario implements Parcelable {
         dest.writeString(this.UID);
         dest.writeTypedList(contactos);
         dest.writeTypedList(frecuentes);
+        dest.writeTypedList(rutinas);
     }
 
     public static final Parcelable.Creator<Usuario> CREATOR

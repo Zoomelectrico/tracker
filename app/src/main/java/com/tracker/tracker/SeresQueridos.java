@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * Clases: SeresQueridos esta clase se encarga de manejar La lista de seres Queridos
  */
-public class seresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
+public class SeresQueridos extends AppCompatActivity implements ContactoFragment.OnListFragmentInteractionListener {
 
     public Usuario user;
 
