@@ -239,8 +239,9 @@
                             android:textColor="?attr/textColor"/>
 
                     </LinearLayout>
+
                     <Button
-                        android:id="@+id/btnAddLugarFrecuente"
+                        android:id="@+id/btnCancelarViaje"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="5dp"
@@ -250,12 +251,13 @@
                         android:layout_marginTop="15dp"
                         android:layout_marginBottom="10dp"
                         android:gravity="center"
-                        android:text="Agregar a Lugares Frecuentes"
+                        android:text="Cancelar Viaje"
                         android:textColor="@color/white"
                         android:background="?attr/buttonColor"
                         android:visibility="gone"/>
+
                     <Button
-                        android:id="@+id/btnCancelarViaje"
+                        android:id="@+id/btnAddLugarFrecuente"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingTop="5dp"
@@ -264,7 +266,7 @@
                         android:paddingRight="12dp"
                         android:layout_marginTop="4dp"
                         android:gravity="center"
-                        android:text="Cancelar Viaje"
+                        android:text="Guardar"
                         android:textColor="?attr/textColor"
                         android:background="?attr/cardColorAlternate"
                         android:visibility="gone"/>
