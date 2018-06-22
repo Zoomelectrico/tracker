@@ -241,9 +241,7 @@ public class Cargando extends AppCompatActivity {
                                 if(user.getPhotoUrl() != null) {
                                     usuario.setPhoto(user.getPhotoUrl().toString());
                                 }
-                                Log.e(TAG, "Esta a punto de hacer el metodo saveData" );
                                 usuario.saveData(db);
-                                Log.e(TAG, "Después de hacer el metodo saveData" );
                             }
                             final String userId = user.getUid();
                             final CollectionReference contactos = db.collection("users/"+userId+"/contactos");
