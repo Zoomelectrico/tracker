@@ -400,10 +400,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ((TextView) header.findViewById(R.id.txtNombre)).setText(this.usuario.getNombre());
         ((TextView) header.findViewById(R.id.txtEmail)).setText(this.usuario.getEmail());
 
-        if(this.usuario.getPhoto() != null || this.usuario.getPhoto().length() > 0) {
-            this.usuario.imageConfig((ImageView) findViewById(R.id.imgPhoto));
-            this.usuario.imageConfig((ImageView) header.findViewById(R.id.imgProfilePhoto));
-        } else {
+        if(this.usuario.getPhoto() != null){
+            if(this.usuario.getPhoto() != null || this.usuario.getPhoto().length() > 0) {
+                this.usuario.imageConfig((ImageView) findViewById(R.id.imgPhoto));
+                this.usuario.imageConfig((ImageView) header.findViewById(R.id.imgProfilePhoto));
+            }
+        }
+         else {
             Log.e("IMAGE", "MAMAGUEVO"); //ok
         }
 
