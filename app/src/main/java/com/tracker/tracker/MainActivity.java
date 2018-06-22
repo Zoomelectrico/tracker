@@ -501,14 +501,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }, new IntentFilter(DELIVERED));
 
-            //Envío del mensaje de texto. El texto está condicionado a la existencia del caracter °
-            boolean grado = placeDestination.getNombre().contains("°");
-            String sms;
-            if(grado) {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue al placeDestination, " + placeDestination.getDireccion() + ". Mensaje enviado con Tracker App";
-            } else {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestination.getNombre() + ". Mensaje enviado desde Tracker App";
+            //Estructuración del contenido del sms.
+            String sms = "Hola " + contacto.getNombre() + ", ya llegue al destino. Mensaje enviado con Tracker app.";
+            //En caso que exista dirección, se coloca la dirección
+            if(placeDestination.getDireccion() != null){
+                sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + placeDestination.getDireccion() + ". Mensaje enviado con Tracker App";
             }
+            //Envío del mensaje de texto. El texto está condicionado a la existencia del caracter ° en el nombre, en caso de que exista
+            boolean grado = placeDestination.getNombre().contains("°");
+            if(!grado) {
+                if(placeDestination.getNombre() != null){
+                    sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestination.getNombre() + ". Mensaje enviado desde Tracker App";
+                }
+            }
+
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
         }
