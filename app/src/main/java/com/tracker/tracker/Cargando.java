@@ -159,20 +159,14 @@ public class Cargando extends AppCompatActivity {
                                                                                                 }
                                                                                                 rutina.setrSeresQueridos(rContactosList);
                                                                                                 usuario.addRutina(rutina);
-                                                                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                                                intent.putExtra("user", usuario);
-                                                                                                startActivity(intent);
-                                                                                                finish();
+                                                                                                openMain(usuario);
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                 });
                                                                             }
                                                                         } else {
-                                                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                            intent.putExtra("user", usuario);
-                                                                            startActivity(intent);
-                                                                            finish();
+                                                                            openMain(usuario);
                                                                         }
                                                                     } else {
                                                                         Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
@@ -286,21 +280,14 @@ public class Cargando extends AppCompatActivity {
                                                                                                         rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
                                                                                                     }
                                                                                                     rutina.setrSeresQueridos(rContactosList);
-                                                                                                    usuario.addRutina(rutina);
-                                                                                                    Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                                                    intent.putExtra("user", usuario);
-                                                                                                    startActivity(intent);
-                                                                                                    finish();
+                                                                                                    openMain(usuario);
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     });
                                                                                 }
                                                                             } else {
-                                                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                                intent.putExtra("user", usuario);
-                                                                                startActivity(intent);
-                                                                                finish();
+                                                                                openMain(usuario);
                                                                             }
                                                                         } else {
                                                                             Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
@@ -331,6 +318,20 @@ public class Cargando extends AppCompatActivity {
     private void signIn() {
         Intent signInIntent = this.googleSIClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    /**
+     * openMain: se encarga de abrir la actividad MainActivity utilizada después de cargar los datos
+     * importantes para el uso de la app. Pasa el parámetro usuario para pasarselo en el intent a
+     * MainActivity
+     * @param usuario
+     */
+
+    private void openMain(Usuario usuario){
+        Intent intent = new Intent(Cargando.this, MainActivity.class);
+        intent.putExtra("user", usuario);
+        startActivity(intent);
+        finish();
     }
 
 }

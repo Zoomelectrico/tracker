@@ -110,8 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Nullable
     private Location currentLocation = null;
     @Nullable
-    private Place placeDestionation = null;
-    private Frecuente destino = null;
+    private Frecuente placeDestination = null;
     private boolean isViajando = false;
     private boolean isLocationEnable = false;
 
@@ -243,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             contactos.add(usuario.getContacto(i));
                         }
                     }
-                    if(destino != null) {
+                    if(placeDestination != null) {
                         isViajando = true;
                         configTrip();
                     } else {
@@ -278,10 +277,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             isLocationEnable = true;
                         }
                         position--;
-                        destino = usuario.getFrecuente(position);
-                        destino.setFrecuente(true);
+                        placeDestination = usuario.getFrecuente(position);
+                        placeDestination.setFrecuente(true);
 
-                        if(destino != null && !contactos.isEmpty()) {
+                        if(placeDestination != null && !contactos.isEmpty()) {
                             isViajando = true;
                             configTrip();
                         } else {
@@ -367,10 +366,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putBoolean("haveDestino", true);
-                args.putString("id", destino.getPlaceId());
-                args.putDouble("destLat", destino.getLatitud());
-                args.putDouble("destLon", destino.getLongitud());
-                args.putString("destDireccion", destino.getDireccion());
+                args.putString("id", placeDestination.getPlaceId());
+                args.putDouble("destLat", placeDestination.getLatitud());
+                args.putDouble("destLon", placeDestination.getLongitud());
+                args.putString("destDireccion", placeDestination.getDireccion());
                 //Muestra un FragmentDialog para añadir el nombre del lugar
                 AddLugarFrecuenteDialog addLF = new AddLugarFrecuenteDialog();
                 addLF.setArguments(args);
@@ -386,8 +385,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 isViajando = false;
                 configTrip();
                 contactos.clear();
-                destino = null;
-                placeDestionation = null;
+                placeDestination = null;
                 boolean[] bool = new boolean[usuario.getContactos().size()];
                 Arrays.fill(bool, false);
                 spinner.setSelected(bool);
@@ -438,10 +436,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
-                if(destino != null) {
+                if(placeDestination != null) {
                     Location destination = new Location("Google Place");
-                    destination.setLatitude(destino.getLatitud());
-                    destination.setLongitude(destino.getLongitud());
+                    destination.setLatitude(placeDestination.getLatitud());
+                    destination.setLongitude(placeDestination.getLongitud());
                     ((TextView) findViewById(R.id.txtDistance))
                             .setText(String.valueOf(currentLocation.distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
@@ -458,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * @param contacto {Contacto} el objecto contacto que referencia el destinatario del mensaje.
      */
     private void sendSMS(@NonNull Contacto contacto) {
-        if(destino != null) {
+        if(placeDestination != null) {
             String SENT = "SMS_SENT";
             String DELIVERED = "SMS_DELIVERED";
 
@@ -504,12 +502,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }, new IntentFilter(DELIVERED));
 
             //Envío del mensaje de texto. El texto está condicionado a la existencia del caracter °
-            boolean grado = destino.getNombre().contains("°");
+            boolean grado = placeDestination.getNombre().contains("°");
             String sms;
             if(grado) {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue al destino, " + destino.getDireccion() + ". Mensaje enviado con Tracker App";
+                sms = "Hola " + contacto.getNombre() + ", ya llegue al placeDestination, " + placeDestination.getDireccion() + ". Mensaje enviado con Tracker App";
             } else {
-                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + destino.getNombre() + ". Mensaje enviado desde Tracker App";
+                sms = "Hola " + contacto.getNombre() + ", ya llegue a " + placeDestination.getNombre() + ". Mensaje enviado desde Tracker App";
             }
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(contacto.getTelf(), null, sms, sentPI, deliveredPI);
@@ -517,7 +515,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * Metodo placeArrival: este metodo es llamado cuando un persona llega a un determinado destino.
+     * Metodo placeArrival: este metodo es llamado cuando un persona llega a un determinado placeDestination.
      * Utilizar el metodo sendSMS para los mensajes de texto.
      * Adicionalmente se encarga de actualizar la UI
      */
@@ -527,7 +525,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         isViajando = false;
         stopLocationUpdates();
-        placeDestionation = null;
+        placeDestination = null;
         contactos.clear();
         boolean[] bool = new boolean[this.usuario.getContactos().size()];
         Arrays.fill(bool, false);
@@ -640,8 +638,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case PLACE_PICKER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(this, data);
-                    this.placeDestionation = place;
-                    this.destino = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()));
+                    this.placeDestination = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()));
                     if(contactos.isEmpty()) {
                         Log.e("Destino", "DESTINO GUARDADO");
                         Toast.makeText(MainActivity.this, "Destino guardado", Toast.LENGTH_LONG).show();
@@ -657,7 +654,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     /**
      * Metodo configTrip: establece los valores que toman los TextFields de la vista que se muestra
      * cuando se tiene un viaje en curso.
-     * Se le pasa el nombre del lugar destino como parámetro
+     * Se le pasa el nombre del lugar placeDestination como parámetro
      */
     private void configTrip() {
         TextView txtDestino = findViewById(R.id.txtDestino);
@@ -675,13 +672,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            if(destino != null) {
-                txtDestino.setText(destino.getNombre());
+            if(placeDestination != null) {
+                txtDestino.setText(placeDestination.getNombre());
                 Location destination = new Location("Google Place");
-                destination.setLatitude(this.destino.getLatitud());
-                destination.setLongitude(this.destino.getLongitud());
+                destination.setLatitude(this.placeDestination.getLatitud());
+                destination.setLongitude(this.placeDestination.getLongitud());
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
-                if(!destino.getFrecuente()){
+                if(!placeDestination.getFrecuente()){
                     findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.VISIBLE);
                 }
             }
