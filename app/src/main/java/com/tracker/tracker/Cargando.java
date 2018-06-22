@@ -144,28 +144,35 @@ public class Cargando extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                                 if (task.isSuccessful()) {
                                                                     if (task.getResult() != null) {
-                                                                        for (DocumentSnapshot documentR : task.getResult()) {
-                                                                            final ArrayList<Contacto> rContactosList = new ArrayList<>();
-                                                                            final CollectionReference rContactosRef = db.collection("users/" + UID + "/rutinas/" + documentR.getId() + "/seresQueridos");
-                                                                            final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
-                                                                            rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                                @Override
-                                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                                    if (task.isSuccessful()) {
-                                                                                        if (task.getResult() != null) {
-                                                                                            for (DocumentSnapshot documentRS : task.getResult()) {
-                                                                                                rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
+                                                                        if(!task.getResult().isEmpty()) {
+                                                                            for (DocumentSnapshot documentR : task.getResult()) {
+                                                                                final ArrayList<Contacto> rContactosList = new ArrayList<>();
+                                                                                final CollectionReference rContactosRef = db.collection("users/" + UID + "/rutinas/" + documentR.getId() + "/seresQueridos");
+                                                                                final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
+                                                                                rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                                        if (task.isSuccessful()) {
+                                                                                            if (task.getResult() != null) {
+                                                                                                for (DocumentSnapshot documentRS : task.getResult()) {
+                                                                                                    rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
+                                                                                                }
+                                                                                                rutina.setrSeresQueridos(rContactosList);
+                                                                                                usuario.addRutina(rutina);
+                                                                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                                                                intent.putExtra("user", usuario);
+                                                                                                startActivity(intent);
+                                                                                                finish();
                                                                                             }
-                                                                                            rutina.setrSeresQueridos(rContactosList);
-                                                                                            usuario.addRutina(rutina);
-                                                                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                                            intent.putExtra("user", usuario);
-                                                                                            startActivity(intent);
-                                                                                            finish();
                                                                                         }
                                                                                     }
-                                                                                }
-                                                                            });
+                                                                                });
+                                                                            }
+                                                                        } else {
+                                                                            Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                                            intent.putExtra("user", usuario);
+                                                                            startActivity(intent);
+                                                                            finish();
                                                                         }
                                                                     } else {
                                                                         Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
@@ -234,7 +241,9 @@ public class Cargando extends AppCompatActivity {
                                 if(user.getPhotoUrl() != null) {
                                     usuario.setPhoto(user.getPhotoUrl().toString());
                                 }
+                                Log.e(TAG, "Esta a punto de hacer el metodo saveData" );
                                 usuario.saveData(db);
+                                Log.e(TAG, "Después de hacer el metodo saveData" );
                             }
                             final String userId = user.getUid();
                             final CollectionReference contactos = db.collection("users/"+userId+"/contactos");
@@ -265,30 +274,35 @@ public class Cargando extends AppCompatActivity {
                                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                                     if (task.isSuccessful()) {
                                                                         if (task.getResult() != null) {
-                                                                            for (DocumentSnapshot documentR : task.getResult()) {
-                                                                                final ArrayList<Contacto> rContactosList = new ArrayList<>();
-                                                                                final CollectionReference rContactosRef = db.collection("users/" + userId + "/rutinas/" + documentR.getId() + "/seresQueridos");
-                                                                                final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
-                                                                                //Log.e(TAG, "El nombre de los lugares de la rutina son: " + rutina.getrNombre());
-
-                                                                                rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                                        if (task.isSuccessful()) {
-                                                                                            if (task.getResult() != null) {
-                                                                                                for (DocumentSnapshot documentRS : task.getResult()) {
-                                                                                                    rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
+                                                                            if(!task.getResult().isEmpty()) {
+                                                                                for (DocumentSnapshot documentR : task.getResult()) {
+                                                                                    final ArrayList<Contacto> rContactosList = new ArrayList<>();
+                                                                                    final CollectionReference rContactosRef = db.collection("users/" + userId + "/rutinas/" + documentR.getId() + "/seresQueridos");
+                                                                                    final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
+                                                                                    rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                                            if (task.isSuccessful()) {
+                                                                                                if (task.getResult() != null) {
+                                                                                                    for (DocumentSnapshot documentRS : task.getResult()) {
+                                                                                                        rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
+                                                                                                    }
+                                                                                                    rutina.setrSeresQueridos(rContactosList);
+                                                                                                    usuario.addRutina(rutina);
+                                                                                                    Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                                                                    intent.putExtra("user", usuario);
+                                                                                                    startActivity(intent);
+                                                                                                    finish();
                                                                                                 }
-                                                                                                rutina.setrSeresQueridos(rContactosList);
-                                                                                                usuario.addRutina(rutina);
-                                                                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
-                                                                                                intent.putExtra("user", usuario);
-                                                                                                startActivity(intent);
-                                                                                                finish();
                                                                                             }
                                                                                         }
-                                                                                    }
-                                                                                });
+                                                                                    });
+                                                                                }
+                                                                            } else {
+                                                                                Intent intent = new Intent(Cargando.this, MainActivity.class);
+                                                                                intent.putExtra("user", usuario);
+                                                                                startActivity(intent);
+                                                                                finish();
                                                                             }
                                                                         } else {
                                                                             Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
