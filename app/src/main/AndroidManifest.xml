@@ -36,6 +36,8 @@
         <activity android:name=".AddSerQuerido" />
         <activity android:name=".SeresQueridos" />
         <activity android:name=".Settings" />
+        <activity android:name=".LugaresFrecuentes" />
+        <activity android:name=".Rutine" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -43,9 +45,18 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
-
-        <activity android:name=".LugaresFrecuentes" />
-        <activity android:name=".Rutine"></activity>
+        <service
+            android:name=".notification.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service
+            android:name=".notification.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
