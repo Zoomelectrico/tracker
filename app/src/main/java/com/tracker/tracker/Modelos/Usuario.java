@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
@@ -70,6 +71,17 @@ public class Usuario implements Parcelable {
         this.contactos = new ArrayList<>();
         this.frecuentes = new ArrayList<>();
         this.rutinas = new ArrayList<>();
+    }
+
+    public static void build(@NonNull DocumentSnapshot document, Usuario u) {
+        String nombre = document.getString("nombre");
+        String email = document.getString("email");
+        String photo = document.getString("photo");
+        String UID = document.getString("UID");
+        u.setNombre(nombre);
+        u.setEmail(email);
+        u.setPhoto(photo);
+        u.setUID(UID);
     }
 
     /**
@@ -196,7 +208,8 @@ public class Usuario implements Parcelable {
     /**
      * eliminarContacto: elimina un contacto de la lista de contactos según la posición que se
      * especifique.
-     * @param nombre
+     * @param nombre {String}
+     * @param telf {String}
      */
     public void eliminarContacto(@NonNull String nombre, @NonNull String telf){
         for (Contacto c: contactos) {
@@ -299,6 +312,14 @@ public class Usuario implements Parcelable {
     }
 
     /**
+     * Método haveRutinas
+     * @return true si la persona tiene viaje rutinarios o false en caso contrario
+     * */
+    public boolean haveRutinas() {
+        return !(this.rutinas.isEmpty());
+    }
+
+    /**
      * metodo getRutinas: permite obtener la lista de rutinas del usuario
      * @return
      */
@@ -314,6 +335,10 @@ public class Usuario implements Parcelable {
         this.rutinas = rutinas;
     }
 
+    /**
+     * Método addRutina
+     * @param rutina {Rutina}
+     */
     public void addRutina(Rutina rutina){
         this.rutinas.add(rutina);
     }

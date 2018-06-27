@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.HashMap;
 
 public class Contacto implements Parcelable {
@@ -24,6 +26,12 @@ public class Contacto implements Parcelable {
         this.nombre = in.readString();
         this.telf = in.readString();
         this.id = in.readString();
+    }
+
+    public static Contacto builder(DocumentSnapshot document) {
+        Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"), false);
+        c.setId(document.getId());
+        return c;
     }
 
     public String getNombre() {

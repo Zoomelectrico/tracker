@@ -14,8 +14,6 @@ import com.tracker.tracker.R;
 
 import java.util.List;
 
-
-
 /**
  *
  */
@@ -81,10 +79,10 @@ public class MyContactoRecyclerViewAdapter extends RecyclerView.Adapter<MyContac
         @NonNull
         public final View view;
         public TextView txtNombre;
-        public TextView txtTelf;
+        private TextView txtTelf;
         public Contacto item;
 
-        public ViewHolder(@NonNull View view) {
+        private ViewHolder(@NonNull View view) {
             super(view);
             this.view = view;
             txtNombre = view.findViewById(R.id.item_number);

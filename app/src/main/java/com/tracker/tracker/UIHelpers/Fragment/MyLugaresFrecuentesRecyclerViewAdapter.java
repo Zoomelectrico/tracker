@@ -34,7 +34,8 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_lugaresfrecuentes, parent, false);
         return new ViewHolder(view);
@@ -67,16 +68,14 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View view;
-        public TextView txtNombreF;
-        // public TextView txtCoordenadasF;
-        public TextView txtDireccionF;
+        private TextView txtNombreF;
+        private TextView txtDireccionF;
         public Frecuente item;
 
-        public ViewHolder(@NonNull View view) {
+        private ViewHolder(@NonNull View view) {
             super(view);
             this.view = view;
             txtNombreF = view.findViewById(R.id.frecNombre);
-            // txtCoordenadasF = view.findViewById(R.id.frecCoordenadas);
             txtDireccionF = view.findViewById(R.id.frecDireccion);
         }
 

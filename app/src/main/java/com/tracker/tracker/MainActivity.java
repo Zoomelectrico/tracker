@@ -18,7 +18,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.AlarmManagerCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.telephony.SmsManager;
 import android.util.Log;
@@ -63,12 +62,12 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.google.android.gms.location.places.Places.getGeoDataClient;
 
 /**
  * Controlador de la actividad principal
@@ -169,6 +168,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    /**
+     * Método alarmConfig
+     */
+    private void alarmConfig() {
+        if (this.usuario.haveRutinas()) {
+            AlarmManager[] alarmManagers = new AlarmManager[this.usuario.getRutinas().size()];
+            PendingIntent[] pendingIntents = new PendingIntent[this.usuario.getRutinas().size()];
+            for (int i = 0; i < alarmManagers.length; i++) {
+                Intent intent = new Intent(this, MainActivity.class);
+                pendingIntents[i] = PendingIntent.getBroadcast(this, 0, intent, 0);
+                Rutina r = this.usuario.getRutinas().get(i);
+                alarmManagers[i]
+                        .setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                                r.getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);
+            }
+        }
     }
 
     /**

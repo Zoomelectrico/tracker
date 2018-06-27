@@ -49,16 +49,9 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
 
     private TextView txtLFCoordenadas;
     private EditText txtLFNombre;
-    private ImageButton btnAgregarLF;
-
-    private Location destinationLF;
     private String nombreLF;
-    private String direccion;
     private Place place;
     private Frecuente destino;
-    private String destionID;
-    private Double destinoLat;
-    private Double destinoLong;
 
     @Nullable
     @Override
@@ -80,7 +73,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                     case R.id.btnAgregarLF:
                         agregarLugarFrecuente();
                         break;
-                    case R.id.btnCancelar:
+                    case R.id.btnALFCancelar:
                         getDialog().dismiss();
                 }
 
@@ -88,6 +81,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         };
         view.findViewById(R.id.btnLFFindPlace).setOnClickListener(listener);
         view.findViewById(R.id.btnAgregarLF).setOnClickListener(listener);
+        view.findViewById(R.id.btnALFCancelar).setOnClickListener(listener);
         this.txtLFCoordenadas = view.findViewById(R.id.txtLFCoordenadas);
         this.txtLFNombre = view.findViewById(R.id.txtLFNombre);
         /**

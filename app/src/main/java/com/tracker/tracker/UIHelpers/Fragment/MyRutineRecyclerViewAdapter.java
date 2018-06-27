@@ -1,61 +1,50 @@
 package com.tracker.tracker.UIHelpers.Fragment;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment.OnListFragmentInteractionListener;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.ContentValues.TAG;
-
-/**
- * {@link RecyclerView.Adapter} that can display a {@link Rutina} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Rutina> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final List<Rutina> rutinas;
+    private final OnListFragmentInteractionListener listener;
 
     public MyRutineRecyclerViewAdapter(List<Rutina> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
-        mListener = listener;
+        this.rutinas = items;
+        this.listener = listener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_rutina, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mNombreRutina.setText(mValues.get(position).getrNombre());
-        holder.mDireccionRutina.setText(mValues.get(position).getrDestino().getNombre());
-        holder.mSeresQueridosRutina.setText(String.valueOf(mValues.get(position).getrSeresQueridosName()));
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+        holder.rutina = rutinas.get(position);
+        holder.nombreRutina.setText(rutinas.get(position).getNombre());
+        holder.direccionRutina.setText(rutinas.get(position).getDestino().getNombre());
+        holder.seresQueridosRutina.setText(String.valueOf(rutinas.get(position).getSeresQueridosName()));
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
+        holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
+                if (null != listener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    listener.onListFragmentInteraction(holder.rutina);
                 }
             }
         });
@@ -63,27 +52,27 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return rutinas.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mNombreRutina;
-        public final TextView mDireccionRutina;
-        public final TextView mSeresQueridosRutina;
-        public Rutina mItem;
+        private final View view;
+        private final TextView nombreRutina;
+        private final TextView direccionRutina;
+        private final TextView seresQueridosRutina;
+        public Rutina rutina;
 
-        public ViewHolder(View view) {
+        private ViewHolder(View view) {
             super(view);
-            mView = view;
-            mNombreRutina = (TextView) view.findViewById(R.id.nombreRutina);
-            mDireccionRutina = (TextView) view.findViewById(R.id.direccionRutina);
-            mSeresQueridosRutina = (TextView) view.findViewById(R.id.seresQueridosRutina);
+            this.view = view;
+            nombreRutina = view.findViewById(R.id.nombreRutina);
+            direccionRutina = view.findViewById(R.id.direccionRutina);
+            seresQueridosRutina = view.findViewById(R.id.seresQueridosRutina);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mDireccionRutina.getText() + "'";
+            return super.toString() + " '" + direccionRutina.getText() + "'";
         }
     }
 }
