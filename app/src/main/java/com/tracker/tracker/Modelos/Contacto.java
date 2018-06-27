@@ -42,19 +42,33 @@ public class Contacto implements Parcelable {
         return telf;
     }
 
-    public String getId(){ return id; }
+    public String getId() {
+        return id;
+    }
 
-    public Integer getPosition(){ return this.position; }
+    public Integer getPosition() {
+        return this.position;
+    }
 
-    public void setId(String id){this.id = id;}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public void setPosition(Integer position){this.position = position;}
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
 
-    public void setNombre(String nombre){this.nombre = nombre;}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public void setTelf(String telf){this.telf = telf;}
+    public void setTelf(String telf) {
+        this.telf = telf;
+    }
 
-    public boolean isNuevo() { return this.nuevo; }
+    public boolean isNuevo() {
+        return this.nuevo;
+    }
 
     @Override
     public String toString() {
@@ -93,4 +107,7 @@ public class Contacto implements Parcelable {
         return contacto;
     }
 
+    public String toStringFirebase () {
+        return this.nombre + "-" + this.telf;
+    }
 }

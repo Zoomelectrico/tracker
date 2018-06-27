@@ -48,6 +48,7 @@ public class Cargando extends AppCompatActivity {
     private FirebaseAuth auth;
     @Nullable
     private FirebaseUser user;
+    private Usuario usuario;
     private FirebaseFirestore db;
     private GoogleSignInClient googleSIClient;
     private Button btnLogin;
@@ -107,20 +108,18 @@ public class Cargando extends AppCompatActivity {
      */
     private void loadUserData() {
         if (this.user != null) {
-            Usuario usuario = this.queryData();
-            openMain(usuario);
+            this.queryData(this.user.getUid());
         } else {
             Log.e("", "");
         }
     }
 
-    private Usuario queryData() {
-        final String UID = this.user.getUid();
-        final Usuario usuario = new Usuario();
+    private void queryData(String UID) {
+        this.usuario = new Usuario();
         final DocumentReference userRef = db.document("users/" + UID);
         final CollectionReference sqRef, frecuentesRef, rutinasRef;
         sqRef = db.collection("users/" + UID + "/contactos");
-        frecuentesRef = db.collection("users" + UID + "/frecuentes");
+        frecuentesRef = db.collection("users/" + UID + "/frecuentes");
         rutinasRef = db.collection("users/" + UID + "/rutinas");
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -143,50 +142,52 @@ public class Cargando extends AppCompatActivity {
                             } else {
                                 Log.e("", "");
                             }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("", "");
-                        }
-                    });
-                    frecuentesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                if (task.getResult() != null) {
-                                    for (DocumentSnapshot document : task.getResult()) {
-                                        Frecuente f = Frecuente.builder(document);
-                                        usuario.addFrecuentes(f);
+                            frecuentesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if (task.getResult() != null) {
+                                            for (DocumentSnapshot document : task.getResult()) {
+                                                Frecuente f = Frecuente.builder(document);
+                                                usuario.addFrecuentes(f);
+                                            }
+                                        } else {
+                                            Log.e("", "");
+                                        }
+                                    } else {
+                                        Log.e("", "");
                                     }
-                                } else {
+                                    rutinasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                if (task.getResult() != null) {
+                                                    for (DocumentSnapshot document : task.getResult()) {
+                                                        Rutina r = Rutina.builder(document, usuario.getUID(), db);
+                                                        usuario.addRutina(r);
+                                                    }
+                                                } else {
+                                                    Log.e("", "");
+                                                }
+                                            } else {
+                                                Log.e("", "");
+                                            }
+                                            openMain(usuario);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("", "");
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
                                     Log.e("", "");
                                 }
-                            } else {
-                                Log.e("", "");
-                            }
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e("", "");
-                        }
-                    });
-                    rutinasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                            if (task.isSuccessful()) {
-                                if (task.getResult() != null) {
-                                    for (DocumentSnapshot document : task.getResult()) {
-                                        Rutina r = Rutina.builder(document);
-                                        usuario.addRutina(r);
-                                    }
-                                } else {
-                                    Log.e("", "");
-                                }
-                            } else {
-                                Log.e("", "");
-                            }
+                            });
+
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -204,7 +205,6 @@ public class Cargando extends AppCompatActivity {
 
             }
         });
-        return usuario;
     }
 
     /**
@@ -253,8 +253,7 @@ public class Cargando extends AppCompatActivity {
                                 }
                                 usuario.saveData(db);
                             }
-                            Usuario usuario2 = queryData();
-                            openMain(usuario2);
+                            queryData(usuario.getUID());
                         }
                     }
                 });

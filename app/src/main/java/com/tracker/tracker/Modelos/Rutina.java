@@ -2,12 +2,22 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.GeoPoint;
 import com.tracker.tracker.Modelos.fecha.DiasHoras;
 import com.tracker.tracker.Modelos.fecha.Hora;
+import com.tracker.tracker.SeresQueridos;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Rutina implements Parcelable {
@@ -36,6 +46,18 @@ public class Rutina implements Parcelable {
 
     }
 
+    private Rutina() {
+
+    }
+
+    private void setRutina(Rutina r) {
+        this.nombre = r.getNombre();
+        this.seresQueridos = r.getSeresQueridos();
+        this.destino = r.getDestino();
+        this.tiempo = r.getTiempo();
+        this.isNueva = r.isNueva();
+    }
+
     public boolean isNueva() {
         return isNueva;
     }
@@ -44,10 +66,48 @@ public class Rutina implements Parcelable {
         isNueva = nueva;
     }
 
-    public static Rutina builder(DocumentSnapshot document) {
-        String nombre = document.getString("nombre");
-        // DiasHoras diasHoras = new DiasHoras(document.getDocumentReference("tiempo"));
-        Rutina rutina = null; // = new Rutina();
+
+    public static Rutina builder(@NonNull final DocumentSnapshot document, String UID, FirebaseFirestore db) {
+        final String nombre = document.getString("nombre");
+        final String destino = document.getString("destino");
+        final String[] seresQueridos = (String[]) document.get("contactos");
+        final HashMap<String, Object> tiempo = (HashMap <String, Object>) document.get("tiempo");
+        final Rutina rutina = new Rutina();
+        DocumentReference destinoRef = db.document("users/"+UID+"/frecuentes/"+destino);
+        destinoRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    if(task.getResult() != null) {
+                        ArrayList<Contacto> contactos = new ArrayList<>();
+                        if(seresQueridos != null) {
+                            for (String s: seresQueridos) {
+                                String[] vec = s.split("-");
+                                contactos.add(new Contacto(vec[0], vec[1], false));
+                            }
+                        }
+                        DocumentSnapshot documentD = task.getResult();
+                        String nombreP = documentD.getString("nombre");
+                        String placeId = documentD.getString("placeId");
+                        String direccion = documentD.getString("direccion");
+                        GeoPoint coordenadas = documentD.getGeoPoint("coordenadas");
+                        Frecuente f = new Frecuente(nombreP, placeId, coordenadas.getLatitude(), coordenadas.getLongitude(), direccion, false);
+                        ArrayList<String> dias = (ArrayList<String>) Arrays.asList((String[]) tiempo.get("dias"));
+                        HashMap<String, Object> horaMap = (HashMap<String, Object>) tiempo.get("hora");
+                        String horas = horaMap.get("hora")+":"+horaMap.get("minutos")+":"+horaMap.get("segundos");
+                        Rutina rutina2 = new Rutina(nombre, f, contactos, dias, horas, false);
+                        rutina.setRutina(rutina2);
+                    }
+                } else {
+                    Log.e("", "");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
         return rutina;
     }
 
@@ -126,10 +186,15 @@ public class Rutina implements Parcelable {
     }
 
     public HashMap<String, Object> toMap() {
-        HashMap<String, Object> frecuentes = new HashMap<>();
-        frecuentes.put("nombre", this.nombre);
-        frecuentes.put("destino", this.destino.toMap());
-        frecuentes.put("SeresQueridos", this.seresQueridos.toArray());
-        return frecuentes;
+        HashMap<String, Object> map = new HashMap<>();
+        String[] contactos = new String[this.seresQueridos.size()];
+        for (int i = 0; i < this.seresQueridos.size(); i++) {
+            contactos[i] = this.seresQueridos.get(i).toStringFirebase();
+        }
+        map.put("nombre", this.nombre);
+        map.put("destino", this.destino.getId());
+        map.put("contactos", contactos);
+        map.put("tiempo", this.tiempo.toMap());
+        return map;
     }
 }

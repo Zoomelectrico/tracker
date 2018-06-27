@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Rutina r = this.usuario.getRutinas().get(i);
                 alarmManagers[i]
                         .setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
-                                r.getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);
+                                r.getTiempo().getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);
             }
         }
     }
@@ -663,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case PLACE_PICKER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(this, data);
-                    this.placeDestination = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()));
+                    this.placeDestination = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()), false);
                     if(contactos.isEmpty()) {
                         Log.e("Destino", "DESTINO GUARDADO");
                         Toast.makeText(MainActivity.this, "Destino guardado", Toast.LENGTH_LONG).show();

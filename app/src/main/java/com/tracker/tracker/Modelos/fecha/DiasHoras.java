@@ -3,7 +3,9 @@ package com.tracker.tracker.Modelos.fecha;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DiasHoras implements Parcelable{
@@ -13,6 +15,14 @@ public class DiasHoras implements Parcelable{
     public DiasHoras(ArrayList<String> dias, String hora) {
         this.dias = dias;
         this.hora = new Hora(hora);
+    }
+
+    public DiasHoras(HashMap<String, Object> map) {
+        String[] dias = (String[]) map.get("dias");
+        HashMap<String, Object> hora = (HashMap<String, Object>) map.get("hora");
+        this.dias.addAll(Arrays.asList(dias));
+        String string = hora.get("hora") + ":" + hora.get("minutos") + ":" + hora.get("segundos");
+        this.hora = new Hora(string);
     }
 
     private DiasHoras(Parcel in) {

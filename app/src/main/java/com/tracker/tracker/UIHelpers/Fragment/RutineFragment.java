@@ -2,6 +2,7 @@ package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,12 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
 public class RutineFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -59,7 +54,7 @@ public class RutineFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_rutina_list, container, false);
         Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();

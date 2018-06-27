@@ -41,7 +41,6 @@ public class Frecuente implements Parcelable {
         this.latitud = Latitud;
         this.longitud = Longitud;
         this.direccion = Direccion;
-
         this.isFrecuente = false;
         this.isNueva = isNueva;
     }

@@ -89,7 +89,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
          */
         if(this.getArguments().getBoolean("haveDestino")){
             this.destino = new Frecuente(null, this.getArguments().getString("id"), this.getArguments().getDouble("destLat"),
-                    this.getArguments().getDouble("destLon"), this.getArguments().getString("destDireccion"));
+                    this.getArguments().getDouble("destLon"), this.getArguments().getString("destDireccion"), false);
             this.destino.setFrecuente(true);
             txtLFCoordenadas.setText("[" + String.valueOf(this.destino.getLatitud()) + ", " + String.valueOf(this.destino.getLongitud()) + "]");
             view.findViewById(R.id.btnLFFindPlace).setVisibility(View.GONE);
@@ -126,8 +126,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
-
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString(), true);
                 this.txtLFCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
         }
@@ -142,35 +141,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
 
     private void agregarLugarFrecuente(){
         nombreLF = String.valueOf(this.txtLFNombre.getText());
-        final Boolean haveDestino = this.getArguments().getBoolean("haveDestino");
-        if(nombreLF.length() > 0 && destino != null) {
-            destino.setNombre(nombreLF);
-            frecuentes.add(destino.toMap())
-                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                        @Override
-                        public void onSuccess(DocumentReference documentReference) {
-                            Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                            destino.setId(documentReference.getId());
-                            if(!haveDestino){
-                                ((LugaresFrecuentes)getActivity()).user.addFrecuentes(destino);
-                                getDialog().dismiss();
-                                getActivity().recreate();
-                            } else{
-                                ((MainActivity)getActivity()).usuario.addFrecuentes(destino);
-                                getDialog().dismiss();
-                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
-                            Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
-                        }
-                    });
 
-
-        }
         if (nombreLF.length() <= 0) {
             txtLFNombre.setError("El campo de nombre no puede estar vacío");
         }
