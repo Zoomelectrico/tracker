@@ -32,6 +32,7 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.notification.MyFirebaseInstanceIDService;
 
 import java.util.ArrayList;
 
@@ -326,9 +327,10 @@ public class Cargando extends AppCompatActivity {
      * MainActivity
      * @param usuario
      */
-
     private void openMain(Usuario usuario){
         Intent intent = new Intent(Cargando.this, MainActivity.class);
+        MyFirebaseInstanceIDService firebaseInstanceIDService = new MyFirebaseInstanceIDService(usuario.getUID());
+        firebaseInstanceIDService.onTokenRefresh();
         intent.putExtra("user", usuario);
         startActivity(intent);
         finish();
