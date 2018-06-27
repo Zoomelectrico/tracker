@@ -120,6 +120,13 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         return false;
     }
 
+    /**
+     * onActivityResult: determina que debe desplegarse la actividad que contiene la API de Google Places
+     * para determinar el lugar que se quiere guardar
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @NonNull Intent data) {
         if(requestCode == PLACE_PICKER_REQUEST) {
@@ -132,31 +139,43 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         }
     }
 
+    /**
+     * agregarLugarFrecuente: permite agregar un lugar frecuente tanto a Firebase como a la Lista de
+     * LugaresFrecuentes en el dispositivo, logra actualizar ambas listas de forma casi simultáneo,
+     * cargando primero el LugarFrecuente en firebase para luego pasarle el id del LugarFrecuente y
+     * guardarlo en la lista del dispositivo.
+     */
+
     private void agregarLugarFrecuente(){
         nombreLF = String.valueOf(this.txtLFNombre.getText());
+        final Boolean haveDestino = this.getArguments().getBoolean("haveDestino");
         if(nombreLF.length() > 0 && destino != null) {
             destino.setNombre(nombreLF);
-            if(!this.getArguments().getBoolean("haveDestino")){
-                ((LugaresFrecuentes)getActivity()).user.addFrecuentes(destino);
-                getDialog().dismiss();
-                getActivity().recreate();
-            } else{
-                ((MainActivity)getActivity()).usuario.addFrecuentes(destino);
-                getDialog().dismiss();
-            }
             frecuentes.add(destino.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
                         public void onSuccess(DocumentReference documentReference) {
                             Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
+                            destino.setId(documentReference.getId());
+                            if(!haveDestino){
+                                ((LugaresFrecuentes)getActivity()).user.addFrecuentes(destino);
+                                getDialog().dismiss();
+                                getActivity().recreate();
+                            } else{
+                                ((MainActivity)getActivity()).usuario.addFrecuentes(destino);
+                                getDialog().dismiss();
+                            }
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error adding document", e);
+                            Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
                         }
                     });
+
+
         }
         if (nombreLF.length() <= 0) {
             txtLFNombre.setError("El campo de nombre no puede estar vacío");

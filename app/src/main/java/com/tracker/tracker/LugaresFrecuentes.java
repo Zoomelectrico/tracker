@@ -1,6 +1,5 @@
 package com.tracker.tracker;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -62,6 +61,24 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
 
     @Override
     public void onListFragmentInteraction(Frecuente item) {
+        Log.e("bla", "El id del item seleccionado es: " + item.getId() );
+        if (item.getId() != null) {
+            Bundle args = new Bundle();
+            args.putParcelable("user", user);
+            args.putString("Nombre", item.getNombre());
+            args.putDouble("Latitud", item.getLatitud());
+            args.putDouble("Longitud", item.getLongitud());
+            args.putString("Direccion", item.getDireccion());
+            args.putString("id", item.getId());
+            args.putString("PlaceId", item.getPlaceId());
+
+            mLugarFrecuenteDialog dialog = new mLugarFrecuenteDialog();
+            dialog.setArguments(args);
+            dialog.show(getFragmentManager(), "mLugarFrecuenteDialog");
+        } else {
+            Toast.makeText(this, "Espere a que el objeto cargue en la BD", Toast.LENGTH_LONG).show();
+        }
+
 
     }
 
