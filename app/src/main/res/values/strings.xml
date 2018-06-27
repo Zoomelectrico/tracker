@@ -21,6 +21,7 @@
     <string name="labelViaje">Iniciar Un Viaje</string>
     <string name="labelSpinner">Selecciona a tus Seres Queridos</string>
     <string name="labelCoordenadas">Coordenadas</string>
+    <string name="labelDireccion">Dirección</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

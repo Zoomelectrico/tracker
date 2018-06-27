@@ -17,6 +17,10 @@ public class Frecuente implements Parcelable {
     private String direccion;
     private Boolean isFrecuente;
 
+    public Frecuente (){
+
+    }
+
     public Frecuente(String Nombre, String placeId, Double Latitud, Double Longitud, String Direccion){
         this.nombre = Nombre;
         this.placeId = placeId;
@@ -32,6 +36,7 @@ public class Frecuente implements Parcelable {
         this.latitud = in.readDouble();
         this.longitud = in.readDouble();
         this.direccion = in.readString();
+        this.id = in.readString();
     }
 
     public String getNombre() {
@@ -51,7 +56,7 @@ public class Frecuente implements Parcelable {
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(String id) {
@@ -119,6 +124,7 @@ public class Frecuente implements Parcelable {
         dest.writeDouble(this.latitud);
         dest.writeDouble(this.longitud);
         dest.writeString(this.direccion);
+        dest.writeString(this.id);
     }
 
     public HashMap<String, Object> toMap() {
@@ -129,6 +135,7 @@ public class Frecuente implements Parcelable {
         frecuentes.put("coordenadas", coordenadas);
         frecuentes.put("direccion", this.direccion);
         frecuentes.put("isFrecuente", this.isFrecuente);
+        frecuentes.put("id", this.id);
         return frecuentes;
     }
 }

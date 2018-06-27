@@ -225,14 +225,55 @@ public class Usuario implements Parcelable {
         return this.frecuentes.get(posicion);
     }
 
+    /**
+     * getFrecuenteById permite obtener un LugarFrecuente del usuario mediante el id de
+     * Firebase
+     * @param id
+     * @return
+     */
     public Frecuente getFrecuenteById(String id){
         Frecuente frecuent = null;
         for(Frecuente f: this.getFrecuentes()){
             if (f.getId().equals(id)) {
                 frecuent = f;
+                break;
             }
         }
         return frecuent;
+    }
+
+    /**
+     * modifyFrecuenteById: permite modificar los lugares frecuentes por el Id de firebase,
+     * de esta forma es más fácil realizar los cambios en el dispositivo sin tener que
+     * requerir de consumo de datos.
+     * @param id
+     * @param frecuente
+     */
+    public void modifyFrecuenteById(String id, Frecuente frecuente){
+        int i = 0;
+        for(Frecuente f: this.getFrecuentes()){
+            if (f.getId().equals(id)) {
+                frecuentes.set(i, frecuente);
+                break;
+            }
+            i++;
+        }
+    }
+
+    /**
+     * deleteFrecuentesById, permite eliminar un LugarFrecuente de la lista con el
+     * id de firebase.
+     * @param id
+     */
+    public void deleteFrecuenteById(String id){
+        int i = 0;
+        for(Frecuente f: this.getFrecuentes()){
+            if (f.getId().equals(id)) {
+                frecuentes.remove(i);
+                break;
+            }
+            i++;
+        }
     }
 
     /**
