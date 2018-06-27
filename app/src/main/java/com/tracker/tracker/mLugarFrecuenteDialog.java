@@ -50,20 +50,10 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
 
     private TextView txtMLFDireccion;
     private EditText txtMLFNombre;
-    private Button btnMLFFindPlace;
-    private ImageButton btnMLFCancelar;
-    private ImageButton btnMLFAceptar;
-    private ImageButton btnMLFEliminar;
 
     private static final int PLACE_PICKER_REQUEST = 2;
-    private Location destinationLF;
-    private String nombreLF;
-    private String direccion;
     private Place place;
     private Frecuente destino;
-    private String destionID;
-    private Double destinoLat;
-    private Double destinoLong;
 
 
     @Override
