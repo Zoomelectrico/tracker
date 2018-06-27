@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public class Rutine extends AppCompatActivity implements RutineFragment.OnListFragmentInteractionListener {
 
-    public Usuario user;
+    private Usuario user;
 
     private FloatingActionButton fabAddRutina;
 
@@ -35,6 +35,7 @@ public class Rutine extends AppCompatActivity implements RutineFragment.OnListFr
         Usuario usuario = this.getIntent().getParcelableExtra("user");
         this.user = usuario;
         Bundle bundle = new Bundle();
+        bundle.putParcelable("user", usuario);
         RutineFragment rutineFragment = new RutineFragment();
         rutineFragment.setArguments(bundle);
 

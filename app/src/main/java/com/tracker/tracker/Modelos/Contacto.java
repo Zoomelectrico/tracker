@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.HashMap;
 
 public class Contacto implements Parcelable {
@@ -26,6 +28,12 @@ public class Contacto implements Parcelable {
         this.id = in.readString();
     }
 
+    public static Contacto builder(DocumentSnapshot document) {
+        Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"), false);
+        c.setId(document.getId());
+        return c;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -34,19 +42,33 @@ public class Contacto implements Parcelable {
         return telf;
     }
 
-    public String getId(){ return id; }
+    public String getId() {
+        return id;
+    }
 
-    public Integer getPosition(){ return this.position; }
+    public Integer getPosition() {
+        return this.position;
+    }
 
-    public void setId(String id){this.id = id;}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public void setPosition(Integer position){this.position = position;}
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
 
-    public void setNombre(String nombre){this.nombre = nombre;}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    public void setTelf(String telf){this.telf = telf;}
+    public void setTelf(String telf) {
+        this.telf = telf;
+    }
 
-    public boolean isNuevo() { return this.nuevo; }
+    public boolean isNuevo() {
+        return this.nuevo;
+    }
 
     @Override
     public String toString() {
@@ -85,4 +107,7 @@ public class Contacto implements Parcelable {
         return contacto;
     }
 
+    public String toStringFirebase () {
+        return this.nombre + "-" + this.telf;
+    }
 }

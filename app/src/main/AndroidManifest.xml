@@ -45,12 +45,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
-        <service
-            android:name=".notification.MyFirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-            </intent-filter>
-        </service>
+
         <service
             android:name=".notification.MyFirebaseInstanceIDService">
             <intent-filter>

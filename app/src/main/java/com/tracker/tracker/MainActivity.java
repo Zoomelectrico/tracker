@@ -2,6 +2,7 @@ package com.tracker.tracker;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -61,12 +62,12 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static com.google.android.gms.location.places.Places.getGeoDataClient;
 
 /**
  * Controlador de la actividad principal
@@ -167,6 +168,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    /**
+     * Método alarmConfig
+     */
+    private void alarmConfig() {
+        if (this.usuario.haveRutinas()) {
+            AlarmManager[] alarmManagers = new AlarmManager[this.usuario.getRutinas().size()];
+            PendingIntent[] pendingIntents = new PendingIntent[this.usuario.getRutinas().size()];
+            for (int i = 0; i < alarmManagers.length; i++) {
+                Intent intent = new Intent(this, MainActivity.class);
+                pendingIntents[i] = PendingIntent.getBroadcast(this, 0, intent, 0);
+                Rutina r = this.usuario.getRutinas().get(i);
+                alarmManagers[i]
+                        .setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                                r.getTiempo().getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);
+            }
+        }
     }
 
     /**
@@ -644,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case PLACE_PICKER_REQUEST:
                 if (resultCode == RESULT_OK) {
                     Place place = PlacePicker.getPlace(this, data);
-                    this.placeDestination = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()));
+                    this.placeDestination = new Frecuente(String.valueOf(place.getName()), place.getId(),place.getLatLng().latitude, place.getLatLng().longitude, String.valueOf(place.getAddress()), false);
                     if(contactos.isEmpty()) {
                         Log.e("Destino", "DESTINO GUARDADO");
                         Toast.makeText(MainActivity.this, "Destino guardado", Toast.LENGTH_LONG).show();

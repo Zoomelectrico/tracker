@@ -16,6 +16,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -47,12 +48,14 @@ public class Cargando extends AppCompatActivity {
     private FirebaseAuth auth;
     @Nullable
     private FirebaseUser user;
+    private Usuario usuario;
     private FirebaseFirestore db;
     private GoogleSignInClient googleSIClient;
     private Button btnLogin;
 
     /**
      * Método onCreate:
+     *
      * @param savedInstanceState {Bundle}
      */
     @Override
@@ -63,7 +66,7 @@ public class Cargando extends AppCompatActivity {
 
         this.googleConfig();
 
-        if(user != null) {
+        if (user != null) {
             loadUserData();
         } else {
             this.btnLogin = findViewById(R.id.btnLogin);
@@ -104,90 +107,102 @@ public class Cargando extends AppCompatActivity {
      * obtener los datos de un usuario en caso de que el mismo ya este registrado en nuestra plataforma
      */
     private void loadUserData() {
-        final String UID = this.user.getUid();
-        final Usuario usuario = new Usuario();
-        final DocumentReference user = db.document("users/"+UID);
-        final CollectionReference contactos = db.collection("users/"+UID+"/contactos");
-        final CollectionReference frecuentes = db.collection("users/"+UID+"/frecuentes");
-        final CollectionReference rutinas = db.collection("users/"+UID+"/rutinas");
-        user.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        if (this.user != null) {
+            this.queryData(this.user.getUid());
+        } else {
+            Log.e("", "");
+        }
+    }
+
+    private void queryData(String UID) {
+        this.usuario = new Usuario();
+        final DocumentReference userRef = db.document("users/" + UID);
+        final CollectionReference sqRef, frecuentesRef, rutinasRef;
+        sqRef = db.collection("users/" + UID + "/contactos");
+        frecuentesRef = db.collection("users/" + UID + "/frecuentes");
+        rutinasRef = db.collection("users/" + UID + "/rutinas");
+        userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()) {
-                    final DocumentSnapshot document = task.getResult();
-                    if(document != null) {
-                        usuario.setNombre(document.getString("nombre"));
-                        usuario.setEmail(document.getString("email"));
-                        usuario.setPhoto(document.getString("photo"));
-                        usuario.setUID(document.getString("UID"));
-                        contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if(task.isSuccessful()) {
-                                    if(task.getResult() != null) {
-                                        for (DocumentSnapshot documentC: task.getResult()) {
-                                            Contacto serQuerido = new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false);
-                                            serQuerido.setId(documentC.getId());
-                                            usuario.addContacto(serQuerido);
-                                        }
-                                        frecuentes.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if(task.isSuccessful()) {
-                                                    if (task.getResult() != null) {
-                                                        for (DocumentSnapshot documentF : task.getResult()) {
-                                                            Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("placeId"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
-                                                            frecuente.setId(documentF.getId());
-                                                            usuario.addFrecuentes(frecuente);
-                                                        }
-                                                        rutinas.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                            @Override
-                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                if (task.isSuccessful()) {
-                                                                    if (task.getResult() != null) {
-                                                                        if(!task.getResult().isEmpty()) {
-                                                                            for (DocumentSnapshot documentR : task.getResult()) {
-                                                                                final ArrayList<Contacto> rContactosList = new ArrayList<>();
-                                                                                final CollectionReference rContactosRef = db.collection("users/" + UID + "/rutinas/" + documentR.getId() + "/seresQueridos");
-                                                                                final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
-                                                                                rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                                        if (task.isSuccessful()) {
-                                                                                            if (task.getResult() != null) {
-                                                                                                for (DocumentSnapshot documentRS : task.getResult()) {
-                                                                                                    rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
-                                                                                                }
-                                                                                                rutina.setrSeresQueridos(rContactosList);
-                                                                                                usuario.addRutina(rutina);
-                                                                                                openMain(usuario);
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        } else {
-                                                                            openMain(usuario);
-                                                                        }
-                                                                    } else {
-                                                                        Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
-                                                                    }
-                                                                }
-                                                            }
-                                                        });
-                                                    } else {
-                                                        Toast.makeText(getApplicationContext(), "No se cargaron los lugares frecuentes", Toast.LENGTH_LONG).show();
-                                                    }
-                                                }
-                                            }
-                                        });
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    Usuario.build(document, usuario);
+                    sqRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                if (task.getResult() != null) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+                                        Contacto c = Contacto.builder(document);
+                                        usuario.addContacto(c);
                                     }
+                                } else {
+                                    Log.e("", "");
                                 }
+                            } else {
+                                Log.e("", "");
                             }
-                        });
+                            frecuentesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        if (task.getResult() != null) {
+                                            for (DocumentSnapshot document : task.getResult()) {
+                                                Frecuente f = Frecuente.builder(document);
+                                                usuario.addFrecuentes(f);
+                                            }
+                                        } else {
+                                            Log.e("", "");
+                                        }
+                                    } else {
+                                        Log.e("", "");
+                                    }
+                                    rutinasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                if (task.getResult() != null) {
+                                                    for (DocumentSnapshot document : task.getResult()) {
+                                                        Rutina r = Rutina.builder(document, usuario.getUID(), db);
+                                                        usuario.addRutina(r);
+                                                    }
+                                                } else {
+                                                    Log.e("", "");
+                                                }
+                                            } else {
+                                                Log.e("", "");
+                                            }
+                                            openMain(usuario);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e("", "");
+                                        }
+                                    });
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e("", "");
+                                }
+                            });
 
-                    }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("", "");
+                        }
+                    });
+                } else {
+                    Log.e("", "");
                 }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
             }
         });
     }
@@ -229,85 +244,16 @@ public class Cargando extends AppCompatActivity {
                             findViewById(R.id.pbLoading).setVisibility(View.VISIBLE);
                             FirebaseUser user = auth.getCurrentUser();
                             final Usuario usuario = new Usuario();
-                            if(user != null) {
+                            if (user != null) {
                                 usuario.setNombre(user.getDisplayName());
                                 usuario.setEmail(user.getEmail());
                                 usuario.setUID(user.getUid());
-                                if(user.getPhotoUrl() != null) {
+                                if (user.getPhotoUrl() != null) {
                                     usuario.setPhoto(user.getPhotoUrl().toString());
                                 }
                                 usuario.saveData(db);
                             }
-                            final String userId = user.getUid();
-                            final CollectionReference contactos = db.collection("users/"+userId+"/contactos");
-                            final CollectionReference frecuentes = db.collection("users/"+userId+"/frecuentes");
-                            final CollectionReference rutinas = db.collection("users/"+userId+"/rutinas");
-                            contactos.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                    if(task.isSuccessful()) {
-                                        if(task.getResult() != null) {
-                                            for (DocumentSnapshot documentC: task.getResult()) {
-                                                Contacto serQuerido = new Contacto(documentC.getString("nombre"), documentC.getString("telf"), false);
-                                                serQuerido.setId(documentC.getId());
-                                                usuario.addContacto(serQuerido);
-                                            }
-                                            frecuentes.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                    if(task.isSuccessful()) {
-                                                        if (task.getResult() != null) {
-                                                            for (DocumentSnapshot documentF : task.getResult()) {
-                                                                Frecuente frecuente = new Frecuente(documentF.getString("nombre"), documentF.getString("placeId"), documentF.getGeoPoint("coordenadas").getLatitude(), documentF.getGeoPoint("coordenadas").getLongitude(), documentF.getString("direccion"));
-                                                                frecuente.setId(documentF.getId());
-                                                                usuario.addFrecuentes(frecuente);
-                                                            }
-                                                            rutinas.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                @Override
-                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                    if (task.isSuccessful()) {
-                                                                        if (task.getResult() != null) {
-                                                                            if(!task.getResult().isEmpty()) {
-                                                                                for (DocumentSnapshot documentR : task.getResult()) {
-                                                                                    final ArrayList<Contacto> rContactosList = new ArrayList<>();
-                                                                                    final CollectionReference rContactosRef = db.collection("users/" + userId + "/rutinas/" + documentR.getId() + "/seresQueridos");
-                                                                                    final Rutina rutina = new Rutina(documentR.getString("nombre"), usuario.getFrecuenteById(documentR.getString("destinationFId")), rContactosList);
-                                                                                    rContactosRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                                        @Override
-                                                                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                                            if (task.isSuccessful()) {
-                                                                                                if (task.getResult() != null) {
-                                                                                                    for (DocumentSnapshot documentRS : task.getResult()) {
-                                                                                                        rContactosList.add(usuario.getContactoById(documentRS.getString("id")));
-                                                                                                    }
-                                                                                                    rutina.setrSeresQueridos(rContactosList);
-                                                                                                    openMain(usuario);
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    });
-                                                                                }
-                                                                            } else {
-                                                                                openMain(usuario);
-                                                                            }
-                                                                        } else {
-                                                                            Toast.makeText(getApplicationContext(), "No se logró cargar Rutinas", Toast.LENGTH_LONG).show();
-                                                                        }
-                                                                    }
-                                                                }
-                                                            });
-                                                        } else {
-                                                            Toast.makeText(getApplicationContext(), "No se cargaron los lugares frecuentes", Toast.LENGTH_LONG).show();
-                                                        }
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    }
-                                }
-                            });
-                        } else {
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            queryData(usuario.getUID());
                         }
                     }
                 });

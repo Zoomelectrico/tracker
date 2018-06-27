@@ -49,16 +49,9 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
 
     private TextView txtLFCoordenadas;
     private EditText txtLFNombre;
-    private ImageButton btnAgregarLF;
-
-    private Location destinationLF;
     private String nombreLF;
-    private String direccion;
     private Place place;
     private Frecuente destino;
-    private String destionID;
-    private Double destinoLat;
-    private Double destinoLong;
 
     @Nullable
     @Override
@@ -80,7 +73,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                     case R.id.btnAgregarLF:
                         agregarLugarFrecuente();
                         break;
-                    case R.id.btnCancelar:
+                    case R.id.btnALFCancelar:
                         getDialog().dismiss();
                 }
 
@@ -88,6 +81,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         };
         view.findViewById(R.id.btnLFFindPlace).setOnClickListener(listener);
         view.findViewById(R.id.btnAgregarLF).setOnClickListener(listener);
+        view.findViewById(R.id.btnALFCancelar).setOnClickListener(listener);
         this.txtLFCoordenadas = view.findViewById(R.id.txtLFCoordenadas);
         this.txtLFNombre = view.findViewById(R.id.txtLFNombre);
         /**
@@ -95,7 +89,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
          */
         if(this.getArguments().getBoolean("haveDestino")){
             this.destino = new Frecuente(null, this.getArguments().getString("id"), this.getArguments().getDouble("destLat"),
-                    this.getArguments().getDouble("destLon"), this.getArguments().getString("destDireccion"));
+                    this.getArguments().getDouble("destLon"), this.getArguments().getString("destDireccion"), false);
             this.destino.setFrecuente(true);
             txtLFCoordenadas.setText("[" + String.valueOf(this.destino.getLatitud()) + ", " + String.valueOf(this.destino.getLongitud()) + "]");
             view.findViewById(R.id.btnLFFindPlace).setVisibility(View.GONE);
@@ -132,7 +126,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString(), true);
 
                 this.txtLFCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
@@ -174,8 +168,6 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                             Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
                         }
                     });
-
-
         }
         if (nombreLF.length() <= 0) {
             txtLFNombre.setError("El campo de nombre no puede estar vacío");

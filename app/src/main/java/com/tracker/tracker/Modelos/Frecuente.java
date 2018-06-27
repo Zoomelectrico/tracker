@@ -3,6 +3,7 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
@@ -16,18 +17,32 @@ public class Frecuente implements Parcelable {
     private Double longitud;
     private String direccion;
     private Boolean isFrecuente;
+    private boolean isNueva;
 
     public Frecuente (){
 
     }
 
-    public Frecuente(String Nombre, String placeId, Double Latitud, Double Longitud, String Direccion){
+    public boolean isNueva() {
+        return isNueva;
+    }
+
+    public void setNueva(boolean nueva) {
+        isNueva = nueva;
+    }
+
+    public static Creator<Frecuente> getCREATOR() {
+        return CREATOR;
+    }
+
+    public Frecuente(String Nombre, String placeId, Double Latitud, Double Longitud, String Direccion, boolean isNueva) {
         this.nombre = Nombre;
         this.placeId = placeId;
         this.latitud = Latitud;
         this.longitud = Longitud;
         this.direccion = Direccion;
         this.isFrecuente = false;
+        this.isNueva = isNueva;
     }
 
     protected Frecuente(Parcel in) {
@@ -37,6 +52,15 @@ public class Frecuente implements Parcelable {
         this.longitud = in.readDouble();
         this.direccion = in.readString();
         this.id = in.readString();
+    }
+
+    public static Frecuente builder(DocumentSnapshot document) {
+        String nombre = document.getString("nombre");
+        String ID = document.getString("placeId");
+        double lat = document.getGeoPoint("coordenadas").getLatitude();
+        double log = document.getGeoPoint("coordenadas").getLatitude();
+        String direccion = document.getString("direccion");
+        return new Frecuente(nombre, ID, lat, log, direccion, false);
     }
 
     public String getNombre() {

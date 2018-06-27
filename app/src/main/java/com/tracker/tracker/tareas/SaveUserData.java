@@ -7,6 +7,8 @@ import android.support.annotation.Nullable;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.HashMap;
@@ -34,6 +36,20 @@ public class SaveUserData extends AsyncTask<Usuario, Void, Void> {
             for (Contacto c: u.getContactos()) {
                 if(c.isNuevo()) {
                     db.collection("users/"+u.getUID()+"/contactos").add(c.toMap());
+                }
+            }
+        }
+        if(u.haveRutinas()) {
+            for (Rutina r: u.getRutinas()) {
+                if (r.isNueva()) {
+                    db.collection("users/"+u.getUID()+"/rutina").add(r.toMap());
+                }
+            }
+        }
+        if(u.haveFrecuentes()) {
+            for (Frecuente f: u.getFrecuentes()) {
+                if(f.isNueva()) {
+                    db.collection("users/"+u.getUID()+"/frecuente").add(f.toMap());
                 }
             }
         }

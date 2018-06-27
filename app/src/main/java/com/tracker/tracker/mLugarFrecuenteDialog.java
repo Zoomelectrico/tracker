@@ -50,20 +50,10 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
 
     private TextView txtMLFDireccion;
     private EditText txtMLFNombre;
-    private Button btnMLFFindPlace;
-    private ImageButton btnMLFCancelar;
-    private ImageButton btnMLFAceptar;
-    private ImageButton btnMLFEliminar;
 
     private static final int PLACE_PICKER_REQUEST = 2;
-    private Location destinationLF;
-    private String nombreLF;
-    private String direccion;
     private Place place;
     private Frecuente destino;
-    private String destionID;
-    private Double destinoLat;
-    private Double destinoLong;
 
 
     @Override
@@ -77,7 +67,7 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
         txtMLFDireccion.setText(String.valueOf(this.getArguments().getString("Direccion")));
         // Creacion de un Destino a partir de los datos del LugarFrecuente que fue seleccionado
         this.destino = new Frecuente(String.valueOf(this.txtMLFNombre.getText()), this.getArguments().getString("PlaceId"),
-                this.getArguments().getDouble("Latitud"), this.getArguments().getDouble("Longitud"), this.getArguments().getString("Direccion"));
+                this.getArguments().getDouble("Latitud"), this.getArguments().getDouble("Longitud"), this.getArguments().getString("Direccion"), false);
         this.destino.setId(this.getArguments().getString("id"));
         // Especificación de las funciones que se desarrollaran al hacer click en algun boton especifico
         View.OnClickListener listener = new View.OnClickListener() {
@@ -145,7 +135,7 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString());
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString(), true);
                 this.txtMLFDireccion.setText(place.getAddress());
             }
         }

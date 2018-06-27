@@ -115,7 +115,7 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
                 AddLugarFrecuenteDialog addLF = new AddLugarFrecuenteDialog();
                 addLF.setArguments(args);
                 addLF.show(getFragmentManager(), "AddLugarFrecuenteDialogFragment");
-                Toast.makeText(getApplicationContext(), "Se agregó un nuevo lugar frecuente", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(), "Se agregó un nuevo lugar frecuente", Toast.LENGTH_SHORT).show();
             }
         });
     }

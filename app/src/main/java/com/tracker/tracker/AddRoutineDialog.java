@@ -29,7 +29,8 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
         };
 
         return view;
-    };
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
