@@ -110,7 +110,7 @@ public class Cargando extends AppCompatActivity {
         if (this.user != null) {
             this.queryData(this.user.getUid());
         } else {
-            Log.e("", "");
+            Log.e("Cargando User", "NULL");
         }
     }
 
@@ -137,9 +137,11 @@ public class Cargando extends AppCompatActivity {
                                         usuario.addContacto(c);
                                     }
                                 } else {
+                                    usuario.setContactos(new ArrayList<Contacto>());
                                     Log.e("", "");
                                 }
                             } else {
+                                usuario.setContactos(new ArrayList<Contacto>());
                                 Log.e("", "");
                             }
                             frecuentesRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -152,9 +154,11 @@ public class Cargando extends AppCompatActivity {
                                                 usuario.addFrecuentes(f);
                                             }
                                         } else {
+                                            usuario.setFrecuentes(new ArrayList<Frecuente>());
                                             Log.e("", "");
                                         }
                                     } else {
+                                        usuario.setFrecuentes(new ArrayList<Frecuente>());
                                         Log.e("", "");
                                     }
                                     rutinasRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -164,18 +168,19 @@ public class Cargando extends AppCompatActivity {
                                                 if (task.getResult() != null) {
                                                     if(!task.getResult().isEmpty()) {
                                                         for (DocumentSnapshot document : task.getResult()) {
-                                                            Rutina r = Rutina.builder(document, usuario, db);
+                                                            Rutina r = Rutina.builder(document, usuario);
                                                             usuario.addRutina(r);
                                                         }
-                                                        openMain(usuario);
                                                     }
                                                 } else {
+                                                    usuario.setRutinas(new ArrayList<Rutina>());
                                                     Log.e("", "");
                                                 }
                                             } else {
+                                                usuario.setRutinas(new ArrayList<Rutina>());
                                                 Log.e("", "");
                                             }
-                                            //openMain(usuario);
+                                            openMain(usuario);
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override

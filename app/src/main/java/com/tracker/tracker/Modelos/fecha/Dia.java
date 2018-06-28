@@ -3,38 +3,49 @@ package com.tracker.tracker.Modelos.fecha;
 import java.util.Arrays;
 
 public class Dia {
-    private int dia;
-    private final String[] dias = {"Lu", "Ma", "Mi", "Ju", "Vi", "Sa", "Do"};
+    private static final String[] diasShort = {"lu", "ma", "mi", "ju", "vi", "sa", "do"};
+    private static final String[] dias = {"lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"};
 
-    public Dia(String codDia) {
-        this.dia = Arrays.binarySearch(dias, codDia) + 1;
+    public static int getCodeFromDiaShort(String diaShort) {
+        return Arrays.binarySearch(diasShort, diaShort.toLowerCase());
     }
 
-    public Dia(int dia) {
-        this.dia = dia;
+    public static String getDiaShortFromCode(int dia) {
+        if(dia > diasShort.length) {
+            return null;
+        } else if (dia < 0) {
+            return null;
+        } else {
+            return dias[dia];
+        }
     }
 
-    public int getDia() {
-        return dia;
+    public static String getShortDiaFromDia(String dia) {
+        int i = Arrays.binarySearch(dias, dia.toLowerCase());
+        if(i < 0) {
+            return null;
+        } else {
+            return diasShort[i];
+        }
     }
 
-    public void setDia(int dia) {
-        this.dia = dia;
+    public static String getDiaFromDiaShort(String diaShort) {
+        int i = Arrays.binarySearch(diasShort, diaShort.toLowerCase());
+        if(i < 0) {
+            return null;
+        } else {
+            return diasShort[i];
+        }
     }
 
-    public String[] getDias() {
-        return dias;
+    public static String getDiaFromCode(int dia) {
+        if(dia > dias.length) {
+            return null;
+        } else if (dia < 0) {
+            return null;
+        } else {
+            return dias[dia];
+        }
     }
 
-    public boolean isBefore(Dia d) {
-        return this.dia < d.getDia();
-    }
-
-    public boolean isAfter(Dia d) {
-        return !(this.isBefore(d));
-    }
-
-    public boolean isEqual(Dia d) {
-        return this.dia == d.getDia();
-    }
 }

@@ -165,6 +165,10 @@ public class Usuario implements Parcelable {
         return contactos;
     }
 
+    public void setContactos(ArrayList<Contacto> contactos) {
+        this.contactos = contactos;
+    }
+
     /**
      * Método getContacto:
      * @param i el indice en que se encuentra el contacto

@@ -156,8 +156,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        this.spinnerConfig();
-        this.spinnerLugaresConfig();
+        if (!isViajando) {
+            this.spinnerConfig();
+            this.spinnerLugaresConfig();
+        }
     }
 
     @Override
@@ -181,9 +183,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent intent = new Intent(this, MainActivity.class);
                 pendingIntents[i] = PendingIntent.getBroadcast(this, 0, intent, 0);
                 Rutina r = this.usuario.getRutinas().get(i);
-                alarmManagers[i]
+                /*alarmManagers[i]
                         .setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
-                                r.getTiempo().getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);
+                                r.getTiempo().getHora().getHora(), AlarmManager.INTERVAL_HALF_HOUR, pendingIntents[i]);*/
             }
         }
     }
@@ -692,6 +694,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
+            this.spinnerLugares.setVisibility(View.GONE);
             txtWelcome.setVisibility(View.GONE);
             txtDestino.setVisibility(View.VISIBLE);
             txtDistance.setVisibility(View.VISIBLE);
@@ -715,6 +718,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
             findViewById(R.id.layoutContacto).setVisibility(View.GONE);
+            this.spinnerLugares.setVisibility(View.VISIBLE);
         }
 
     }

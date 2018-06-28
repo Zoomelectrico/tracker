@@ -84,7 +84,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         view.findViewById(R.id.btnALFCancelar).setOnClickListener(listener);
         this.txtLFCoordenadas = view.findViewById(R.id.txtLFCoordenadas);
         this.txtLFNombre = view.findViewById(R.id.txtLFNombre);
-        /**
+        /*
          * Ocultar el boton de seleccionar destino si ya se pasa desde el MainActivity
          */
         if(this.getArguments().getBoolean("haveDestino")){
@@ -94,7 +94,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
             txtLFCoordenadas.setText("[" + String.valueOf(this.destino.getLatitud()) + ", " + String.valueOf(this.destino.getLongitud()) + "]");
             view.findViewById(R.id.btnLFFindPlace).setVisibility(View.GONE);
         }
-        /**
+        /*
          * Especificaciones de la base de datos
          */
         this.auth = FirebaseAuth.getInstance();

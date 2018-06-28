@@ -103,7 +103,7 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
         view.findViewById(R.id.btnMLFCancelar).setOnClickListener(listener);
         view.findViewById(R.id.btnMLFEliminar).setOnClickListener(listener);
 
-        /**
+        /*
          * Especificaciones de la base de datos
          */
         this.auth = FirebaseAuth.getInstance();
