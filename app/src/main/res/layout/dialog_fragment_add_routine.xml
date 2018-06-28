@@ -1,15 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.tracker.tracker.AddRoutineDialog">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Función no disponible. Disculpe las molestias."
-        tools:layout_editor_absoluteX="71dp"
-        tools:layout_editor_absoluteY="214dp" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="15dp"
+            android:text="Añadir Rutina"
+            android:textAlignment="center"
+            android:textColor="?attr/textColor"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/labelNombre"
+                android:textAlignment="center"
+                android:textColor="?attr/textColor" />
+
+            <EditText
+                android:id="@+id/txtARNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Nombre de la Rutina"
+                android:inputType="textPersonName"
+                android:textColorHint="?attr/lowContrastTextColor" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="15dp"
+                android:text="Escoge los Seres Queridos"
+                android:textColor="?attr/textColor" />
+
+            <com.thomashaertel.widget.MultiSpinner
+                android:id="@+id/spinnerMultiAR"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="0dp"
+                android:cursorVisible="true"
+                android:scrollbars="none"
+                android:text="@string/labelSpinner"
+                android:textColor="?attr/textColor"
+                android:textSize="8pt" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/labelCoordenadas"
+                android:textAlignment="center"
+                android:textColor="?attr/textColor" />
+
+            <TextView
+                android:id="@+id/txtARCoordenadas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:textAlignment="center"
+                android:textColor="?attr/textColor"
+                android:textSize="9pt" />
+
+            <Button
+                android:id="@+id/btnARFindPlace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="8dp"
+                android:background="?attr/cardColor"
+                android:padding="16dp"
+                android:text="@string/btnEscogerSitio"
+                android:textColor="?attr/textColor" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btnARCancelar"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?attr/backgroundColor"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_delete"
+                    android:textColor="?attr/textColor" />
+
+                <ImageButton
+                    android:id="@+id/btnAgregarR"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?attr/backgroundColor"
+                    android:cropToPadding="false"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_confirm_icon"
+                    android:textColor="?attr/textColor" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

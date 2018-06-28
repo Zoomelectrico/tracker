@@ -60,7 +60,9 @@ public class Frecuente implements Parcelable {
         double lat = document.getGeoPoint("coordenadas").getLatitude();
         double log = document.getGeoPoint("coordenadas").getLatitude();
         String direccion = document.getString("direccion");
-        return new Frecuente(nombre, ID, lat, log, direccion, false);
+        Frecuente f = new Frecuente(nombre, ID, lat, log, direccion, false);
+        f.setId(document.getId());
+        return f;
     }
 
     public String getNombre() {

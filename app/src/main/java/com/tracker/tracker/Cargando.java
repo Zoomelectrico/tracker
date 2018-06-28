@@ -162,9 +162,12 @@ public class Cargando extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                             if (task.isSuccessful()) {
                                                 if (task.getResult() != null) {
-                                                    for (DocumentSnapshot document : task.getResult()) {
-                                                        Rutina r = Rutina.builder(document, usuario.getUID(), db);
-                                                        usuario.addRutina(r);
+                                                    if(!task.getResult().isEmpty()) {
+                                                        for (DocumentSnapshot document : task.getResult()) {
+                                                            Rutina r = Rutina.builder(document, usuario, db);
+                                                            usuario.addRutina(r);
+                                                        }
+                                                        openMain(usuario);
                                                     }
                                                 } else {
                                                     Log.e("", "");
@@ -172,7 +175,7 @@ public class Cargando extends AppCompatActivity {
                                             } else {
                                                 Log.e("", "");
                                             }
-                                            openMain(usuario);
+                                            //openMain(usuario);
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override

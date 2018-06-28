@@ -166,6 +166,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                         public void onFailure(@NonNull Exception e) {
                             Log.w(TAG, "Error adding document", e);
                             Toast.makeText(getActivity(), "Ha ocurrido un error", Toast.LENGTH_LONG).show();
+                            getDialog().dismiss();
                         }
                     });
         }

@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public class Rutine extends AppCompatActivity implements RutineFragment.OnListFragmentInteractionListener {
 
-    private Usuario user;
+    public Usuario user;
 
     private FloatingActionButton fabAddRutina;
 
@@ -84,7 +84,11 @@ public class Rutine extends AppCompatActivity implements RutineFragment.OnListFr
         fabAddRutina.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putParcelable("user", user);
+
                 AddRoutineDialog addRoutineDialog = new AddRoutineDialog();
+                addRoutineDialog.setArguments(args);
                 addRoutineDialog.show(getFragmentManager(), "AddRoutineDialog");
             }
         });

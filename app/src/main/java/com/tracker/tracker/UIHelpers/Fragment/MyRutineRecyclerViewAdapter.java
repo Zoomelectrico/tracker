@@ -2,6 +2,7 @@ package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment.OnListFragmentInteractionListener;
 
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRecyclerViewAdapter.ViewHolder> {
 
