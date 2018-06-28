@@ -2,7 +2,6 @@ package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,6 @@ import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment.OnListFragmentInteractionListener;
 
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
 
 public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRecyclerViewAdapter.ViewHolder> {
 
@@ -59,13 +56,14 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
         private final View view;
         private final TextView nombreRutina;
         private final TextView direccionRutina;
         private final TextView seresQueridosRutina;
         public Rutina rutina;
 
-        private ViewHolder(View view) {
+        private ViewHolder(@NonNull View view) {
             super(view);
             this.view = view;
             nombreRutina = view.findViewById(R.id.nombreRutina);
@@ -73,6 +71,7 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
             seresQueridosRutina = view.findViewById(R.id.seresQueridosRutina);
         }
 
+        @NonNull
         @Override
         public String toString() {
             return super.toString() + " '" + direccionRutina.getText() + "'";

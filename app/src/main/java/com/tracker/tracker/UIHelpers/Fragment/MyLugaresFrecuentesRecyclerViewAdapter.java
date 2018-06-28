@@ -12,8 +12,6 @@ import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.LugaresFrecuentesFragment.OnListFragmentInteractionListener;
 import com.tracker.tracker.Modelos.Frecuente;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -67,6 +65,7 @@ public class MyLugaresFrecuentesRecyclerViewAdapter extends RecyclerView.Adapter
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        @NonNull
         public final View view;
         private TextView txtNombreF;
         private TextView txtDireccionF;

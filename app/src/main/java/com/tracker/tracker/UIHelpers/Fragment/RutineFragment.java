@@ -3,11 +3,11 @@ package com.tracker.tracker.UIHelpers.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static android.content.ContentValues.TAG;
-
 public class RutineFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
+    @Nullable
     private OnListFragmentInteractionListener listerner;
     private List<Rutina> rutinas = new ArrayList<>();
 
@@ -38,6 +37,7 @@ public class RutineFragment extends Fragment {
     }
 
     // TODO: Customize parameter initialization
+    @NonNull
     @SuppressWarnings("unused")
     public static RutineFragment newInstance(int columnCount) {
         RutineFragment fragment = new RutineFragment();

@@ -12,8 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.Places;
 import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Usuario;
 import com.tracker.tracker.UIHelpers.Fragment.LugaresFrecuentesFragment;
@@ -60,7 +58,7 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
     }
 
     @Override
-    public void onListFragmentInteraction(Frecuente item) {
+    public void onListFragmentInteraction(@NonNull Frecuente item) {
         Log.e("bla", "El id del item seleccionado es: " + item.getId() );
         if (item.getId() != null) {
             Bundle args = new Bundle();

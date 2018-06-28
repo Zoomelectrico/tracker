@@ -113,7 +113,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
         ((SeresQueridos)getActivity()).user.modificarContacto(this.getArguments().getInt("position"),
                 String.valueOf(txtModifyNombre.getText()), String.valueOf(txtModifyPhone.getText()));
 
-        db.collection("users").document(this.user.getUid())
+        db.collection("users").document(Objects.requireNonNull(this.user).getUid())
             .collection("contactos").document(Objects.requireNonNull(this.getArguments().getString("id")))
             .set(serQueridoModify)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -139,9 +139,9 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void eliminarSQ(){
-        ((SeresQueridos)getActivity()).user.eliminarContacto(this.getArguments().getString("Nombre"), this.getArguments().getString("Telf"));
+        ((SeresQueridos)getActivity()).user.eliminarContacto(Objects.requireNonNull(this.getArguments().getString("Nombre")), Objects.requireNonNull(this.getArguments().getString("Telf")));
 
-        db.collection("users").document(this.user.getUid()).collection("contactos")
+        db.collection("users").document(Objects.requireNonNull(this.user).getUid()).collection("contactos")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

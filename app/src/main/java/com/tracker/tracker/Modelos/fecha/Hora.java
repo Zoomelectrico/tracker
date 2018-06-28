@@ -2,6 +2,7 @@ package com.tracker.tracker.Modelos.fecha;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -54,18 +55,18 @@ public class Hora implements Parcelable {
         this.segundos = segundos;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.valueOf(hora));
-        sb.append(":");
-        sb.append(String.valueOf(minutos));
-        sb.append(":");
-        sb.append(String.valueOf(segundos));
-        return sb.toString();
+        String sb = String.valueOf(hora) +
+                ":" +
+                String.valueOf(minutos) +
+                ":" +
+                String.valueOf(segundos);
+        return sb;
     }
 
-    public boolean isBefore(Hora h) {
+    public boolean isBefore(@NonNull Hora h) {
         if (h.getHora() > this.hora) {
             return true;
         } else if (h.getHora() == this.hora) {
@@ -81,7 +82,7 @@ public class Hora implements Parcelable {
         }
     }
 
-    public boolean isAfter(Hora h) {
+    public boolean isAfter(@NonNull Hora h) {
         return !(this.isBefore(h));
     }
 
@@ -91,7 +92,7 @@ public class Hora implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(this.hora);
         dest.writeInt(this.minutos);
         dest.writeInt(this.segundos);
@@ -99,7 +100,7 @@ public class Hora implements Parcelable {
 
     private static final Creator<Hora> CREATOR = new Creator<Hora>() {
         @Override
-        public Hora createFromParcel(Parcel source) {
+        public Hora createFromParcel(@NonNull Parcel source) {
             return new Hora(source);
         }
 
@@ -109,6 +110,7 @@ public class Hora implements Parcelable {
         }
     };
 
+    @NonNull
     public HashMap<String, Object> toMap() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("hora", this.hora);

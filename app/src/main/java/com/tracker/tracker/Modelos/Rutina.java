@@ -3,14 +3,13 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Rutina implements Parcelable {
 
@@ -47,10 +46,10 @@ public class Rutina implements Parcelable {
 
     }
 
-    public static Rutina builder(@NonNull final DocumentSnapshot document, Usuario u) {
+    public static Rutina builder(@NonNull final DocumentSnapshot document, @NonNull Usuario u) {
         String nombre = document.getString("nombre");
         GeoPoint coordenadas = document.getGeoPoint("destino.coordenadas");
-        Frecuente f = new Frecuente(document.getString("destino.nombre"), document.getString("destino.placeId"), coordenadas.getLatitude(), coordenadas.getLongitude(), document.getString("destino.direccion"),false);
+        Frecuente f = new Frecuente(document.getString("destino.nombre"), document.getString("destino.placeId"), Objects.requireNonNull(coordenadas).getLatitude(), coordenadas.getLongitude(), document.getString("destino.direccion"),false);
         Object objContacto = document.get("contactos");
         ArrayList<Contacto> sq = new ArrayList<>();
         if (objContacto instanceof ArrayList) {
@@ -71,6 +70,7 @@ public class Rutina implements Parcelable {
         return new Rutina(nombre, f, sq, dias, hora, false);
     }
 
+    @NonNull
     public ArrayList<String> getSeresQueridosName () {
         ArrayList<String> nombres = new ArrayList<>();
         for (Contacto contacto: seresQueridos) {
@@ -79,13 +79,14 @@ public class Rutina implements Parcelable {
         return nombres;
     }
 
+    @NonNull
     public static Creator<Rutina> getCREATOR() {
         return CREATOR;
     }
 
     public static final Creator<Rutina> CREATOR = new Creator<Rutina>() {
         @Override
-        public Rutina createFromParcel(Parcel in) {
+        public Rutina createFromParcel(@NonNull Parcel in) {
             return new Rutina(in);
         }
 
@@ -101,7 +102,7 @@ public class Rutina implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(nombre);
         dest.writeParcelable(destino, flags);
         dest.writeTypedList(seresQueridos);
@@ -171,6 +172,7 @@ public class Rutina implements Parcelable {
         isNueva = nueva;
     }
 
+    @NonNull
     public HashMap<String, Object> horaToMap() {
         HashMap<String, Object> map = new HashMap<>();
         String[] horaVec = hora.split(":");
@@ -180,6 +182,7 @@ public class Rutina implements Parcelable {
         return map;
     }
 
+    @NonNull
     public HashMap<String, Object> toMap() {
         HashMap<String, Object> map = new HashMap<>();
         ArrayList<String> contacts = new ArrayList<>();

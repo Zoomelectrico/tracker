@@ -67,6 +67,7 @@ import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 
 /**
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Nullable
     private Location currentLocation = null;
     @Nullable
-    private Frecuente placeDestination = null;
+    private Frecuente placeDestination;
     private boolean isViajando = false;
     private boolean isLocationEnable = false;
 
@@ -387,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 Bundle args = new Bundle();
                 args.putBoolean("haveDestino", true);
-                args.putString("id", placeDestination.getPlaceId());
+                args.putString("id", Objects.requireNonNull(placeDestination).getPlaceId());
                 args.putDouble("destLat", placeDestination.getLatitud());
                 args.putDouble("destLon", placeDestination.getLongitud());
                 args.putString("destDireccion", placeDestination.getDireccion());
@@ -462,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     destination.setLatitude(placeDestination.getLatitud());
                     destination.setLongitude(placeDestination.getLongitud());
                     ((TextView) findViewById(R.id.txtDistance))
-                            .setText(String.valueOf(currentLocation.distanceTo(destination)));
+                            .setText(String.valueOf(Objects.requireNonNull(currentLocation).distanceTo(destination)));
                     if(currentLocation.distanceTo(destination) <= 50.0) {
                         Log.e("placeArrival", contactos.toString());
                         placeArrival();
@@ -591,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                         Log.i("", "All location settings are satisfied.");
                         try {
-                            locationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+                            locationProviderClient.requestLocationUpdates(locationRequest, Objects.requireNonNull(locationCallback), Looper.myLooper());
                         } catch (SecurityException e) {
                             Log.e("Main", "Security Exception", e);
                         }
@@ -694,13 +695,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
             this.spinnerLugares.setVisibility(View.GONE);
             txtWelcome.setVisibility(View.GONE);
             txtDestino.setVisibility(View.VISIBLE);
             txtDistance.setVisibility(View.VISIBLE);
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
-            if(placeDestination != null) {
+            if(placeDestination != null && currentLocation != null) {
                 txtDestino.setText(placeDestination.getNombre());
                 Location destination = new Location("Google Place");
                 destination.setLatitude(this.placeDestination.getLatitud());
@@ -708,7 +710,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
                 if(!placeDestination.getFrecuente()){
                     findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.GONE);
                 }
+            } else if (currentLocation == null) {
+                this.configTrip();
+            } else if (placeDestination == null) {
+                this.configTrip();
+            } else {
+
             }
         } else {
             txtWelcome.setVisibility(View.VISIBLE);
@@ -718,6 +728,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
             findViewById(R.id.layoutContacto).setVisibility(View.GONE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
             this.spinnerLugares.setVisibility(View.VISIBLE);
         }
 

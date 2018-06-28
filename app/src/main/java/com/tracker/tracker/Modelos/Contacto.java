@@ -28,6 +28,7 @@ public class Contacto implements Parcelable {
         this.id = in.readString();
     }
 
+    @NonNull
     public static Contacto builder(DocumentSnapshot document) {
         Contacto c = new Contacto(document.getString("nombre"), document.getString("telf"), false);
         c.setId(document.getId());
@@ -107,6 +108,7 @@ public class Contacto implements Parcelable {
         return contacto;
     }
 
+    @NonNull
     public String toStringFirebase () {
         return this.nombre + "-" + this.telf;
     }

@@ -2,7 +2,6 @@ package com.tracker.tracker;
 
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,16 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,9 +29,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.tracker.tracker.Modelos.Frecuente;
 
+import java.util.Objects;
+
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
-import static java.lang.String.valueOf;
 
 public class AddLugarFrecuenteDialog extends DialogFragment implements NavigationView.OnNavigationItemSelectedListener {
     private static final int PLACE_PICKER_REQUEST = 2;
@@ -55,7 +51,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_fragment_add_lugar_frecuente, container, false);
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
@@ -104,7 +100,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         this.db.setFirestoreSettings(settings);
-        frecuentes = db.collection("users/"+user.getUid()+"/frecuentes");
+        frecuentes = db.collection("users/"+ Objects.requireNonNull(user).getUid()+"/frecuentes");
 
         return view;
     }
@@ -126,7 +122,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString(), true);
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, Objects.requireNonNull(this.place.getAddress()).toString(), true);
 
                 this.txtLFCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
@@ -148,7 +144,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
             frecuentes.add(destino.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
+                        public void onSuccess(@NonNull DocumentReference documentReference) {
                             Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
                             destino.setId(documentReference.getId());
                             if(!haveDestino){

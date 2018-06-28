@@ -3,7 +3,7 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
+import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -12,8 +12,6 @@ import com.tracker.tracker.tareas.ProfilePicture;
 import com.tracker.tracker.tareas.SaveUserData;
 
 import java.util.ArrayList;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Clase Usuario: esta es la clase usuario, que modela al objeto Usuario en la DB
@@ -178,6 +176,7 @@ public class Usuario implements Parcelable {
         return this.contactos.get(i);
     }
 
+    @Nullable
     public Contacto getContactoById(String id){
         Contacto contact = null;
         for(Contacto c: this.contactos){
@@ -248,6 +247,7 @@ public class Usuario implements Parcelable {
      * @param id
      * @return
      */
+    @Nullable
     public Frecuente getFrecuenteById(String id){
         Frecuente frecuent = null;
         for(Frecuente f: this.getFrecuentes()){

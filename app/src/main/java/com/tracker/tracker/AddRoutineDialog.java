@@ -35,6 +35,7 @@ import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
@@ -49,6 +50,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
     private FirebaseFirestore db;
     private CollectionReference rutinas;
 
+    @Nullable
     private Usuario usuario;
     private ArrayList<Contacto> contactosSel;
 
@@ -63,7 +65,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         this.usuario = this.getArguments().getParcelable("user");
         View view = inflater.inflate(R.layout.dialog_fragment_add_routine, container, false);
         View.OnClickListener listener = new View.OnClickListener() {
@@ -103,7 +105,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         this.db.setFirestoreSettings(settings);
-        rutinas = db.collection("users/"+user.getUid()+"/rutinas");
+        rutinas = db.collection("users/"+ Objects.requireNonNull(user).getUid()+"/rutinas");
 
         return view;
     }
@@ -119,7 +121,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
         if(requestCode == PLACE_PICKER_REQUEST) {
             if (resultCode == RESULT_OK) {
                 place = PlacePicker.getPlace(getActivity(), data);
-                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, this.place.getAddress().toString(), true);
+                destino = new Frecuente(null, place.getId(), place.getLatLng().latitude, place.getLatLng().longitude, Objects.requireNonNull(this.place.getAddress()).toString(), true);
 
                 this.txtARCoordenadas.setText("["+place.getLatLng().latitude + ", " + place.getLatLng().longitude+"]");
             }
@@ -133,7 +135,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
             rutinas.add(rutina.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
-                        public void onSuccess(DocumentReference documentReference) {
+                        public void onSuccess(@NonNull DocumentReference documentReference) {
                             Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
                             rutina.setId(documentReference.getId());
                             ((Rutine)getActivity()).user.addRutina(rutina);

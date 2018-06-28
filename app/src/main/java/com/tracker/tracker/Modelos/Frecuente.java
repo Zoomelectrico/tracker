@@ -2,11 +2,13 @@ package com.tracker.tracker.Modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Frecuente implements Parcelable {
 
@@ -31,6 +33,7 @@ public class Frecuente implements Parcelable {
         isNueva = nueva;
     }
 
+    @NonNull
     public static Creator<Frecuente> getCREATOR() {
         return CREATOR;
     }
@@ -54,11 +57,12 @@ public class Frecuente implements Parcelable {
         this.id = in.readString();
     }
 
+    @NonNull
     public static Frecuente builder(DocumentSnapshot document) {
         String nombre = document.getString("nombre");
         String ID = document.getString("placeId");
-        double lat = document.getGeoPoint("coordenadas").getLatitude();
-        double log = document.getGeoPoint("coordenadas").getLatitude();
+        double lat = Objects.requireNonNull(document.getGeoPoint("coordenadas")).getLatitude();
+        double log = Objects.requireNonNull(document.getGeoPoint("coordenadas")).getLatitude();
         String direccion = document.getString("direccion");
         Frecuente f = new Frecuente(nombre, ID, lat, log, direccion, false);
         f.setId(document.getId());
@@ -128,7 +132,7 @@ public class Frecuente implements Parcelable {
 
     public static final Creator<Frecuente> CREATOR = new Creator<Frecuente>() {
         @Override
-        public Frecuente createFromParcel(Parcel in) {
+        public Frecuente createFromParcel(@NonNull Parcel in) {
             return new Frecuente(in);
         }
 
@@ -144,7 +148,7 @@ public class Frecuente implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.nombre);
         dest.writeString(this.placeId);
         dest.writeDouble(this.latitud);
@@ -153,6 +157,7 @@ public class Frecuente implements Parcelable {
         dest.writeString(this.id);
     }
 
+    @NonNull
     public HashMap<String, Object> toMap() {
         GeoPoint coordenadas = new GeoPoint(this.getLatitud(), this.getLongitud());
         HashMap<String, Object> frecuentes = new HashMap<>();

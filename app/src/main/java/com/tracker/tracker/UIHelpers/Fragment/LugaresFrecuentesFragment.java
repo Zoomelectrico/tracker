@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +19,6 @@ import com.tracker.tracker.Modelos.Frecuente;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * A fragment representing a list of Items.
@@ -45,6 +42,7 @@ public class LugaresFrecuentesFragment extends Fragment {
     public LugaresFrecuentesFragment() {
     }
 
+    @NonNull
     @SuppressWarnings("unused")
     public static LugaresFrecuentesFragment newInstance(int columnCount) {
         LugaresFrecuentesFragment fragment = new LugaresFrecuentesFragment();
