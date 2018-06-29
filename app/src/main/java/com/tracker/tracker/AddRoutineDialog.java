@@ -201,13 +201,9 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
     private void spinnerConfigDias() {
         final ArrayList<String> adapterList = new ArrayList<>();
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
-        adapter.add("Lunes");
-        adapter.add("Martes");
-        adapter.add("Miércoles");
-        adapter.add("Jueves");
-        adapter.add("Viernes");
-        adapter.add("Sábado");
-        adapter.add("Domingo");
+        for(String s: Dia.getDias()) {
+            adapter.add(s);
+        }
         for(String a: adapterList){
             adapter.add(a);
         }
@@ -217,7 +213,8 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
                 diasSel.clear();
                 for (int i = 0; i < selected.length; i++) {
                     if(selected[i]) {
-                        diasSel.add(adapter.getItem(i));
+                        String dia = Dia.getShortDiaFromDia(adapter.getItem(i));
+                        diasSel.add(dia);
                     }
                 }
             }

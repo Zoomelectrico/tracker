@@ -46,6 +46,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAyH0x00OpuFWALfV5OpE2ceuAejOEeanM" />
 
+        <receiver android:name=".notification.NotificationPublisher" />
         <service
             android:name=".notification.MyFirebaseInstanceIDService">
             <intent-filter>

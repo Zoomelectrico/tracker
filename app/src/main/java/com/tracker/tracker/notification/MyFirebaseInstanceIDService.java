@@ -17,6 +17,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
         this.UID = uid;
     }
 
+    public MyFirebaseInstanceIDService() {}
 
     @Override
     public void onTokenRefresh() {
