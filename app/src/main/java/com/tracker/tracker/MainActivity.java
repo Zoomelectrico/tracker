@@ -695,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
-            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
+            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
             this.spinnerLugares.setVisibility(View.GONE);
             txtWelcome.setVisibility(View.GONE);
             txtDestino.setVisibility(View.VISIBLE);
@@ -728,7 +728,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
             findViewById(R.id.layoutContacto).setVisibility(View.GONE);
-            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
+            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
             this.spinnerLugares.setVisibility(View.VISIBLE);
         }
 

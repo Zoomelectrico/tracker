@@ -3,13 +3,17 @@ package com.tracker.tracker.Modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+
+import static android.content.ContentValues.TAG;
 
 public class Rutina implements Parcelable {
 
@@ -189,12 +193,12 @@ public class Rutina implements Parcelable {
         for(Contacto c: seresQueridos){
             contacts.add(c.getId());
         }
-        map.put("contactos", contacts.toArray());
+        map.put("contactos", contacts);
         map.put("destino", this.destino.toMap());
         map.put("id", this.id);
         map.put("nombre", this.nombre);
         HashMap<String, Object> tiempo = new HashMap<>();
-        tiempo.put("dias", this.dias.toArray());
+        tiempo.put("dias", this.dias);
         tiempo.put("hora", this.horaToMap());
         map.put("tiempo", tiempo);
         return map;

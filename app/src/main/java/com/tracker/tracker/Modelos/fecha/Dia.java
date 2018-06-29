@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class Dia {
     private static final String[] diasShort = {"lu", "ma", "mi", "ju", "vi", "sa", "do"};
-    private static final String[] dias = {"lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"};
+    private static final String[] dias = {"lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"};
 
     public static int getCodeFromDiaShort(String diaShort) {
         return Arrays.binarySearch(diasShort, diaShort.toLowerCase());
@@ -48,4 +48,7 @@ public class Dia {
         }
     }
 
+    public static String[] getDias() {
+        return dias;
+    }
 }

@@ -35,7 +35,9 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.rutina = rutinas.get(position);
         holder.nombreRutina.setText(rutinas.get(position).getNombre());
-        holder.direccionRutina.setText(rutinas.get(position).getDestino().getNombre());
+        holder.horaRutina.setText(rutinas.get(position).getHora());
+        holder.diasRutina.setText(String.valueOf(rutinas.get(position).getDias()));
+        holder.direccionRutina.setText(rutinas.get(position).getDestino().getDireccion());
         holder.seresQueridosRutina.setText(String.valueOf(rutinas.get(position).getSeresQueridosName()));
 
         holder.view.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +61,8 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
         @NonNull
         private final View view;
         private final TextView nombreRutina;
+        private final TextView horaRutina;
+        private final TextView diasRutina;
         private final TextView direccionRutina;
         private final TextView seresQueridosRutina;
         public Rutina rutina;
@@ -67,6 +71,8 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
             super(view);
             this.view = view;
             nombreRutina = view.findViewById(R.id.nombreRutina);
+            horaRutina = view.findViewById(R.id.horaRutina);
+            diasRutina = view.findViewById(R.id.diasRutina);
             direccionRutina = view.findViewById(R.id.direccionRutina);
             seresQueridosRutina = view.findViewById(R.id.seresQueridosRutina);
         }

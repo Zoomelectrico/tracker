@@ -33,6 +33,7 @@ import com.tracker.tracker.Modelos.Contacto;
 import com.tracker.tracker.Modelos.Frecuente;
 import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.Modelos.fecha.Dia;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -53,15 +54,20 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
     @Nullable
     private Usuario usuario;
     private ArrayList<Contacto> contactosSel;
+    private ArrayList<String> diasSel;
 
     private TextView txtARCoordenadas;
     private EditText txtARNombre;
+    private EditText txtARHora;
+    private EditText txtARMinuto;
+    private EditText txtARSegundo;
     private String nombreAR;
     private Place place;
     private Frecuente destino;
     private Rutina rutina;
 
-    private MultiSpinner spinnerMultiAR;
+    private MultiSpinner spinnerMultiARSQ;
+    private MultiSpinner spinnerMultiARDias;
 
     @Nullable
     @Override
@@ -91,12 +97,17 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
             }
         };
         this.contactosSel = new ArrayList<>();
-        this.spinnerMultiAR = view.findViewById(R.id.spinnerMultiAR);
+        this.diasSel = new ArrayList<>();
+        this.spinnerMultiARSQ = view.findViewById(R.id.spinnerMultiARSQ);
+        this.spinnerMultiARDias = view.findViewById(R.id.spinnerMultiARDias);
         view.findViewById(R.id.btnARFindPlace).setOnClickListener(listener);
         view.findViewById(R.id.btnAgregarR).setOnClickListener(listener);
         view.findViewById(R.id.btnARCancelar).setOnClickListener(listener);
         this.txtARCoordenadas = view.findViewById(R.id.txtARCoordenadas);
         this.txtARNombre = view.findViewById(R.id.txtARNombre);
+        this.txtARHora = view.findViewById(R.id.txtARHora);
+        this.txtARMinuto = view.findViewById(R.id.txtARMinuto);
+        this.txtARSegundo = view.findViewById(R.id.txtARSegundo);
 
         this.auth = FirebaseAuth.getInstance();
         this.user = this.auth.getCurrentUser();
@@ -107,13 +118,15 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
         this.db.setFirestoreSettings(settings);
         rutinas = db.collection("users/"+ Objects.requireNonNull(user).getUid()+"/rutinas");
 
+        this.spinnerConfigSQ();
+        this.spinnerConfigDias();
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        this.spinnerConfig();
     }
 
     @Override
@@ -130,8 +143,9 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
 
     private void agregarRutina(){
         String nombreAR = String.valueOf(txtARNombre.getText());
+        String horaAR = String.valueOf(txtARHora.getText()) + ":" + String.valueOf(txtARMinuto.getText()) + ":" + String.valueOf(txtARSegundo.getText());
         if(txtARNombre.getText() != null && destino != null && !contactosSel.isEmpty()) {
-            rutina = new Rutina(String.valueOf(txtARNombre.getText()), destino, contactosSel, null, null, true);
+            rutina = new Rutina(String.valueOf(txtARNombre.getText()), destino, contactosSel, diasSel, horaAR, true);
             rutinas.add(rutina.toMap())
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                         @Override
@@ -161,13 +175,13 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
 
     }
 
-    private void spinnerConfig() {
+    private void spinnerConfigSQ() {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
         if(this.usuario.haveContactos()) {
             for (Contacto c : this.usuario.getContactos()) {
                 adapter.add(c.getNombre());
             }
-            this.spinnerMultiAR.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
+            this.spinnerMultiARSQ.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
                 @Override
                 public void onItemsSelected(@NonNull boolean[] selected) {
                     contactosSel.clear();
@@ -184,6 +198,31 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
         }
     }
 
+    private void spinnerConfigDias() {
+        final ArrayList<String> adapterList = new ArrayList<>();
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item);
+        adapter.add("Lunes");
+        adapter.add("Martes");
+        adapter.add("Miércoles");
+        adapter.add("Jueves");
+        adapter.add("Viernes");
+        adapter.add("Sábado");
+        adapter.add("Domingo");
+        for(String a: adapterList){
+            adapter.add(a);
+        }
+        this.spinnerMultiARDias.setAdapter(adapter, false, new MultiSpinner.MultiSpinnerListener() {
+            @Override
+            public void onItemsSelected(@NonNull boolean[] selected) {
+                diasSel.clear();
+                for (int i = 0; i < selected.length; i++) {
+                    if(selected[i]) {
+                        diasSel.add(adapter.getItem(i));
+                    }
+                }
+            }
+        });
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
