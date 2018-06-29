@@ -46,7 +46,7 @@
                 android:textColor="?attr/textColor" />
 
             <EditText
-                android:id="@+id/txtARNombre"
+                android:id="@+id/txtMRNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -65,7 +65,7 @@
                 android:textColor="?attr/textColor" />
 
             <com.thomashaertel.widget.MultiSpinner
-                android:id="@+id/spinnerMultiARSQ"
+                android:id="@+id/spinnerMultiMRSQ"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
@@ -85,7 +85,7 @@
                 android:textColor="?attr/textColor" />
 
             <com.thomashaertel.widget.MultiSpinner
-                android:id="@+id/spinnerMultiARDias"
+                android:id="@+id/spinnerMultiMRDias"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="0dp"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="10dp"
-                android:text="Escoge la hora"
+                android:text="Hora"
                 android:textAlignment="center"
                 android:textColor="?attr/textColor" />
 
@@ -114,7 +114,7 @@
                 android:padding="10dp">
 
                 <EditText
-                    android:id="@+id/txtARHora"
+                    android:id="@+id/txtMRHora"
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:ems="2"
@@ -134,7 +134,7 @@
                     android:textColor="?attr/textColor" />
 
                 <EditText
-                    android:id="@+id/txtARMinuto"
+                    android:id="@+id/txtMRMinuto"
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:ems="2"
@@ -154,7 +154,7 @@
                     android:textColor="?attr/textColor" />
 
                 <EditText
-                    android:id="@+id/txtARSegundo"
+                    android:id="@+id/txtMRSegundo"
                     android:layout_width="75dp"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -168,13 +168,13 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10dp"
                 android:text="@string/labelCoordenadas"
                 android:textAlignment="center"
                 android:textColor="?attr/textColor" />
 
             <TextView
-                android:id="@+id/txtARCoordenadas"
+                android:id="@+id/txtMRDireccion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
@@ -183,7 +183,7 @@
                 android:textSize="9pt" />
 
             <Button
-                android:id="@+id/btnARFindPlace"
+                android:id="@+id/btnMRFindPlace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -200,27 +200,36 @@
                 android:orientation="horizontal">
 
                 <ImageButton
-                    android:id="@+id/btnARCancelar"
+                    android:id="@+id/btnMRCancelar"
                     android:layout_width="60dp"
-                    android:layout_height="45dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="?attr/backgroundColor"
+                    android:background="?attr/selectableItemBackground"
                     android:padding="4dp"
-                    android:src="@drawable/ic_delete"
-                    android:textColor="?attr/textColor" />
+                    android:src="@drawable/ic_delete" />
 
                 <ImageButton
-                    android:id="@+id/btnAgregarR"
+                    android:id="@+id/btnMRAceptar"
                     android:layout_width="60dp"
-                    android:layout_height="45dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="?attr/backgroundColor"
+                    android:background="?attr/selectableItemBackground"
                     android:cropToPadding="false"
                     android:padding="4dp"
-                    android:src="@drawable/ic_confirm_icon"
-                    android:textColor="?attr/textColor" />
+                    android:src="@drawable/ic_confirm_icon" />
+
+                <ImageButton
+
+                    android:id="@+id/btnMREliminar"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_baseline_delete_24px" />
 
             </LinearLayout>
 

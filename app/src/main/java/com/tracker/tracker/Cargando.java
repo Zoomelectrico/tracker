@@ -168,6 +168,7 @@ public class Cargando extends AppCompatActivity {
                                                     if(!task.getResult().isEmpty()) {
                                                         for (DocumentSnapshot document : task.getResult()) {
                                                             Rutina r = Rutina.builder(document, usuario);
+                                                            r.setId(document.getId());
                                                             usuario.addRutina(r);
                                                         }
                                                     }

@@ -347,6 +347,28 @@ public class Usuario implements Parcelable {
         this.rutinas.add(rutina);
     }
 
+    public void modifyRutinaById(String id, Rutina rutina){
+        int i = 0;
+        for(Rutina r: this.getRutinas()){
+            if (r.getId().equals(id)) {
+                rutinas.set(i, rutina);
+                break;
+            }
+            i++;
+        }
+    }
+
+    public void deleteRutinaById(String id){
+        int i = 0;
+        for(Rutina r: this.getRutinas()){
+            if (r.getId().equals(id)) {
+                rutinas.remove(i);
+                break;
+            }
+            i++;
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;

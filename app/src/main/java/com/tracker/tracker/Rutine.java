@@ -10,6 +10,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.tracker.tracker.Modelos.Rutina;
 import com.tracker.tracker.Modelos.Usuario;
@@ -53,7 +54,23 @@ public class Rutine extends AppCompatActivity implements RutineFragment.OnListFr
 
     @Override
     public void onListFragmentInteraction(Rutina item) {
+        Log.e("bla", "El id del item seleccionado es: " + item.getId() );
+        if (item.getId() != null) {
+            Bundle args = new Bundle();
+            args.putParcelable("rutina", item);
+            args.putString("Nombre", item.getNombre());
+            args.putParcelable("Destino", item.getDestino());
+            args.putParcelableArrayList("seresQueridos", item.getSeresQueridos());
+            args.putStringArrayList("dias", item.getDias());
+            args.putString("hora", item.getHora());
+            args.putBoolean("nueva", item.isNueva());
 
+            mRutinasDialog dialog = new mRutinasDialog();
+            dialog.setArguments(args);
+            dialog.show(getFragmentManager(), "mRutinasDialog");
+        } else {
+            Toast.makeText(this, "Espere a que el objeto cargue en la BD", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
