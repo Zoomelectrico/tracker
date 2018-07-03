@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tracker.tracker.Modelos.Rutina;
-import com.tracker.tracker.Modelos.fecha.Dia;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.fecha.Dia;
 import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment.OnListFragmentInteractionListener;
 

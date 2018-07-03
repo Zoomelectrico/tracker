@@ -1,7 +1,6 @@
-package com.tracker.tracker.Modelos.fecha;
+package com.tracker.tracker.modelos.fecha;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Dia {
     private static final String[] diasShort = {"do", "lu", "ma", "mi", "ju", "vi", "sa"};

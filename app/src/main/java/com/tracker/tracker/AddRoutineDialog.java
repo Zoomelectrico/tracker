@@ -29,11 +29,11 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Frecuente;
-import com.tracker.tracker.Modelos.Rutina;
-import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.Modelos.fecha.Dia;
+import com.tracker.tracker.modelos.Contacto;
+import com.tracker.tracker.modelos.Frecuente;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.Usuario;
+import com.tracker.tracker.modelos.fecha.Dia;
 
 import java.util.ArrayList;
 import java.util.Objects;

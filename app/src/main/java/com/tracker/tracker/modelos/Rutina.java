@@ -1,19 +1,15 @@
-package com.tracker.tracker.Modelos;
+package com.tracker.tracker.modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
-
-import static android.content.ContentValues.TAG;
 
 public class Rutina implements Parcelable {
 

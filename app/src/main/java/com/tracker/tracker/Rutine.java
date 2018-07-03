@@ -12,8 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.tracker.tracker.Modelos.Rutina;
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.Usuario;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment;
 
 import java.util.Objects;

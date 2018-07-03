@@ -20,9 +20,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatDelegate;
 import android.telephony.SmsManager;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -63,25 +63,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Frecuente;
-import com.tracker.tracker.Modelos.Rutina;
-import com.tracker.tracker.Modelos.Usuario;
-import com.tracker.tracker.Modelos.fecha.Dia;
-import com.tracker.tracker.Modelos.fecha.Hora;
+import com.tracker.tracker.modelos.Contacto;
+import com.tracker.tracker.modelos.Frecuente;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.Usuario;
+import com.tracker.tracker.modelos.fecha.Dia;
 import com.tracker.tracker.notification.NotificationPublisher;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 
@@ -89,7 +81,7 @@ import java.util.Objects;
  * Controlador de la actividad principal
  * Esta clase configura el menú, permite crear viaje, maneja el tema de la ubicación
  */
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int PLACE_PICKER_REQUEST = 2;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
@@ -135,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Metodo onCreate:
+     *
      * @param savedInstanceState {Bundle}
      */
     @Override
@@ -167,14 +160,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.createLocationRequest();
         this.buildLocationSettingsRequest();
         this.updateUI();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.e("MAIN", "AJA1");
         this.notificationConfig();
+        this.tripRutina(this.getIntent());
         if (!isViajando) {
             this.spinnerConfig();
             this.spinnerLugaresConfig();
@@ -191,67 +183,77 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onPause();
     }
 
+
+    private void tripRutina(Intent intent) {
+        Rutina r = intent.getParcelableExtra("RUTINA");
+        if (r == null) {
+            Log.e("TRIPPPPPPPPP", "NULL");
+        } else {
+            Log.e("TRIPPPPPPP", r.toMap().toString());
+        }
+    }
+
     private void notificationConfig() {
-        Log.e("MAIN", "AJA2");
-        if(this.usuario.haveRutinas()) {
-            Log.e("MAIN", "AJA3");
-            for (Rutina r: this.usuario.getRutinas()) {
-                Log.e("MAIN", "AJA4");
-                this.alarmConfig(r);
+        ArrayList<Intent> notificationIntents = new ArrayList<>();
+        ArrayList<PendingIntent> pendingIntents = new ArrayList<>();
+        if (this.usuario.haveRutinas()) {
+            for (Rutina r : this.usuario.getRutinas()) {
+                for(String d: r.getDias()) {
+                    Calendar now = Calendar.getInstance();
+                    if(Dia.getCodeFromDiaShort(d) == now.get(Calendar.DAY_OF_WEEK)) {
+                        Calendar date = Calendar.getInstance();
+                        String[] horaVec = r.getHora().split(":");
+                        long REF = now.getTimeInMillis() - toMillis(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
+                        date.setTimeInMillis(REF + toMillis(Long.parseLong(horaVec[0]), Long.parseLong(horaVec[1])));
+                        if(now.before(date)) {
+                            Log.e("CONFIGURACION", "AQUI VAMOS");
+                            long futureInMillis = SystemClock.elapsedRealtime() + (date.getTimeInMillis() - now.getTimeInMillis());
+                            this.alarmConfig(r, futureInMillis, notificationIntents, pendingIntents);
+                        }
+                    }
+                }
             }
         }
     }
+
+    private long toMillis(long hour, long min) {
+        return hour * 3600000L + min * 60000;
+    }
+
 
     /**
      * Método alarmConfig
      */
-    private void alarmConfig(Rutina r) {
-        Log.e("MAIN", "AJA5");
+    private void alarmConfig(Rutina r, long delay, ArrayList<Intent> intents, ArrayList<PendingIntent> pendingIntents) {
         Intent notificationIntent = new Intent(this, NotificationPublisher.class);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        notificationIntent.putExtra("NOTIFICATION_ID", 1);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        notificationIntent.putExtra("NOTIFICATION_ID", r.describeContents());
         notificationIntent.putExtra("RUTINA", r);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        Notification notificacion = notificationBuilder(r.getNombre(), pendingIntent);
-        notificationIntent.putExtra("NOTIFICATION", notificacion);
-        long futureInMillis = -1;
-        ArrayList<String> dias = r.getDias();
-        Calendar now = Calendar.getInstance();
-        Calendar date = Calendar.getInstance();
-        for(String s: dias) {
-            Log.e("DIAFOR",s);
-            Log.e("Code", String.valueOf(Dia.getCodeFromDiaShort(s)));
-            Log.e("Code2", String.valueOf(now.get(Calendar.DAY_OF_WEEK)));
-            if(Dia.getCodeFromDiaShort(s) == now.get(Calendar.DAY_OF_WEEK)) {
-                Log.e("MAIN", "AJA6");
-                String[] horaVec = r.getHora().split(":");
-                date.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_WEEK), Integer.parseInt(horaVec[0]), Integer.parseInt(horaVec[1]), Integer.parseInt(horaVec[2]));
-                Log.e("DATE", now.toString());
-                Log.e("DATE2", date.toString());
-                if (now.before(date)) {
-                    futureInMillis = SystemClock.elapsedRealtime() + (date.getTimeInMillis() - now.getTimeInMillis());
-                    Log.e("tiempo", String.valueOf(futureInMillis));
-                } else {
-                    futureInMillis = -1;
-                    Log.e("tiempo", String.valueOf(futureInMillis));
-                }
-                break;
-            }
-        }
-        if (futureInMillis != -1) {
-            Log.e("AJA", String.valueOf(futureInMillis));
-            AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
-            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+        notificationIntent.putExtra("user", usuario);
+        int penIntResCode = 1000;
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, penIntResCode + pendingIntents.size(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification notificacion = notificationBuilder(r.getNombre(), pendingIntent, notificationIntent, penIntResCode + pendingIntents.size());
+        intents.add(notificationIntent);
+        pendingIntents.add(pendingIntent);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        if(alarmManager != null) {
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+            Log.e("ALARM MANAGER", "CONFIGURADO");
         }
     }
 
-    private Notification notificationBuilder(String titulo, PendingIntent intent) {
+    private Notification notificationBuilder(String titulo, PendingIntent pendingIntent, Intent intent, int PID) {
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle(titulo);
         builder.setContentText("Desea Iniciar este viaje");
         builder.setSmallIcon(R.drawable.ic_confirm_icon);
-        builder.setContentIntent(intent);
-        return builder.build();
+        builder.setContentIntent(pendingIntent);
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        builder.setAutoCancel(true);
+        Notification notification = builder.build();
+        intent.putExtra("NOTIFICATION", notification);
+        pendingIntent = PendingIntent.getBroadcast(this, PID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return notification;
     }
 
 

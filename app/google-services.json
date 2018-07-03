@@ -39,16 +39,24 @@
           }
         },
         {
-          "client_id": "767188578624-e4bnm86j46ibf03tj43sojk2cla5fqu2.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
           "client_id": "767188578624-9d19718tr7a8had3jbrpqhn99t9q8ul6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.tracker.tracker",
             "certificate_hash": "316335c654725ed82d7ab788281c71240343eb5f"
           }
+        },
+        {
+          "client_id": "767188578624-nttsadp78q39cufkqf5on28e452ukv8c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tracker.tracker",
+            "certificate_hash": "e322d965ea7b1d9ef0e740f18afc5b9d2069177f"
+          }
+        },
+        {
+          "client_id": "767188578624-e4bnm86j46ibf03tj43sojk2cla5fqu2.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment.OnListFragmentInteractionListener;
-import com.tracker.tracker.Modelos.Contacto;
+import com.tracker.tracker.modelos.Contacto;
 import com.tracker.tracker.R;
 
 import java.util.List;
