@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -189,6 +190,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (r == null) {
             Log.e("TRIPPPPPPPPP", "NULL");
         } else {
+            startLocationUpdates();
+            placeDestination = r.getDestino();
+            contactos = r.getSeresQueridos();
+            isViajando = true;
+            configTrip();
             Log.e("TRIPPPPPPP", r.toMap().toString());
         }
     }
@@ -237,7 +243,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pendingIntents.add(pendingIntent);
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         if(alarmManager != null) {
-            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+            } else {
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+            }
             Log.e("ALARM MANAGER", "CONFIGURADO");
         }
     }
@@ -246,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle(titulo);
         builder.setContentText("Desea Iniciar este viaje");
-        builder.setSmallIcon(R.drawable.ic_confirm_icon);
+        builder.setSmallIcon(R.mipmap.ic_launcher_round);
         builder.setContentIntent(pendingIntent);
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
         builder.setAutoCancel(true);
