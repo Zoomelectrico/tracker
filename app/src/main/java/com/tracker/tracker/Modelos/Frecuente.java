@@ -38,9 +38,9 @@ public class Frecuente implements Parcelable {
         return CREATOR;
     }
 
-    public Frecuente(String Nombre, String placeId, Double Latitud, Double Longitud, String Direccion, boolean isNueva) {
+    public Frecuente(String Nombre, String id, Double Latitud, Double Longitud, String Direccion, boolean isNueva) {
         this.nombre = Nombre;
-        this.placeId = placeId;
+        this.id = id;
         this.latitud = Latitud;
         this.longitud = Longitud;
         this.direccion = Direccion;
@@ -60,12 +60,12 @@ public class Frecuente implements Parcelable {
     @NonNull
     public static Frecuente builder(DocumentSnapshot document) {
         String nombre = document.getString("nombre");
-        String ID = document.getString("placeId");
+        String ID = document.getId();
         double lat = Objects.requireNonNull(document.getGeoPoint("coordenadas")).getLatitude();
-        double log = Objects.requireNonNull(document.getGeoPoint("coordenadas")).getLatitude();
+        double log = Objects.requireNonNull(document.getGeoPoint("coordenadas")).getLongitude();
         String direccion = document.getString("direccion");
         Frecuente f = new Frecuente(nombre, ID, lat, log, direccion, false);
-        f.setId(document.getId());
+        f.setPlaceId(document.getString("placeId"));
         return f;
     }
 

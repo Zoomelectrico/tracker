@@ -59,7 +59,7 @@ public class LugaresFrecuentes extends AppCompatActivity implements LugaresFrecu
 
     @Override
     public void onListFragmentInteraction(@NonNull Frecuente item) {
-        Log.e("bla", "El id del item seleccionado es: " + item.getId() );
+        Log.e("bla", "El id del item seleccionado es: " + item.getLatitud() );
         if (item.getId() != null) {
             Bundle args = new Bundle();
             args.putParcelable("user", user);
