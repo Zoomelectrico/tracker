@@ -166,14 +166,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        this.spinner = findViewById(R.id.spinnerMulti);
-        this.spinnerLugares = findViewById(R.id.spinnerLugares);
         this.notificationConfig();
-        this.tripRutina(this.getIntent());
         if (!isViajando) {
             this.spinnerConfig();
             this.spinnerLugaresConfig();
         }
+        this.tripRutina(this.getIntent());
     }
 
     @Override
@@ -193,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.e("TRIPPPPPPPPP", "NULL");
         } else {
             startLocationUpdates();
+            isLocationEnable = true;
             placeDestination = r.getDestino();
             contactos = r.getSeresQueridos();
             isViajando = true;
@@ -256,12 +255,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Notification notificationBuilder(String titulo, PendingIntent pendingIntent, Intent intent, int PID) {
         Notification.Builder builder = new Notification.Builder(this);
-        builder.setContentTitle(titulo);
-        builder.setContentText("Desea Iniciar este viaje");
+        builder.setContentTitle("Tracker App");
+        builder.setContentText("Su rutina " + titulo + ", ha iniciado");
         builder.setSmallIcon(R.mipmap.ic_launcher_round);
-        builder.setContentIntent(pendingIntent);
         builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        builder.setAutoCancel(true);
         Notification notification = builder.build();
         intent.putExtra("NOTIFICATION", notification);
         pendingIntent = PendingIntent.getBroadcast(this, PID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -791,12 +788,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else {
                     findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.GONE);
                 }
-            } else if (currentLocation == null) {
-                this.configTrip();
-            } else if (placeDestination == null) {
-                this.configTrip();
-            } else {
-
             }
         } else {
             txtWelcome.setVisibility(View.VISIBLE);
