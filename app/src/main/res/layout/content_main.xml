@@ -20,7 +20,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="8dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="0dp"
+            android:paddingRight="8dp"
+            android:paddingLeft="8dp"
             android:background="?attr/backgroundColor">
 
             <android.support.v7.widget.CardView
@@ -70,7 +73,7 @@
             android:orientation="vertical"
             android:padding="8dp"
             android:background="?attr/backgroundColor"
-            android:gravity="center">
+            android:gravity="top">
 
             <android.support.v7.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -104,13 +107,14 @@
                         android:textSize="24sp" />
 
                     <TextView
+                        android:id="@+id/txtLblSpinnerSQ"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="?attr/textColor"
-                        android:textAlignment="center"
-                        android:text="Escoge los Seres Queridos"
                         android:layout_marginBottom="7dp"
-                        android:layout_marginTop="10dp" />
+                        android:layout_marginTop="10dp"
+                        android:text="Escoge los Seres Queridos"
+                        android:textAlignment="center"
+                        android:textColor="?attr/textColor" />
 
                     <com.thomashaertel.widget.MultiSpinner
                         android:id="@+id/spinnerMulti"

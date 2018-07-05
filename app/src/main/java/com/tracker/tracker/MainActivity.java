@@ -38,8 +38,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -122,9 +124,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Nullable
     private Frecuente placeDestination;
     private boolean isViajando = false;
+    private boolean isRutina = false;
     private boolean isLocationEnable = false;
 
     public Usuario usuario;
+
+    private android.support.v7.widget.SwitchCompat  nightModeSwitch;
 
     /**
      * Metodo onCreate:
@@ -166,14 +171,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
-        this.spinner = findViewById(R.id.spinnerMulti);
-        this.spinnerLugares = findViewById(R.id.spinnerLugares);
         this.notificationConfig();
-        this.tripRutina(this.getIntent());
         if (!isViajando) {
             this.spinnerConfig();
             this.spinnerLugaresConfig();
         }
+        this.tripRutina(this.getIntent());
     }
 
     @Override
@@ -192,7 +195,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (r == null) {
             Log.e("TRIPPPPPPPPP", "NULL");
         } else {
+            isRutina = true;
             startLocationUpdates();
+            isLocationEnable = true;
             placeDestination = r.getDestino();
             contactos = r.getSeresQueridos();
             isViajando = true;
@@ -228,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return hour * 3600000L + min * 60000;
     }
 
-
     /**
      * Método alarmConfig
      */
@@ -246,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         if(alarmManager != null) {
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
             } else {
                 alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
             }
@@ -256,18 +260,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Notification notificationBuilder(String titulo, PendingIntent pendingIntent, Intent intent, int PID) {
         Notification.Builder builder = new Notification.Builder(this);
-        builder.setContentTitle(titulo);
-        builder.setContentText("Desea Iniciar este viaje");
+        builder.setContentTitle("Tracker App");
+        builder.setContentText("Su rutina " + titulo + ", ha iniciado");
         builder.setSmallIcon(R.mipmap.ic_launcher_round);
-        builder.setContentIntent(pendingIntent);
-        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-        builder.setAutoCancel(true);
+        builder.setPriority(Notification.PRIORITY_HIGH);
         Notification notification = builder.build();
         intent.putExtra("NOTIFICATION", notification);
         pendingIntent = PendingIntent.getBroadcast(this, PID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return notification;
     }
-
 
     /**
      * Metodo: getUserData: Este metodo se encarga de obtener el Objeto Parcelable del Usuario
@@ -482,6 +483,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 stopLocationUpdates();
+                if(isRutina) {
+                    isRutina = false;
+                }
                 isViajando = false;
                 configTrip();
                 contactos.clear();
@@ -525,6 +529,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
         findViewById(R.id.btnFindPlace).setOnClickListener(listener);
+
+        nightModeSwitch = (android.support.v7.widget.SwitchCompat) header.findViewById(R.id.nightModeSwitch);
+
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            nightModeSwitch.setChecked(true);
+        }
+        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+                MainActivity.this.recreate();
+            }
+        });
     }
 
     /**
@@ -628,6 +649,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void placeArrival() {
         for (Contacto contacto: contactos) {
             this.sendSMS(contacto);
+        }
+        if(isRutina) {
+            isRutina = false;
         }
         isViajando = false;
         stopLocationUpdates();
@@ -768,12 +792,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView txtContactos = findViewById(R.id.txtContactos);
         TextView txtWelcome = findViewById(R.id.txtWelcome);
         if(isViajando) {
+            if(isRutina) {
+                findViewById(R.id.txtLblSpinnerSQ).setVisibility(View.GONE);
+                this.spinner.setVisibility(View.GONE);
+            }
             findViewById(R.id.btnFindPlace).setVisibility(View.GONE);
             findViewById(R.id.btnCancelarViaje).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
-            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
             this.spinnerLugares.setVisibility(View.GONE);
             txtWelcome.setVisibility(View.GONE);
             txtDestino.setVisibility(View.VISIBLE);
@@ -791,12 +819,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else {
                     findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.GONE);
                 }
-            } else if (currentLocation == null) {
-                this.configTrip();
-            } else if (placeDestination == null) {
-                this.configTrip();
-            } else {
-
             }
         } else {
             txtWelcome.setVisibility(View.VISIBLE);
@@ -806,8 +828,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
             findViewById(R.id.layoutContacto).setVisibility(View.GONE);
-            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
+            findViewById(R.id.txtLblSpinnerSQ).setVisibility(View.VISIBLE);
             this.spinnerLugares.setVisibility(View.VISIBLE);
+            this.spinner.setVisibility(View.VISIBLE);
         }
 
     }
@@ -845,32 +869,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
-    }
-
-    /**
-     * Metodo onCreateOptionsMenu:
-     * @param menu {Menu}
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    /**
-     * Metodo onOptionsItemSelected
-     * @param item {MenuItem}
-     */
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), Settings.class);
-            intent.putExtra("user", usuario);
-            startActivityForResult(intent, 0);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     /**

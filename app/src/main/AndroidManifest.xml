@@ -35,7 +35,6 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".AddSerQuerido" />
         <activity android:name=".SeresQueridos" />
-        <activity android:name=".Settings" />
         <activity android:name=".LugaresFrecuentes" />
         <activity android:name=".Rutine" />
 

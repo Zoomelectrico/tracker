@@ -34,15 +34,6 @@ public class Dia {
         return i;
     }
 
-    public static String getDiaShortFromCode(int dia) {
-        if(dia > diasShort.length) {
-            return null;
-        } else if (dia < 0) {
-            return null;
-        } else {
-            return dias[dia];
-        }
-    }
 
     public static String getShortDiaFromDia(String dia) {
         int i;
@@ -73,28 +64,12 @@ public class Dia {
 
     }
 
-    public static String getDiaFromCode(int dia) {
-        if(dia > dias.length) {
-            return null;
-        } else if (dia < 0) {
-            return null;
-        } else {
-            return dias[dia];
-        }
-    }
-
-    public static boolean isTheSame(int diaCode, ArrayList<String> diasShort) {
-        boolean bool = false;
-        for(String s : diasShort){
-            if(Dia.getCodeFromDiaShort(s) == diaCode) {
-                bool = true;
-                break;
-            }
-        }
-        return bool;
-    }
-
     public static String[] getDias() {
         return dias;
     }
+
+    public static String[] getDiasShort() {
+        return diasShort;
+    }
+
 }
