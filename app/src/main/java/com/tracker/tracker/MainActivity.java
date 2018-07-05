@@ -38,8 +38,10 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -125,6 +127,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean isLocationEnable = false;
 
     public Usuario usuario;
+
+    private android.support.v7.widget.SwitchCompat  nightModeSwitch;
 
     /**
      * Metodo onCreate:
@@ -226,7 +230,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return hour * 3600000L + min * 60000;
     }
 
-
     /**
      * Método alarmConfig
      */
@@ -265,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pendingIntent = PendingIntent.getBroadcast(this, PID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return notification;
     }
-
 
     /**
      * Metodo: getUserData: Este metodo se encarga de obtener el Objeto Parcelable del Usuario
@@ -523,6 +525,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
         findViewById(R.id.btnFindPlace).setOnClickListener(listener);
+
+        nightModeSwitch = (android.support.v7.widget.SwitchCompat) header.findViewById(R.id.nightModeSwitch);
+
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+            nightModeSwitch.setChecked(true);
+        }
+        nightModeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                } else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                }
+                MainActivity.this.recreate();
+            }
+        });
     }
 
     /**
@@ -843,32 +862,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
-    }
-
-    /**
-     * Metodo onCreateOptionsMenu:
-     * @param menu {Menu}
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    /**
-     * Metodo onOptionsItemSelected
-     * @param item {MenuItem}
-     */
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), Settings.class);
-            intent.putExtra("user", usuario);
-            startActivityForResult(intent, 0);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     /**
