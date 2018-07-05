@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Nullable
     private Frecuente placeDestination;
     private boolean isViajando = false;
+    private boolean isRutina = false;
     private boolean isLocationEnable = false;
 
     public Usuario usuario;
@@ -190,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (r == null) {
             Log.e("TRIPPPPPPPPP", "NULL");
         } else {
+            isRutina = true;
             startLocationUpdates();
             isLocationEnable = true;
             placeDestination = r.getDestino();
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
         if(alarmManager != null) {
             if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
             } else {
                 alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, delay, pendingIntent);
             }
@@ -258,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         builder.setContentTitle("Tracker App");
         builder.setContentText("Su rutina " + titulo + ", ha iniciado");
         builder.setSmallIcon(R.mipmap.ic_launcher_round);
-        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        builder.setPriority(Notification.PRIORITY_HIGH);
         Notification notification = builder.build();
         intent.putExtra("NOTIFICATION", notification);
         pendingIntent = PendingIntent.getBroadcast(this, PID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -479,6 +481,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 stopLocationUpdates();
+                if(isRutina) {
+                    isRutina = false;
+                }
                 isViajando = false;
                 configTrip();
                 contactos.clear();
@@ -626,6 +631,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (Contacto contacto: contactos) {
             this.sendSMS(contacto);
         }
+        if(isRutina) {
+            isRutina = false;
+        }
         isViajando = false;
         stopLocationUpdates();
         placeDestination = null;
@@ -765,12 +773,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextView txtContactos = findViewById(R.id.txtContactos);
         TextView txtWelcome = findViewById(R.id.txtWelcome);
         if(isViajando) {
+            if(isRutina) {
+                findViewById(R.id.txtLblSpinnerSQ).setVisibility(View.GONE);
+                this.spinner.setVisibility(View.GONE);
+            }
             findViewById(R.id.btnFindPlace).setVisibility(View.GONE);
             findViewById(R.id.btnCancelarViaje).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDestino).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutContacto).setVisibility(View.VISIBLE);
             findViewById(R.id.layoutDistancia).setVisibility(View.VISIBLE);
-            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.GONE);
             this.spinnerLugares.setVisibility(View.GONE);
             txtWelcome.setVisibility(View.GONE);
             txtDestino.setVisibility(View.VISIBLE);
@@ -797,8 +809,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             findViewById(R.id.layoutDestino).setVisibility(View.GONE);
             findViewById(R.id.layoutDistancia).setVisibility(View.GONE);
             findViewById(R.id.layoutContacto).setVisibility(View.GONE);
-            //findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
+            findViewById(R.id.txtDestinoFrecuente).setVisibility(View.VISIBLE);
+            findViewById(R.id.txtLblSpinnerSQ).setVisibility(View.VISIBLE);
             this.spinnerLugares.setVisibility(View.VISIBLE);
+            this.spinner.setVisibility(View.VISIBLE);
         }
 
     }
