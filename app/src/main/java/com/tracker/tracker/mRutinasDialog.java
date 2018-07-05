@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ import com.thomashaertel.widget.MultiSpinner;
 import com.tracker.tracker.modelos.Contacto;
 import com.tracker.tracker.modelos.Frecuente;
 import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.fecha.Dia;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -53,6 +56,9 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
     private EditText txtMRHora;
     private EditText txtMRMinutos;
     private EditText txtMRSegundos;
+
+    private LinearLayout layoutButton;
+    private ProgressBar readyProgressBar;
 
     private ArrayList<Contacto> contactosSel;
     private ArrayList<String> diasSel;
@@ -89,7 +95,9 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         txtMRHora.setText(horaVec[0]);
         txtMRMinutos.setText(horaVec[1]);
         txtMRSegundos.setText(horaVec[2]);
-
+        layoutButton = view.findViewById(R.id.layoutButtons);
+        readyProgressBar = view.findViewById(R.id.readyProgressBar);
+        readyProgressBar.setVisibility(View.GONE);
 
         this.contactosSel = new ArrayList<>();
         this.diasSel = new ArrayList<>();
@@ -111,7 +119,9 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
                         }
                         break;
                     case R.id.btnMRAceptar:
-                        modificaMR();
+                        if(confirmValues()){
+                            modificaMR();
+                        }
                         break;
                     case R.id.btnMRCancelar:
                         getDialog().dismiss();
@@ -201,7 +211,8 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
                 diasSel.clear();
                 for (int i = 0; i < selected.length; i++) {
                     if(selected[i]) {
-                        diasSel.add(adapter.getItem(i));
+                        String diaShort = Dia.getShortDiaFromDia(adapter.getItem(i).toString());
+                        diasSel.add(diaShort);
                     }
                 }
             }
@@ -213,6 +224,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
      * del dispositivo como en Firebase.
      */
     public void modificaMR(){
+        modificarUI();
         if(this.rutina.getId()!=null && txtMRNombre.getText().length()>0 && destino!=null && txtMRHora.getText().length()>0 && txtMRMinutos.getText().length()>0
                 && txtMRSegundos.getText().length()>0){
             this.rutina.setNombre(String.valueOf(this.txtMRNombre.getText()));
@@ -248,18 +260,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         } else {
             Toast.makeText(getActivity(), "Ha habido un problema.", Toast.LENGTH_LONG).show();
         }
-        if (txtMRNombre.getText().length() <= 0) {
-            txtMRNombre.setError("El campo de nombre no puede estar vacío");
-        }
-        if (txtMRHora.getText().length() <= 0) {
-            txtMRHora.setError("El campo de nombre no puede estar vacío");
-        }
-        if (txtMRMinutos.getText().length() <= 0) {
-            txtMRMinutos.setError("El campo de nombre no puede estar vacío");
-        }
-        if (txtMRSegundos.getText().length() <= 0) {
-            txtMRSegundos.setError("El campo de nombre no puede estar vacío");
-        }
+
     }
 
     /**
@@ -271,7 +272,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
             @Override
             public void onSuccess(Void aVoid) {
                 Log.e(TAG, "DocumentSnapshot successfully deleted!");
-                ((Rutine)getActivity()).user.deleteRutinaById(rutina.getId());
+
                 getDialog().dismiss();
                 getActivity().recreate();
                 Toast.makeText(getActivity(), "Lugar Frecuente eliminado.", Toast.LENGTH_LONG).show();
@@ -284,6 +285,48 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
                         Toast.makeText(getActivity(), "Operación fallida.", Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void modificarUI(){
+        layoutButton.setVisibility(View.GONE);
+        readyProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private boolean confirmValues(){
+        boolean checked = true;
+        if (txtMRNombre.getText().length() <= 0) {
+            checked = false;
+            txtMRNombre.setError("El campo de nombre no puede estar vacío");
+        }
+        if (txtMRHora.getText().length() <= 0) {
+            checked = false;
+            txtMRHora.setError("El campo de hora no puede estar vacío");
+        } else {
+            Log.e(TAG, "confirmValues: El numero de hora es : " + Integer.parseInt(String.valueOf(txtMRHora.getText())) );
+            if(Integer.parseInt(String.valueOf(txtMRHora.getText()))>23 || Integer.parseInt(String.valueOf(txtMRHora.getText()))<0 ){
+                checked = false;
+                txtMRHora.setError("Debe seleccionar un valor entre las 0 hrs y las 24 hrs");
+            }
+        }
+        if (txtMRMinutos.getText().length() <= 0) {
+            checked = false;
+            txtMRMinutos.setError("El campo de minutos no puede estar vacío");
+        } else {
+            if(Integer.parseInt(String.valueOf(txtMRMinutos.getText()))>59 || Integer.parseInt(String.valueOf(txtMRMinutos.getText()))<0 ){
+                checked = false;
+                txtMRMinutos.setError("Debe seleccionar un valor entre los 0 y 59");
+            }
+        }
+        if (txtMRSegundos.getText().length() <= 0) {
+            checked = false;
+            txtMRSegundos.setError("El campo de segundos no puede estar vacío");
+        } else {
+            if (Integer.parseInt(String.valueOf(txtMRSegundos.getText())) > 59 || Integer.parseInt(String.valueOf(txtMRSegundos.getText())) < 0) {
+                checked = false;
+                txtMRSegundos.setError("Debe seleccionar un valor entre los 0 y 59");
+            }
+        }
+        return checked;
     }
 
     @Override
