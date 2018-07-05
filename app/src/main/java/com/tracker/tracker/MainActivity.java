@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
+        this.spinner = findViewById(R.id.spinnerMulti);
+        this.spinnerLugares = findViewById(R.id.spinnerLugares);
         this.notificationConfig();
         this.tripRutina(this.getIntent());
         if (!isViajando) {
