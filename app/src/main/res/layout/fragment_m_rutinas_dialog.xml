@@ -194,6 +194,7 @@
                 android:textColor="?attr/textColor" />
 
             <LinearLayout
+                android:id="@+id/layoutButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -232,6 +233,12 @@
                     android:src="@drawable/ic_baseline_delete_24px" />
 
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/readyProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
 
         </LinearLayout>
