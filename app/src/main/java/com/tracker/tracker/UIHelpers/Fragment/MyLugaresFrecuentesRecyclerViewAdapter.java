@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.LugaresFrecuentesFragment.OnListFragmentInteractionListener;
-import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.modelos.Frecuente;
 
 import java.util.List;
 

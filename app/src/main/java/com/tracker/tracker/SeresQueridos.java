@@ -9,8 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Contacto;
+import com.tracker.tracker.modelos.Usuario;
 import com.tracker.tracker.UIHelpers.Fragment.ContactoFragment;
 
 import java.util.Objects;

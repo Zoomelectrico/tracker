@@ -1,4 +1,4 @@
-package com.tracker.tracker.Modelos;
+package com.tracker.tracker.modelos;
 
 import android.os.Parcel;
 import android.os.Parcelable;

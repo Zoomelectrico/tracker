@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.modelos.Frecuente;
 
 import java.util.Objects;
 

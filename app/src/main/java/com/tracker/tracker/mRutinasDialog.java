@@ -1,14 +1,11 @@
 package com.tracker.tracker;
 
 import android.app.DialogFragment;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,9 +29,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.thomashaertel.widget.MultiSpinner;
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Frecuente;
-import com.tracker.tracker.Modelos.Rutina;
+import com.tracker.tracker.modelos.Contacto;
+import com.tracker.tracker.modelos.Frecuente;
+import com.tracker.tracker.modelos.Rutina;
 
 import java.util.ArrayList;
 import java.util.Objects;

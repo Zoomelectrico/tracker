@@ -2,12 +2,14 @@ package com.tracker.tracker.UIHelpers.Fragment;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.tracker.tracker.Modelos.Rutina;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.fecha.Dia;
 import com.tracker.tracker.R;
 import com.tracker.tracker.UIHelpers.Fragment.RutineFragment.OnListFragmentInteractionListener;
 
@@ -36,16 +38,28 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
         holder.rutina = rutinas.get(position);
         holder.nombreRutina.setText(rutinas.get(position).getNombre());
         holder.horaRutina.setText(rutinas.get(position).getHora());
-        holder.diasRutina.setText(String.valueOf(rutinas.get(position).getDias()));
+        StringBuilder sb = new StringBuilder();
+        for (String s :rutinas.get(position).getDias()) {
+            sb.append(Dia.getDiaFromDiaShort(s));
+            Log.e("DIA", s);
+            sb.append(", ");
+        }
+        String dias = sb.toString();
+        dias = dias.substring(0, dias.length() - 2);
+        holder.diasRutina.setText(dias);
         holder.direccionRutina.setText(rutinas.get(position).getDestino().getDireccion());
-        holder.seresQueridosRutina.setText(String.valueOf(rutinas.get(position).getSeresQueridosName()));
-
+        sb = new StringBuilder();
+        for (String s: rutinas.get(position).getSeresQueridosName()) {
+            sb.append(s);
+            sb.append(", ");
+        }
+        String contactos = sb.toString();
+        contactos = contactos.substring(0, contactos.length() - 2 );
+        holder.seresQueridosRutina.setText(contactos);
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != listener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
                     listener.onListFragmentInteraction(holder.rutina);
                 }
             }

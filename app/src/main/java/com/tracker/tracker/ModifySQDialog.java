@@ -24,7 +24,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Usuario;
 
 import java.util.HashMap;
 import java.util.Map;

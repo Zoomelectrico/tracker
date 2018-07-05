@@ -12,9 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Usuario;
 import com.tracker.tracker.R;
-import com.tracker.tracker.Modelos.Frecuente;
+import com.tracker.tracker.modelos.Frecuente;
 
 import java.util.ArrayList;
 import java.util.List;

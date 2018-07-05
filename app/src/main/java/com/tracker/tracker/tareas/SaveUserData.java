@@ -6,10 +6,10 @@ import android.support.annotation.Nullable;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.tracker.tracker.Modelos.Contacto;
-import com.tracker.tracker.Modelos.Frecuente;
-import com.tracker.tracker.Modelos.Rutina;
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Contacto;
+import com.tracker.tracker.modelos.Frecuente;
+import com.tracker.tracker.modelos.Rutina;
+import com.tracker.tracker.modelos.Usuario;
 
 import java.util.HashMap;
 

@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import com.tracker.tracker.Modelos.Usuario;
+import com.tracker.tracker.modelos.Usuario;
 
 import java.util.Objects;
 
