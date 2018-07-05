@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.tracker.tracker.MainActivity;
@@ -13,7 +14,7 @@ import com.tracker.tracker.modelos.Usuario;
 public class NotificationPublisher extends BroadcastReceiver {
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(@NonNull Context context, @NonNull Intent intent) {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         Rutina rutina = intent.getParcelableExtra("RUTINA");
         Notification notification = intent.getParcelableExtra("NOTIFICATION");

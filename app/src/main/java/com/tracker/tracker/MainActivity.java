@@ -530,7 +530,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         findViewById(R.id.btnFindPlace).setOnClickListener(listener);
 
-        nightModeSwitch = (android.support.v7.widget.SwitchCompat) header.findViewById(R.id.nightModeSwitch);
+        nightModeSwitch = header.findViewById(R.id.nightModeSwitch);
 
         if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
             nightModeSwitch.setChecked(true);

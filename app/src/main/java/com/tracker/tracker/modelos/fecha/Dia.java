@@ -1,5 +1,7 @@
 package com.tracker.tracker.modelos.fecha;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class Dia {
@@ -35,7 +37,7 @@ public class Dia {
     }
 
 
-    public static String getShortDiaFromDia(String dia) {
+    public static String getShortDiaFromDia(@NonNull String dia) {
         int i;
         for (i = 0; i < dias.length; i++) {
             if(dia.equalsIgnoreCase(dias[i])) {
@@ -64,10 +66,12 @@ public class Dia {
 
     }
 
+    @NonNull
     public static String[] getDias() {
         return dias;
     }
 
+    @NonNull
     public static String[] getDiasShort() {
         return diasShort;
     }

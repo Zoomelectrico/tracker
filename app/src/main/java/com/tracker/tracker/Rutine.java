@@ -53,7 +53,7 @@ public class Rutine extends AppCompatActivity implements RutineFragment.OnListFr
     }
 
     @Override
-    public void onListFragmentInteraction(Rutina item) {
+    public void onListFragmentInteraction(@NonNull Rutina item) {
         Log.e("bla", "El id del item seleccionado es: " + item.getId() );
         if (item.getId() != null) {
             Bundle args = new Bundle();
