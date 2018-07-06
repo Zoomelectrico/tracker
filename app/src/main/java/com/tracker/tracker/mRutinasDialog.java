@@ -12,10 +12,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +57,6 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
     private EditText txtMRNombre;
     private EditText txtMRHora;
     private EditText txtMRMinutos;
-    private EditText txtMRSegundos;
 
     private LinearLayout layoutButton;
     private ProgressBar readyProgressBar;
@@ -65,6 +66,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
 
     private MultiSpinner spinnerMultiMRSQ;
     private MultiSpinner spinnerMultiMRDias;
+    private Spinner spinnerMAMPM;
 
 
     private static final int PLACE_PICKER_REQUEST = 2;
@@ -73,6 +75,8 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
 
     @Nullable
     private Rutina rutina;
+
+    private Boolean isAM;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -88,13 +92,11 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
                 this.getArguments().getStringArrayList("dias"), this.getArguments().getString("hora"), this.getArguments().getBoolean("nueva"));*/
         txtMRHora = view.findViewById(R.id.txtMRHora);
         txtMRMinutos = view.findViewById(R.id.txtMRMinuto);
-        txtMRSegundos = view.findViewById(R.id.txtMRSegundo);
         txtMRNombre.setText(rutina.getNombre());
         txtMRDireccion.setText(rutina.getDestino().getDireccion());
         String[] horaVec = this.rutina.getHora().split(":");
         txtMRHora.setText(horaVec[0]);
         txtMRMinutos.setText(horaVec[1]);
-        txtMRSegundos.setText(horaVec[2]);
         layoutButton = view.findViewById(R.id.layoutButtons);
         readyProgressBar = view.findViewById(R.id.readyProgressBar);
         readyProgressBar.setVisibility(View.GONE);
@@ -103,6 +105,8 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         this.diasSel = new ArrayList<>();
         this.spinnerMultiMRSQ = view.findViewById(R.id.spinnerMultiMRSQ);
         this.spinnerMultiMRDias = view.findViewById(R.id.spinnerMultiMRDias);
+        this.isAM = true;
+        this.spinnerMAMPM = view.findViewById(R.id.spinnerMAMPM);
 
         // Especificación de las funciones que se desarrollaran al hacer click en algun boton especifico
         View.OnClickListener listener = new View.OnClickListener() {
@@ -142,6 +146,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
 
         this.spinnerConfigSQ();
         this.spinnerConfigDias();
+        this.spinnerConfigTiempo();
 
         /*
          * Especificaciones de la base de datos
@@ -219,14 +224,36 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         });
     }
 
+    private void spinnerConfigTiempo() {
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_ampm);
+        adapter.add("AM");
+        adapter.add("PM");
+        this.spinnerMAMPM.setAdapter(adapter);
+        this.spinnerMAMPM.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 1){
+                    Log.e(TAG, "onItemSelected: Esto es " + adapter.getItem(position) );
+                    isAM = false;
+                } else {
+                    isAM = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
     /**
      * modificarMLF: permite modificar un LugarFrecuente tanto en la lista de LugaresFrecuentes
      * del dispositivo como en Firebase.
      */
     public void modificaMR(){
         modificarUI();
-        if(this.rutina.getId()!=null && txtMRNombre.getText().length()>0 && destino!=null && txtMRHora.getText().length()>0 && txtMRMinutos.getText().length()>0
-                && txtMRSegundos.getText().length()>0){
+        if(this.rutina.getId()!=null && txtMRNombre.getText().length()>0 && destino!=null && txtMRHora.getText().length()>0 && txtMRMinutos.getText().length()>0){
             this.rutina.setNombre(String.valueOf(this.txtMRNombre.getText()));
             this.rutina.setDestino(destino);
             if(!contactosSel.isEmpty()){
@@ -235,7 +262,12 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
             if(!diasSel.isEmpty()){
                 this.rutina.setDias(diasSel);
             }
-            this.rutina.setHora(String.valueOf(this.txtMRHora.getText()) + ":" + String.valueOf(this.txtMRMinutos.getText()) + ":" + String.valueOf(this.txtMRSegundos.getText()));
+            if(!isAM){
+                String horaChange = String.valueOf(Integer.parseInt(String.valueOf(this.txtMRHora.getText())) + 12);
+                this.rutina.setHora(horaChange + ":" + String.valueOf(this.txtMRMinutos.getText()) + ":" + "00");
+            } else {
+                this.rutina.setHora(String.valueOf(this.txtMRHora.getText()) + ":" + String.valueOf(this.txtMRMinutos.getText()) + ":" + "00");
+            }
 
             final AppCompatActivity act = (AppCompatActivity) this.getActivity();
 
@@ -268,11 +300,12 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
      * del dispositivo como en Firebase.
      */
     private void eliminarR(){
+        modificarUI();
         this.rutinas.document(Objects.requireNonNull(rutina.getId())).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
                 Log.e(TAG, "DocumentSnapshot successfully deleted!");
-
+                ((Rutine)getActivity()).user.deleteRutinaById(rutina.getId());
                 getDialog().dismiss();
                 getActivity().recreate();
                 Toast.makeText(getActivity(), "Lugar Frecuente eliminado.", Toast.LENGTH_LONG).show();
@@ -303,9 +336,9 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
             txtMRHora.setError("El campo de hora no puede estar vacío");
         } else {
             Log.e(TAG, "confirmValues: El numero de hora es : " + Integer.parseInt(String.valueOf(txtMRHora.getText())) );
-            if(Integer.parseInt(String.valueOf(txtMRHora.getText()))>23 || Integer.parseInt(String.valueOf(txtMRHora.getText()))<0 ){
+            if(Integer.parseInt(String.valueOf(txtMRHora.getText()))>12 || Integer.parseInt(String.valueOf(txtMRHora.getText()))<0 ){
                 checked = false;
-                txtMRHora.setError("Debe seleccionar un valor entre las 0 hrs y las 24 hrs");
+                txtMRHora.setError("Debe seleccionar un valor entre las 0 hrs y las 12 hrs");
             }
         }
         if (txtMRMinutos.getText().length() <= 0) {
@@ -315,15 +348,6 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
             if(Integer.parseInt(String.valueOf(txtMRMinutos.getText()))>59 || Integer.parseInt(String.valueOf(txtMRMinutos.getText()))<0 ){
                 checked = false;
                 txtMRMinutos.setError("Debe seleccionar un valor entre los 0 y 59");
-            }
-        }
-        if (txtMRSegundos.getText().length() <= 0) {
-            checked = false;
-            txtMRSegundos.setError("El campo de segundos no puede estar vacío");
-        } else {
-            if (Integer.parseInt(String.valueOf(txtMRSegundos.getText())) > 59 || Integer.parseInt(String.valueOf(txtMRSegundos.getText())) < 0) {
-                checked = false;
-                txtMRSegundos.setError("Debe seleccionar un valor entre los 0 y 59");
             }
         }
         return checked;
