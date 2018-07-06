@@ -242,11 +242,7 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         this.spinnerMAMPM.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(adapter.getItem(position).equals("PM")){
-                    isAM = false;
-                } else {
-                    isAM = true;
-                }
+                isAM = !adapter.getItem(position).equals("PM");
             }
 
             @Override
