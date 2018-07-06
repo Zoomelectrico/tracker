@@ -95,7 +95,13 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         txtMRNombre.setText(rutina.getNombre());
         txtMRDireccion.setText(rutina.getDestino().getDireccion());
         String[] horaVec = this.rutina.getHora().split(":");
-        txtMRHora.setText(horaVec[0]);
+        isAM = true;
+        if(Integer.parseInt(horaVec[0])>12){
+            txtMRHora.setText(String.valueOf(Integer.parseInt(horaVec[0]) - 12));
+            isAM = false;
+        } else {
+            txtMRHora.setText(horaVec[0]);
+        }
         txtMRMinutos.setText(horaVec[1]);
         layoutButton = view.findViewById(R.id.layoutButtons);
         readyProgressBar = view.findViewById(R.id.readyProgressBar);
@@ -105,7 +111,6 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
         this.diasSel = new ArrayList<>();
         this.spinnerMultiMRSQ = view.findViewById(R.id.spinnerMultiMRSQ);
         this.spinnerMultiMRDias = view.findViewById(R.id.spinnerMultiMRDias);
-        this.isAM = true;
         this.spinnerMAMPM = view.findViewById(R.id.spinnerMAMPM);
 
         // Especificación de las funciones que se desarrollaran al hacer click en algun boton especifico
@@ -226,14 +231,18 @@ public class mRutinasDialog extends DialogFragment implements NavigationView.OnN
 
     private void spinnerConfigTiempo() {
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_ampm);
-        adapter.add("AM");
-        adapter.add("PM");
+        if(isAM){
+            adapter.add("AM");
+            adapter.add("PM");
+        } else {
+            adapter.add("PM");
+            adapter.add("AM");
+        }
         this.spinnerMAMPM.setAdapter(adapter);
         this.spinnerMAMPM.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position == 1){
-                    Log.e(TAG, "onItemSelected: Esto es " + adapter.getItem(position) );
+                if(adapter.getItem(position).equals("PM")){
                     isAM = false;
                 } else {
                     isAM = true;
