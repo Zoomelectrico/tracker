@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,6 +49,9 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
     private EditText txtModifyNombre, txtModifyPhone;
     private ImageButton btnEditarSQ, btnCancelar, btnEliminarSQ;
 
+    private LinearLayout layoutMSQButton;
+    private ProgressBar readyMSQProgressBar;
+
     /**
      * Método OnCreate, especifica que al crear el dialogo, la información del serQuerido
      * seleccionado se muestre en los campos de nombre y telefono para su posterior modificación
@@ -80,6 +85,10 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
         btnEditarSQ.setOnClickListener(this);
         btnEliminarSQ.setOnClickListener(this);
         btnCancelar.setOnClickListener(this);
+
+        layoutMSQButton = view.findViewById(R.id.layoutMSQButtons);
+        readyMSQProgressBar = view.findViewById(R.id.readyMSQProgressBar);
+        readyMSQProgressBar.setVisibility(View.GONE);
         return view;
     }
 
@@ -104,6 +113,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void modificarSQ(){
+        modificarUI();
         final Context ActivityContext = getActivity();
         final AppCompatActivity act = (AppCompatActivity) this.getActivity();
 
@@ -139,6 +149,7 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
      * Muestra un Toast indicando el éxito o fracaso de la operación
      */
     private void eliminarSQ(){
+        modificarSQ();
         ((SeresQueridos)getActivity()).user.eliminarContacto(Objects.requireNonNull(this.getArguments().getString("Nombre")), Objects.requireNonNull(this.getArguments().getString("Telf")));
 
         db.collection("users").document(Objects.requireNonNull(this.user).getUid()).collection("contactos")
@@ -160,5 +171,10 @@ public class ModifySQDialog extends DialogFragment implements View.OnClickListen
         });
         getDialog().dismiss();
         this.getActivity().recreate();
+    }
+
+    private void modificarUI(){
+        layoutMSQButton.setVisibility(View.GONE);
+        readyMSQProgressBar.setVisibility(View.VISIBLE);
     }
 }

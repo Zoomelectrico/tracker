@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +51,9 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
     private Place place;
     private Frecuente destino;
 
+    private LinearLayout layoutALFButton;
+    private ProgressBar readyALFProgressBar;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +85,9 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
         view.findViewById(R.id.btnALFCancelar).setOnClickListener(listener);
         this.txtLFCoordenadas = view.findViewById(R.id.txtLFCoordenadas);
         this.txtLFNombre = view.findViewById(R.id.txtLFNombre);
+        layoutALFButton = view.findViewById(R.id.layoutALFButtons);
+        readyALFProgressBar = view.findViewById(R.id.readyALFProgressBar);
+        readyALFProgressBar.setVisibility(View.GONE);
         /*
          * Ocultar el boton de seleccionar destino si ya se pasa desde el MainActivity
          */
@@ -137,6 +145,7 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
      */
 
     private void agregarLugarFrecuente(){
+        modificarUI();
         nombreLF = String.valueOf(this.txtLFNombre.getText());
         final Boolean haveDestino = this.getArguments().getBoolean("haveDestino");
         if(nombreLF.length() > 0 && destino != null) {
@@ -173,6 +182,11 @@ public class AddLugarFrecuenteDialog extends DialogFragment implements Navigatio
             Toast.makeText(getActivity(), "Por favor, escoja un destino", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void modificarUI(){
+        layoutALFButton.setVisibility(View.GONE);
+        readyALFProgressBar.setVisibility(View.VISIBLE);
     }
 
 }

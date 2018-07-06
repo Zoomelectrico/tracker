@@ -13,6 +13,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +47,9 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
     private TextView txtMLFDireccion;
     private EditText txtMLFNombre;
 
+    private LinearLayout layoutMLFButton;
+    private ProgressBar readyMLFProgressBar;
+
     private static final int PLACE_PICKER_REQUEST = 2;
     private Place place;
     private Frecuente destino;
@@ -59,6 +64,9 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
         txtMLFNombre = view.findViewById(R.id.txtMLFNombre);
         txtMLFNombre.setText(this.getArguments().getString("Nombre"));
         txtMLFDireccion.setText(String.valueOf(this.getArguments().getString("Direccion")));
+        layoutMLFButton = view.findViewById(R.id.layoutMLFButtons);
+        readyMLFProgressBar = view.findViewById(R.id.readyMLFProgressBar);
+        readyMLFProgressBar.setVisibility(View.GONE);
         // Creacion de un Destino a partir de los datos del LugarFrecuente que fue seleccionado
         this.destino = new Frecuente(String.valueOf(this.txtMLFNombre.getText()), this.getArguments().getString("PlaceId"),
                 this.getArguments().getDouble("Latitud"), this.getArguments().getDouble("Longitud"), this.getArguments().getString("Direccion"), false);
@@ -140,6 +148,7 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
      * del dispositivo como en Firebase.
      */
     public void modificaMLF(){
+        modificarUI();
         if(this.getArguments().getString("id")!=null){
 
             this.destino.setNombre(String.valueOf(this.txtMLFNombre.getText()));
@@ -176,6 +185,7 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
      * del dispositivo como en Firebase.
      */
     private void eliminarLF(){
+        modificarUI();
         this.frecuentes.document(Objects.requireNonNull(this.getArguments().getString("id"))).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
@@ -193,5 +203,10 @@ public class mLugarFrecuenteDialog extends DialogFragment implements NavigationV
                         Toast.makeText(getActivity(), "Operación fallida.", Toast.LENGTH_LONG).show();
                     }
                 });
+    }
+
+    private void modificarUI(){
+        layoutMLFButton.setVisibility(View.GONE);
+        readyMLFProgressBar.setVisibility(View.VISIBLE);
     }
 }
