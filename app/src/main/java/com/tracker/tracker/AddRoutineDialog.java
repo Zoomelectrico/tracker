@@ -11,8 +11,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,8 +70,13 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
     private Frecuente destino;
     private Rutina rutina;
 
+    private LinearLayout layoutAButton;
+    private ProgressBar readyAProgressBar;
+
     private MultiSpinner spinnerMultiARSQ;
     private MultiSpinner spinnerMultiARDias;
+    private Spinner spinnerAAMPM;
+    private Boolean isAM;
 
     @Nullable
     @Override
@@ -88,7 +97,9 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
                         }
                         break;
                     case R.id.btnAgregarR:
-                        agregarRutina();
+                        if(confirmValues()){
+                            agregarRutina();
+                        }
                         break;
                     case R.id.btnARCancelar:
                         getDialog().dismiss();
@@ -107,7 +118,11 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
         this.txtARNombre = view.findViewById(R.id.txtARNombre);
         this.txtARHora = view.findViewById(R.id.txtARHora);
         this.txtARMinuto = view.findViewById(R.id.txtARMinuto);
-        this.txtARSegundo = view.findViewById(R.id.txtARSegundo);
+        layoutAButton = view.findViewById(R.id.layoutAButtons);
+        readyAProgressBar = view.findViewById(R.id.readyAProgressBar);
+        readyAProgressBar.setVisibility(View.GONE);
+
+        this.spinnerAAMPM = view.findViewById(R.id.spinnerAAMPM);
 
         this.auth = FirebaseAuth.getInstance();
         this.user = this.auth.getCurrentUser();
@@ -120,6 +135,7 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
 
         this.spinnerConfigSQ();
         this.spinnerConfigDias();
+        this.spinnerConfigTiempo();
 
         return view;
     }
@@ -142,8 +158,15 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
     }
 
     private void agregarRutina(){
+        modificarUI();
         String nombreAR = String.valueOf(txtARNombre.getText());
-        String horaAR = String.valueOf(txtARHora.getText()) + ":" + String.valueOf(txtARMinuto.getText()) + ":" + String.valueOf(txtARSegundo.getText());
+        String horaAR = null;
+        if(!isAM){
+            String horaChange = String.valueOf(Integer.parseInt(String.valueOf(this.txtARHora.getText())) + 12);
+            horaAR = horaChange + ":" + String.valueOf(this.txtARMinuto.getText()) + ":" + "00";
+        } else {
+            horaAR = String.valueOf(txtARHora.getText()) + ":" + String.valueOf(txtARMinuto.getText()) + ":" + "00";
+        }
         if(txtARNombre.getText() != null && destino != null && !contactosSel.isEmpty()) {
             rutina = new Rutina(String.valueOf(txtARNombre.getText()), destino, contactosSel, diasSel, horaAR, true);
             rutinas.add(rutina.toMap())
@@ -220,6 +243,63 @@ public class AddRoutineDialog extends DialogFragment implements NavigationView.O
             }
         });
     }
+
+    private void spinnerConfigTiempo() {
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.spinner_ampm);
+        adapter.add("AM");
+        adapter.add("PM");
+        this.spinnerAAMPM.setAdapter(adapter);
+        this.spinnerAAMPM.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position == 1){
+                    Log.e(TAG, "onItemSelected: Esto es " + adapter.getItem(position) );
+                    isAM = false;
+                } else {
+                    isAM = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void modificarUI(){
+        layoutAButton.setVisibility(View.GONE);
+        readyAProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private boolean confirmValues(){
+        boolean checked = true;
+        if (txtARNombre.getText().length() <= 0) {
+            checked = false;
+            txtARNombre.setError("El campo de nombre no puede estar vacío");
+        }
+        if (txtARHora.getText().length() <= 0) {
+            checked = false;
+            txtARHora.setError("El campo de hora no puede estar vacío");
+        } else {
+            Log.e(TAG, "confirmValues: El numero de hora es : " + Integer.parseInt(String.valueOf(txtARHora.getText())) );
+            if(Integer.parseInt(String.valueOf(txtARHora.getText()))>12 || Integer.parseInt(String.valueOf(txtARHora.getText()))<0 ){
+                checked = false;
+                txtARHora.setError("Debe seleccionar un valor entre las 0 hrs y las 12 hrs");
+            }
+        }
+        if (txtARMinuto.getText().length() <= 0) {
+            checked = false;
+            txtARMinuto.setError("El campo de minutos no puede estar vacío");
+        } else {
+            if(Integer.parseInt(String.valueOf(txtARMinuto.getText()))>59 || Integer.parseInt(String.valueOf(txtARMinuto.getText()))<0 ){
+                checked = false;
+                txtARMinuto.setError("Debe seleccionar un valor entre los 0 y 59");
+            }
+        }
+        return checked;
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
