@@ -7,20 +7,23 @@
     app:cardCornerRadius="0dp"
     app:cardElevation="1dp"
     app:cardMaxElevation="1dp"
-    app:cardPreventCornerOverlap="true">
+    app:cardPreventCornerOverlap="true"
+    android:background="?attr/backgroundColor">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:background="?attr/backgroundColor">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_weight="3"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?attr/backgroundColor">
 
             <TextView
                 android:id="@+id/nombreRutina"
@@ -30,7 +33,7 @@
                 android:text="Rutina"
                 android:textAlignment="center"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -41,7 +44,7 @@
                 android:layout_marginTop="8dp"
                 android:text="06:30:00"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp" />
 
             <TextView
@@ -51,7 +54,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Lunes, Martes, Miercoles"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="16sp" />
 
             <TextView
@@ -61,7 +64,7 @@
                 android:layout_marginTop="4dp"
                 android:text="dirección"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp" />
 
             <TextView
@@ -71,7 +74,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Ser Querido 1, Ser Queridos 2"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp" />
         </LinearLayout>
     </LinearLayout>

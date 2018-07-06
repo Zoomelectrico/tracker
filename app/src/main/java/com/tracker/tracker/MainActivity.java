@@ -426,8 +426,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fabAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, "Esta Funcionalidad no esta Disponible", Toast.LENGTH_SHORT).show();
-                // TODO: Navegar a la actividad para agregar ubicacion
+                Intent intent = new Intent(MainActivity.this, LugaresFrecuentes.class);
+                intent.putExtra("user", usuario);
+                startActivity(intent);
+                finish();
+
             }
         });
 
@@ -809,15 +812,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             txtContactos.setVisibility(View.VISIBLE);
             txtContactos.setText(getContactosText());
             if(placeDestination != null && currentLocation != null) {
-                txtDestino.setText(placeDestination.getNombre());
+                if(placeDestination.getNombre() == null) {
+                    txtDestino.setText("Viaje de Rutina");
+                } else {
+                    txtDestino.setText(placeDestination.getNombre());
+                }
                 Location destination = new Location("Google Place");
                 destination.setLatitude(this.placeDestination.getLatitud());
                 destination.setLongitude(this.placeDestination.getLongitud());
                 txtDistance.setText(String.valueOf(destination.distanceTo(currentLocation)));
-                if(!placeDestination.getFrecuente()){
-                    findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.GONE);
+                if(placeDestination != null) {
+                    if(!placeDestination.getFrecuente()){
+                        findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.VISIBLE);
+                    } else {
+                        findViewById(R.id.btnAddLugarFrecuente).setVisibility(View.GONE);
+                    }
                 }
             }
         } else {
@@ -887,22 +896,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case R.id.rutine:
                     intent = new Intent(this, Rutine.class);
                     intent.putExtra("user", usuario);
-                    finish();
+                    //finish();
                     break;
                 case R.id.frecuent_place:
                     intent = new Intent(this, LugaresFrecuentes.class);
                     intent.putExtra("user", usuario);
-                    finish();
+                    //finish();
                     break;
                 case R.id.add_seres:
                     intent = new Intent(this, AddSerQuerido.class);
                     intent.putExtra("user", usuario);
-                    finish();
+                    //finish();
                     break;
                 case R.id.seres:
                     intent = new Intent(this, SeresQueridos.class);
                     intent.putExtra("user", usuario);
-                    finish();
+                    //finish();
                     break;
                 case R.id.logout:
                     this.auth.signOut();

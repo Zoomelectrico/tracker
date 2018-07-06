@@ -3,6 +3,7 @@ package com.tracker.tracker.modelos;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.GeoPoint;
@@ -49,7 +50,8 @@ public class Rutina implements Parcelable {
     public static Rutina builder(@NonNull final DocumentSnapshot document, @NonNull Usuario u) {
         String nombre = document.getString("nombre");
         GeoPoint coordenadas = document.getGeoPoint("destino.coordenadas");
-        Frecuente f = new Frecuente(document.getString("destino.nombre"), document.getString("destino.placeId"), Objects.requireNonNull(coordenadas).getLatitude(), coordenadas.getLongitude(), document.getString("destino.direccion"),false);
+        Object o = document.get("destino.nombre");
+        Frecuente f = new Frecuente((String) o, document.getString("destino.placeId"), Objects.requireNonNull(coordenadas).getLatitude(), coordenadas.getLongitude(), document.getString("destino.direccion"),false);
         Object objContacto = document.get("contactos");
         ArrayList<Contacto> sq = new ArrayList<>();
         if (objContacto instanceof ArrayList) {

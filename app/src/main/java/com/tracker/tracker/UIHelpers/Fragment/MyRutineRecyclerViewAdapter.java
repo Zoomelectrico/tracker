@@ -37,7 +37,14 @@ public class MyRutineRecyclerViewAdapter extends RecyclerView.Adapter<MyRutineRe
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.rutina = rutinas.get(position);
         holder.nombreRutina.setText(rutinas.get(position).getNombre());
-        holder.horaRutina.setText(rutinas.get(position).getHora());
+        String horaVec[] = rutinas.get(position).getHora().split(":");
+        if (Integer.parseInt(horaVec[0]) > 12) {
+            String hora = String.valueOf(Integer.parseInt(horaVec[0])-12) + ":" + horaVec[1] + " pm";
+            holder.horaRutina.setText(hora);
+        } else {
+            String hora = horaVec[0] + ":" + horaVec[1] + " am";
+            holder.horaRutina.setText(hora);
+        }
         StringBuilder sb = new StringBuilder();
         for (String s :rutinas.get(position).getDias()) {
             sb.append(Dia.getDiaFromDiaShort(s));

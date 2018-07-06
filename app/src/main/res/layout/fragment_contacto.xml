@@ -8,13 +8,15 @@
     app:cardMaxElevation="1dp"
     app:cardElevation="0.7dp"
     app:cardPreventCornerOverlap="true"
-    android:layout_marginBottom="1dp">
+    android:layout_marginBottom="1dp"
+    android:background="?attr/backgroundColor">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:background="?attr/backgroundColor">
 
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="wrap_content"
@@ -23,14 +25,15 @@
             android:layout_gravity="start"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:layout_weight="3">
+            android:layout_weight="3"
+            android:background="?attr/backgroundColor">
 
             <TextView
                 android:id="@+id/item_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:text="Jose Quevedo"/>
@@ -41,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:textAppearance="?attr/textAppearanceListItem"
-                android:textColor="@color/black"
+                android:textColor="?attr/textColor"
                 android:textSize="18sp"
                 android:text="04121331439"/>
 

@@ -54,7 +54,7 @@
                 android:layout_marginTop="15dp"
                 android:text="@string/labelDireccion"
                 android:textAlignment="center"
-                android:textColor="?attr/textColor" />
+                android:textColor="@color/black" />
 
             <TextView
                 android:id="@+id/txtMLFDireccion"
@@ -63,7 +63,7 @@
                 android:layout_marginBottom="15dp"
                 android:ems="10"
                 android:textAlignment="center"
-                android:textColor="?attr/textColor"
+                android:textColor="@color/black"
                 android:textSize="9pt" />
 
             <Button

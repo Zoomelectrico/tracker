@@ -60,9 +60,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="?attr/buttonColor"
+            android:textColorHint="?attr/lowContrastTextColor"
             android:ems="10"
             android:hint="04245555555"
-            android:textColorHint="?attr/lowContrastTextColor"
             android:inputType="phone"
             android:padding="8dp" />
 
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:background="?attr/cardColor"
+            android:background="?attr/colorAccent"
             android:textColor="?attr/textColor"
             android:onClick="onClick"
             android:padding="8dp"
