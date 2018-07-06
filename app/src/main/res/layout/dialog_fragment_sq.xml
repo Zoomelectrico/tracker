@@ -62,6 +62,7 @@
                 android:padding="8dp" />
 
             <LinearLayout
+                android:id="@+id/layoutMSQButtons"
                 android:layout_width="match_parent"
                 android:layout_height="75dp"
                 android:layout_marginTop="5dp"
@@ -101,6 +102,11 @@
 
             </LinearLayout>
 
+            <ProgressBar
+                android:id="@+id/readyMSQProgressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
